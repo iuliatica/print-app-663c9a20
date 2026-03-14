@@ -944,6 +944,23 @@ export default function Home() {
                                   </span>
                                 )}
                               </p>
+                              {/* Color analysis per file */}
+                              {item.pages != null && (item.printMode ?? "bw") === "color" && item.colorAnalysis && (
+                                <p className="mt-0.5 text-xs text-slate-500">
+                                  <span className="inline-flex items-center gap-1">
+                                    <span className="inline-block h-2 w-2 rounded-full bg-blue-500" />
+                                    <span className="font-semibold text-blue-600">{item.colorAnalysis.colorPages}</span> color
+                                  </span>
+                                  <span className="mx-1 text-slate-300">·</span>
+                                  <span className="inline-flex items-center gap-1">
+                                    <span className="inline-block h-2 w-2 rounded-full bg-slate-400" />
+                                    <span className="font-semibold text-slate-600">{item.colorAnalysis.bwPages}</span> alb-negru
+                                  </span>
+                                </p>
+                              )}
+                              {item.pages != null && (item.printMode ?? "bw") === "color" && !item.colorAnalysis && (
+                                <p className="mt-0.5 text-xs text-amber-600">Toate paginile taxate ca color</p>
+                              )}
                               {/* Price per file */}
                               {item.pages != null && (
                                 <p className="mt-0.5 text-xs font-semibold text-blue-600 tabular-nums">
