@@ -440,8 +440,8 @@ export default function Home() {
         0
       );
       const opts = groupOptions[groupIndex] ?? defaultGroupOpts;
-      if (groupPages > 0 && opts.spiralType === "plastic") {
-        sum += groupPages <= SPIRAL_PAGE_THRESHOLD ? SPIRAL_PLASTIC_UP_TO_200 : SPIRAL_PLASTIC_OVER_200;
+      if (groupPages > 0 && opts.spiralType === "spirala") {
+        sum += SPIRAL_PRICE;
       }
     });
     return sum;
