@@ -838,8 +838,6 @@ export default function Home() {
                 Acceptă mai multe fișiere · Doar PDF · Max 50 MB per fișier
               </p>
             </label>
-
-            <FAQ />
           </div>
         ) : (
           <>
@@ -852,19 +850,19 @@ export default function Home() {
                   onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                   onDragLeave={() => setIsDragging(false)}
                   onDrop={onDrop}
-                  className={`mb-4 flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed px-4 py-3 transition-all duration-200 ${
+                  className={`mb-4 flex cursor-pointer items-center gap-3 border-2 border-dashed px-5 py-4 transition-all duration-200 ${
                     isDragging
                       ? "border-blue-500 bg-blue-50/90"
-                      : "border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/40"
+                      : "border-blue-300 bg-blue-50/50 hover:border-blue-400 hover:bg-blue-50/80"
                   }`}
                 >
                   <input ref={fileInputRef} type="file" accept="application/pdf" multiple onChange={onFileInput} className="hidden" />
-                  <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${isDragging ? "bg-blue-100 text-blue-600" : "bg-slate-100 text-slate-500"}`}>
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${isDragging ? "bg-blue-200 text-blue-700" : "bg-blue-100 text-blue-600"}`}>
                     <Plus className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-slate-700">Adaugă fișiere PDF</p>
-                    <p className="text-xs text-slate-500">Trage aici sau click</p>
+                    <p className="text-sm font-semibold text-blue-700">+ Adaugă alte fișiere PDF</p>
+                    <p className="text-xs text-blue-600/70">Trage aici sau click pentru a selecta</p>
                   </div>
                 </label>
 
@@ -1072,17 +1070,24 @@ export default function Home() {
                         };
                         return (
                           <div key={file.id}>
-                            <div className="mb-4 flex items-center gap-2">
-                              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
-                                <Printer className="h-4 w-4" />
+                            <div className="mb-5 flex items-start gap-3">
+                              <span className="flex h-10 w-10 shrink-0 items-center justify-center bg-blue-100 text-blue-600">
+                                <Printer className="h-5 w-5" />
                               </span>
                               <div className="min-w-0 flex-1">
                                 <h3 className="text-sm font-semibold text-slate-800">Opțiuni de printare</h3>
-                                <p className="truncate text-xs font-medium text-slate-600" title={file.name}>{file.name}</p>
+                                <p className="truncate text-sm font-medium text-slate-600 mt-0.5" title={file.name}>{file.name}</p>
                                 {file.pages != null && (
-                                  <p className="text-xs text-slate-500">
-                                    {file.pages} pagini · <span className="font-semibold text-blue-600">{calculateFilePrice(file).toFixed(2)} lei</span>
-                                  </p>
+                                  <div className="mt-2 flex items-center gap-3">
+                                    <span className="inline-flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 text-sm font-bold text-slate-800">
+                                      <FileText className="h-4 w-4 text-slate-500" />
+                                      {file.pages} pagini
+                                    </span>
+                                    <span className="inline-flex items-center gap-1.5 bg-blue-100 px-3 py-1.5 text-sm font-bold text-blue-700">
+                                      <CreditCard className="h-4 w-4 text-blue-500" />
+                                      {calculateFilePrice(file).toFixed(2)} lei
+                                    </span>
+                                  </div>
                                 )}
                               </div>
                             </div>
@@ -1268,29 +1273,33 @@ export default function Home() {
                 </section>
 
                 {/* Summary */}
-                <section className="rounded-2xl bg-gradient-to-br from-blue-50/80 to-slate-50/80 p-4 ring-1 ring-slate-200/60 sm:p-5">
+                <section className="bg-gradient-to-br from-blue-50/80 to-slate-50/80 p-4 ring-1 ring-slate-200/60 sm:p-5">
                   <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Rezumat</p>
-                  <p className="mt-1 text-sm text-slate-700">
-                    <span className="font-semibold text-slate-800">{totalPages}</span> pagini
-                    {totalPages > 0 ? (
+                  <div className="mt-2 flex flex-wrap items-center gap-3">
+                    <span className="inline-flex items-center gap-1.5 bg-slate-100 px-3 py-2 text-base font-bold text-slate-800">
+                      <FileText className="h-4 w-4 text-slate-500" />
+                      {totalPages} pagini
+                    </span>
+                    {totalPages > 0 && (
                       <>
-                        <span className="mx-1.5 text-slate-400">·</span>
-                        <span className="font-semibold text-blue-600">{totalPrice.toFixed(2)} lei</span> printare
-                        <span className="mx-1.5 text-slate-400">·</span>
-                        <span className="font-semibold text-slate-800">{totalWithShipping.toFixed(2)} lei</span> total (incl. {SHIPPING_COST_LEI} lei transport)
-                      </>
-                    ) : (
-                      <>
-                        <span className="mx-1.5 text-slate-400">·</span>
-                        <span className="text-slate-500">Transport: {SHIPPING_COST_LEI} lei</span>
+                        <span className="inline-flex items-center gap-1.5 bg-blue-100 px-3 py-2 text-base font-bold text-blue-700">
+                          <CreditCard className="h-4 w-4 text-blue-500" />
+                          {totalPrice.toFixed(2)} lei printare
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 bg-slate-800 px-3 py-2 text-base font-bold text-white">
+                          {totalWithShipping.toFixed(2)} lei total
+                        </span>
                       </>
                     )}
-                  </p>
+                    {totalPages === 0 && (
+                      <span className="text-sm text-slate-500">Transport: {SHIPPING_COST_LEI} lei</span>
+                    )}
+                  </div>
                   {detectedColorPages > 0 && (
-                    <p className="mt-1.5 text-xs text-slate-600">
-                      Detectat: <span className="font-semibold text-blue-600">{detectedColorPages} color</span>
-                      <span className="mx-1 text-slate-400">·</span>
-                      <span className="font-semibold text-slate-700">{detectedBwPages} alb-negru</span>
+                    <p className="mt-2 text-sm text-slate-600">
+                      Detectat: <span className="font-bold text-blue-600">{detectedColorPages} color</span>
+                      <span className="mx-1.5 text-slate-400">·</span>
+                      <span className="font-bold text-slate-700">{detectedBwPages} alb-negru</span>
                     </p>
                   )}
                   {orderSuccess && <p className="mt-1.5 text-xs font-medium text-green-700">{orderSuccess}</p>}
@@ -1298,6 +1307,7 @@ export default function Home() {
                 </section>
               </div>
             </div>
+
           </>
         )}
 
@@ -1347,6 +1357,11 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* FAQ - always visible */}
+        <div className="mx-auto max-w-2xl">
+          <FAQ />
+        </div>
       </div>
 
       {/* ═══ Checkout modal ═══ */}
