@@ -932,7 +932,7 @@ export default function Home() {
                                 {item.pages != null ? (
                                   <span>
                                     {item.pages} pag. · {item.copies ?? 1} {(item.copies ?? 1) > 1 ? "copii" : "copie"} ·{" "}
-                                    {(item.printMode ?? "bw") === "color" ? "Color" : "A/N"}
+                                    {(item.printMode ?? "bw") === "color" ? "Color" : "Alb-negru"}
                                     {item.duplex ? " · Duplex" : ""}
                                   </span>
                                 ) : item.error ? (
