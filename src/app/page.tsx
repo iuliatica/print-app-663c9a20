@@ -533,7 +533,6 @@ export default function Home() {
         return {
           spiralType: opts.spiralType,
           ...(opts.spiralType !== "none" && { spiralColor: opts.spiralColor }),
-          coverFrontColor: opts.coverFrontColor,
           coverBackColor: opts.coverBackColor,
         };
       });
@@ -549,8 +548,8 @@ export default function Home() {
         bindingOptions: validBindingOptions,
         spiralType: validBindingOptions[0]?.spiralType ?? "none",
         ...(validBindingOptions[0]?.spiralType !== "none" && { spiralColor: validBindingOptions[0].spiralColor }),
-        coverFrontColor: validBindingOptions[0]?.coverFrontColor ?? "transparent",
-        coverBackColor: validBindingOptions[0]?.coverBackColor ?? "transparent",
+        coverFrontColor: "transparent",
+        coverBackColor: validBindingOptions[0]?.coverBackColor ?? "negru",
       };
 
       const orderRes = await fetch("/api/orders", {
