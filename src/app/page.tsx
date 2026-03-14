@@ -25,9 +25,7 @@ const PRICE_BW_ONE_SIDE = 0.25;
 const PRICE_BW_DUPLEX = 0.35;
 const PRICE_COLOR_ONE_SIDE = 1.5;
 const PRICE_COLOR_DUPLEX = 2.5;
-const SPIRAL_PLASTIC_UP_TO_200 = 3;
-const SPIRAL_PLASTIC_OVER_200 = 5;
-const SPIRAL_PAGE_THRESHOLD = 200;
+const SPIRAL_PRICE = 3;
 const SHIPPING_COST_LEI = 15;
 
 /** Limită mărime fișier PDF (50 MB). */
@@ -90,16 +88,15 @@ function validateShipping(form: ShippingForm): ShippingErrors {
 }
 
 type PrintMode = "color" | "bw";
-type SpiralType = "none" | "plastic" | "perforare2" | "capsare";
-type SpiralColorOption = "negru" | "alb" | "albastru" | "rosu";
-type CoverColor = "transparent" | "alb" | "negru" | "albastru";
+type SpiralType = "none" | "spirala" | "perforare2" | "capsare";
+type SpiralColorOption = "negru" | "alb";
+type CoverBackColor = "negru" | "alb" | "albastru_inchis" | "galben" | "rosu" | "verde";
 
 type OrderSuccessGroup = {
   files: { name: string; pages: number | null; printMode: string; duplex: boolean; copies: number }[];
   spiralType: SpiralType;
   spiralColor: SpiralColorOption;
-  coverFrontColor: CoverColor;
-  coverBackColor: CoverColor;
+  coverBackColor: CoverBackColor;
 };
 
 type OrderSuccessDetails = {
@@ -175,8 +172,7 @@ export default function Home() {
   const defaultGroupOpts = {
     spiralType: "none" as SpiralType,
     spiralColor: "negru" as SpiralColorOption,
-    coverFrontColor: "transparent" as CoverColor,
-    coverBackColor: "transparent" as CoverColor,
+    coverBackColor: "negru" as CoverBackColor,
   };
   const [groupOptions, setGroupOptions] = useState<Record<number, typeof defaultGroupOpts>>({});
   const bindingGroups = useMemo(() => getBindingGroups(files), [files]);
@@ -188,7 +184,6 @@ export default function Home() {
 
   const spiralType = selectedGroupIndex !== null ? (groupOptions[selectedGroupIndex] ?? defaultGroupOpts).spiralType : defaultGroupOpts.spiralType;
   const spiralColor = selectedGroupIndex !== null ? (groupOptions[selectedGroupIndex] ?? defaultGroupOpts).spiralColor : defaultGroupOpts.spiralColor;
-  const coverFrontColor = selectedGroupIndex !== null ? (groupOptions[selectedGroupIndex] ?? defaultGroupOpts).coverFrontColor : defaultGroupOpts.coverFrontColor;
   const coverBackColor = selectedGroupIndex !== null ? (groupOptions[selectedGroupIndex] ?? defaultGroupOpts).coverBackColor : defaultGroupOpts.coverBackColor;
 
   const updateSelectedGroupOptions = useCallback((patch: Partial<typeof defaultGroupOpts>) => {
@@ -445,8 +440,8 @@ export default function Home() {
         0
       );
       const opts = groupOptions[groupIndex] ?? defaultGroupOpts;
-      if (groupPages > 0 && opts.spiralType === "plastic") {
-        sum += groupPages <= SPIRAL_PAGE_THRESHOLD ? SPIRAL_PLASTIC_UP_TO_200 : SPIRAL_PLASTIC_OVER_200;
+      if (groupPages > 0 && opts.spiralType === "spirala") {
+        sum += SPIRAL_PRICE;
       }
     });
     return sum;
@@ -454,23 +449,17 @@ export default function Home() {
   const totalPrice = pagePrice + spiralPrice;
   const totalWithShipping = totalPrice + SHIPPING_COST_LEI;
 
-  const coverColors: {
-    value: CoverColor;
+  const coverBackColors: {
+    value: CoverBackColor;
     label: string;
     circleClass: string;
   }[] = [
-    {
-      value: "transparent",
-      label: "Fără copertă",
-      circleClass: "bg-slate-100 border-2 border-dashed border-slate-300",
-    },
-    {
-      value: "alb",
-      label: "Alb",
-      circleClass: "bg-white border border-slate-200 shadow-inner",
-    },
     { value: "negru", label: "Negru", circleClass: "bg-slate-800" },
-    { value: "albastru", label: "Albastru", circleClass: "bg-blue-500" },
+    { value: "alb", label: "Alb", circleClass: "bg-white border border-slate-200 shadow-inner" },
+    { value: "albastru_inchis", label: "Albastru închis", circleClass: "bg-blue-900" },
+    { value: "galben", label: "Galben", circleClass: "bg-yellow-400" },
+    { value: "rosu", label: "Roșu", circleClass: "bg-red-500" },
+    { value: "verde", label: "Verde", circleClass: "bg-green-600" },
   ];
 
   const spiralColorOptions: {
@@ -480,8 +469,6 @@ export default function Home() {
   }[] = [
     { value: "negru", label: "Negru", circleClass: "bg-slate-800" },
     { value: "alb", label: "Alb", circleClass: "bg-white border border-slate-200 shadow-inner" },
-    { value: "albastru", label: "Albastru", circleClass: "bg-blue-500" },
-    { value: "rosu", label: "Roșu", circleClass: "bg-red-500" },
   ];
 
   const selectedGroupPages =
@@ -493,7 +480,7 @@ export default function Home() {
       : totalPages;
   const spiralOptions: { value: SpiralType; label: string; icon: React.ReactNode; description: string }[] = [
     { value: "none", label: "Doar print", icon: <BookOpen className="h-8 w-8" />, description: "Fără legare, doar printare" },
-    { value: "plastic", label: "Spiralare", icon: <Circle className="h-8 w-8" />, description: selectedGroupPages <= SPIRAL_PAGE_THRESHOLD ? "3 lei" : "5 lei" },
+    { value: "spirala", label: "Spiralare", icon: <Circle className="h-8 w-8" />, description: "3 lei" },
     { value: "perforare2", label: "Perforare 2 găuri", icon: <BookMarked className="h-8 w-8" />, description: "Perforare dosar cu 2 găuri" },
     { value: "capsare", label: "Capsare (max 240 coli)", icon: <CheckCircle2 className="h-8 w-8" />, description: "Capsare colț / lateral (maxim 240 coli)" },
   ];
@@ -546,7 +533,6 @@ export default function Home() {
         return {
           spiralType: opts.spiralType,
           ...(opts.spiralType !== "none" && { spiralColor: opts.spiralColor }),
-          coverFrontColor: opts.coverFrontColor,
           coverBackColor: opts.coverBackColor,
         };
       });
@@ -562,8 +548,8 @@ export default function Home() {
         bindingOptions: validBindingOptions,
         spiralType: validBindingOptions[0]?.spiralType ?? "none",
         ...(validBindingOptions[0]?.spiralType !== "none" && { spiralColor: validBindingOptions[0].spiralColor }),
-        coverFrontColor: validBindingOptions[0]?.coverFrontColor ?? "transparent",
-        coverBackColor: validBindingOptions[0]?.coverBackColor ?? "transparent",
+        coverFrontColor: "transparent",
+        coverBackColor: validBindingOptions[0]?.coverBackColor ?? "negru",
       };
 
       const orderRes = await fetch("/api/orders", {
@@ -585,7 +571,7 @@ export default function Home() {
       if (paymentMethod === "ramburs") {
         setOrderSuccessDetails({
           paymentMethod: "ramburs",
-          groups: validBindingGroups.map((grp, groupIndex) => {
+            groups: validBindingGroups.map((grp, groupIndex) => {
             const opts = validBindingOptions[groupIndex] ?? defaultGroupOpts;
             return {
               files: grp.filesInGroup.map((f) => ({
@@ -597,8 +583,7 @@ export default function Home() {
               })),
               spiralType: opts.spiralType,
               spiralColor: opts.spiralColor ?? "negru",
-              coverFrontColor: opts.coverFrontColor,
-              coverBackColor: opts.coverBackColor,
+              coverBackColor: opts.coverBackColor ?? "negru",
             };
           }),
           totalPages,
@@ -615,10 +600,7 @@ export default function Home() {
       fileUrls.forEach((url, i) => {
         fileUrlMeta[`file_url_${i}`] = url;
       });
-      const coverColorSummary =
-        coverFrontColor === "transparent" && coverBackColor === "transparent"
-          ? ""
-          : `fata:${coverFrontColor};spate:${coverBackColor}`;
+      const coverColorSummary = `fata:transparent;spate:${coverBackColor}`;
       const amountBani = Math.round(totalWithShipping * 100);
       const res = await fetch("/api/checkout", {
         method: "POST",
@@ -698,12 +680,8 @@ export default function Home() {
                     <p className="mt-0.5 font-semibold text-blue-600 tabular-nums">{PRICE_COLOR_DUPLEX} lei</p>
                   </div>
                   <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-1.5 py-1 sm:px-2 sm:py-1.5">
-                    <p className="text-slate-600 leading-tight truncate">Plast. ≤{SPIRAL_PAGE_THRESHOLD}</p>
-                    <p className="mt-0.5 font-semibold text-slate-800 tabular-nums">{SPIRAL_PLASTIC_UP_TO_200} lei</p>
-                  </div>
-                  <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-1.5 py-1 sm:px-2 sm:py-1.5">
-                    <p className="text-slate-600 leading-tight truncate">Plast. &gt;{SPIRAL_PAGE_THRESHOLD}</p>
-                    <p className="mt-0.5 font-semibold text-slate-800 tabular-nums">{SPIRAL_PLASTIC_OVER_200} lei</p>
+                    <p className="text-slate-600 leading-tight truncate">Spiralare</p>
+                    <p className="mt-0.5 font-semibold text-slate-800 tabular-nums">{SPIRAL_PRICE} lei</p>
                   </div>
                 </div>
               </div>
@@ -1208,7 +1186,7 @@ export default function Home() {
               </div>
             </div>
 
-            {spiralType === "plastic" && (
+            {spiralType === "spirala" && (
               <div className="space-y-4">
                 <div>
                   <p className="mb-2 text-sm font-medium text-slate-700">
@@ -1248,34 +1226,7 @@ export default function Home() {
                   <p className="mb-2 text-sm font-medium text-slate-700">
                     Copertă față
                   </p>
-                  <div className="flex flex-wrap items-center gap-4">
-                    {coverColors.map(({ value, label, circleClass }) => (
-                      <label
-                        key={value}
-                        className="flex cursor-pointer flex-col items-center gap-2"
-                        title={label}
-                      >
-                        <input
-                          type="radio"
-                          name="coverFrontColor"
-                          value={value}
-                          checked={coverFrontColor === value}
-                          onChange={() => updateSelectedGroupOptions({ coverFrontColor: value })}
-                          className="sr-only"
-                        />
-                        <span
-                          className={`flex h-11 w-11 shrink-0 rounded-full transition-all duration-200 hover:scale-110 ${
-                            coverFrontColor === value
-                              ? "ring-4 ring-blue-500 ring-offset-2"
-                              : "ring-2 ring-transparent ring-offset-2 hover:ring-slate-300"
-                          } ${circleClass}`}
-                        />
-                        <span className="text-xs font-medium text-slate-600">
-                          {label}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
+                  <p className="text-sm text-slate-600 italic">Transparent (standard)</p>
                 </div>
 
                 <div>
@@ -1283,7 +1234,7 @@ export default function Home() {
                     Copertă spate
                   </p>
                   <div className="flex flex-wrap items-center gap-4">
-                    {coverColors.map(({ value, label, circleClass }) => (
+                    {coverBackColors.map(({ value, label, circleClass }) => (
                       <label
                         key={value}
                         className="flex cursor-pointer flex-col items-center gap-2"
@@ -1461,11 +1412,11 @@ export default function Home() {
                           <p>
                             <span className="font-medium text-slate-700">{isSingleDoc ? "Legare:" : "Legare (acest grup):"}</span>{" "}
                             {group.spiralType === "none" && "Doar print"}
-                            {group.spiralType === "plastic" && (
+                            {group.spiralType === "spirala" && (
                               <>
                                 Spiralare{group.spiralColor ? ` · Culoare ${group.spiralColor}` : ""}
                                 {" · "}
-                                Copertă față: {group.coverFrontColor === "transparent" ? "Fără" : group.coverFrontColor} · Copertă spate: {group.coverBackColor === "transparent" ? "Fără" : group.coverBackColor}
+                                Copertă față: Transparent · Copertă spate: {coverBackColors.find(c => c.value === group.coverBackColor)?.label ?? group.coverBackColor}
                               </>
                             )}
                             {group.spiralType === "perforare2" && "Perforare cu 2 găuri"}
@@ -1525,8 +1476,8 @@ export default function Home() {
                     const opts = groupOptions[group.groupIndex] ?? defaultGroupOpts;
                     const spiralLabel = spiralOptions.find((o) => o.value === opts.spiralType)?.label ?? "Fără spirală";
                     const spiralColorLabel = opts.spiralType !== "none" ? spiralColorOptions.find((c) => c.value === opts.spiralColor)?.label ?? opts.spiralColor : null;
-                    const coverFrontLabel = coverColors.find((c) => c.value === opts.coverFrontColor)?.label ?? "—";
-                    const coverBackLabel = coverColors.find((c) => c.value === opts.coverBackColor)?.label ?? "—";
+                    const coverFrontLabel = "Transparent";
+                    const coverBackLabel = coverBackColors.find((c) => c.value === opts.coverBackColor)?.label ?? opts.coverBackColor;
                     const isSingleDoc = group.filesInGroup.length === 1;
                     return (
                       <li key={group.groupIndex} className="border-b border-slate-200 pb-4 last:border-0 last:pb-0">
@@ -1949,7 +1900,7 @@ export default function Home() {
                           <span className="text-xs font-medium">{label}</span>
                           <span className="text-[11px] opacity-80">
                             {value === "none" && "Doar print"}
-                            {value === "plastic" && "Spiralare"}
+                            {value === "spirala" && "Spiralare"}
                             {value === "perforare2" && "Perforare 2 găuri"}
                             {value === "capsare" && "Capsare (max 240 coli)"}
                           </span>
@@ -1992,28 +1943,7 @@ export default function Home() {
                         <p className="mb-2 text-sm font-medium text-slate-800">
                           Copertă față
                         </p>
-                        <div className="flex flex-wrap items-center gap-3">
-                          {coverColors.map(({ value, label, circleClass }) => (
-                            <button
-                              key={value}
-                              type="button"
-                              onClick={() => updateSelectedGroupOptions({ coverFrontColor: value })}
-                              className="flex flex-col items-center gap-1 text-xs"
-                              title={label}
-                            >
-                              <span
-                                className={`flex h-9 w-9 shrink-0 rounded-full transition-all duration-200 ${
-                                  coverFrontColor === value
-                                    ? "ring-3 ring-blue-500 ring-offset-2"
-                                    : "ring-2 ring-transparent ring-offset-2 hover:ring-slate-300"
-                                } ${circleClass}`}
-                              />
-                              <span className="text-[11px] text-slate-600">
-                                {label}
-                              </span>
-                            </button>
-                          ))}
-                        </div>
+                        <p className="text-sm text-slate-600 italic">Transparent (standard)</p>
                       </div>
 
                       <div>
@@ -2021,7 +1951,7 @@ export default function Home() {
                           Copertă spate
                         </p>
                         <div className="flex flex-wrap items-center gap-3">
-                          {coverColors.map(({ value, label, circleClass }) => (
+                          {coverBackColors.map(({ value, label, circleClass }) => (
                             <button
                               key={value}
                               type="button"
