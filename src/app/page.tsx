@@ -1172,7 +1172,7 @@ export default function Home() {
                     <div className="mt-5 space-y-5 border-t border-slate-200 pt-5">
                       <div>
                         <p className="mb-3 text-sm font-semibold text-slate-700">
-                          Tip legare
+                          Finisare document
                           {selectedGroupIndex !== null && bindingGroups[selectedGroupIndex]?.filesInGroup.length > 1 && (
                             <span className="ml-2 font-normal text-slate-500 text-xs">
                               ({bindingGroups[selectedGroupIndex].filesInGroup.length} fișiere legate)
