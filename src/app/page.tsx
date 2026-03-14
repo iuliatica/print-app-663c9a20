@@ -1374,7 +1374,28 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ═══ Checkout modal ═══ */}
+      {/* ═══ Sticky CTA bar on mobile ═══ */}
+      {files.length > 0 && totalPages > 0 && !checkoutModalOpen && !orderSuccessDetails && (
+        <div className="fixed bottom-0 inset-x-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur-sm px-4 py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] lg:hidden">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-lg font-bold text-slate-900 tabular-nums">{totalWithShipping.toFixed(2)} lei</p>
+              <p className="text-xs text-slate-500 truncate">{totalPages} pag. · incl. {SHIPPING_COST_LEI} lei transport</p>
+            </div>
+            <button
+              type="button"
+              onClick={handleOpenCheckout}
+              disabled={isCheckoutLoading}
+              className="flex shrink-0 items-center gap-2 bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-blue-600/20 transition-all hover:bg-blue-700 disabled:opacity-50"
+            >
+              <CreditCard className="h-4 w-4" />
+              Finalizează
+            </button>
+          </div>
+        </div>
+      )}
+
+
       {checkoutModalOpen && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 px-4 py-6 backdrop-blur-sm">
           <div className="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-slate-200/50 sm:p-8 animate-[fade-in_0.3s_ease-out]">
