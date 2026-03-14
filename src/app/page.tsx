@@ -184,7 +184,6 @@ export default function Home() {
 
   const spiralType = selectedGroupIndex !== null ? (groupOptions[selectedGroupIndex] ?? defaultGroupOpts).spiralType : defaultGroupOpts.spiralType;
   const spiralColor = selectedGroupIndex !== null ? (groupOptions[selectedGroupIndex] ?? defaultGroupOpts).spiralColor : defaultGroupOpts.spiralColor;
-  const coverFrontColor = selectedGroupIndex !== null ? (groupOptions[selectedGroupIndex] ?? defaultGroupOpts).coverFrontColor : defaultGroupOpts.coverFrontColor;
   const coverBackColor = selectedGroupIndex !== null ? (groupOptions[selectedGroupIndex] ?? defaultGroupOpts).coverBackColor : defaultGroupOpts.coverBackColor;
 
   const updateSelectedGroupOptions = useCallback((patch: Partial<typeof defaultGroupOpts>) => {
