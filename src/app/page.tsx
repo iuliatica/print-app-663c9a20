@@ -779,7 +779,7 @@ export default function Home() {
               <div className="shrink-0">
                 <div className="grid grid-cols-3 gap-1.5 p-2 text-xs sm:gap-2 sm:p-2.5 sm:text-sm">
                   <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-1.5 py-1 sm:px-2 sm:py-1.5">
-                    <p className="text-slate-600 leading-tight truncate">A/N 1 față</p>
+                    <p className="text-slate-600 leading-tight truncate">Alb-negru 1 față</p>
                     <p className="mt-0.5 font-semibold text-slate-800 tabular-nums">{PRICE_BW_ONE_SIDE} lei</p>
                   </div>
                   <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-1.5 py-1 sm:px-2 sm:py-1.5">
