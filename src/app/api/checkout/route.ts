@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createServerSupabaseAuth } from "@/lib/supabase-server-auth";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+function getStripe() {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) throw new Error("STRIPE_SECRET_KEY is not set");
+  return new Stripe(key);
+}
 
 export type CheckoutBody = {
   /** Sumă de încasat, în unități minime ale monedei (ex: bani pentru RON – 10.50 lei = 1050). */
@@ -45,7 +49,7 @@ export async function POST(request: Request) {
       customerEmail = metadata.shipping_email.trim().toLowerCase();
     }
 
-    const session = await stripe.checkout.sessions.create({
+    const session = await getStripe().checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: [
         {

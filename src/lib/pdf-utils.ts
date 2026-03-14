@@ -5,6 +5,8 @@ import {
   PDFArray,
   PDFRef,
   PDFStream,
+  PDFName,
+  PDFDict,
   decodePDFRawStream,
 } from "pdf-lib";
 
@@ -30,18 +32,16 @@ export interface PdfColorAnalysis {
   colorPageIndices: number[];
 }
 
-/**
- * Extrage textul dintr-un content stream (PDFRawStream sau PDFStream).
- */
+/* ── helpers ─────────────────────────────────────────────── */
+
+/** Decode a content stream to text */
 function getStreamText(stream: PDFRawStream | PDFStream): string {
   try {
     if (stream instanceof PDFRawStream) {
       const decoded = decodePDFRawStream(stream);
-      // decoded.decode() returns Uint8Array
       const bytes = decoded.decode();
       return new TextDecoder("latin1").decode(bytes);
     }
-    // For other stream types, try to get contents
     const contents = (stream as PDFRawStream).contents;
     if (contents instanceof Uint8Array) {
       return new TextDecoder("latin1").decode(contents);
@@ -52,72 +52,218 @@ function getStreamText(stream: PDFRawStream | PDFStream): string {
   }
 }
 
+// Regex that matches PDF numbers: 0.5, .5, 1, 1.0, -0.3 etc.
+const NUM = "[-]?\\d*\\.?\\d+";
+
 /**
- * Verifică dacă un string de content-stream conține operatori de culoare
- * care indică DeviceRGB sau DeviceCMYK (= pagină color).
- *
- * Operatori PDF relevanți:
- * - rg / RG  → setează fill/stroke color în DeviceRGB
- * - k / K    → setează fill/stroke color în DeviceCMYK
- * - cs / CS  → setează color space (dacă e DeviceRGB sau DeviceCMYK)
- * - sc / SC / scn / SCN → setează culoare în spațiul curent
- *
- * O pagină este considerată color dacă:
- * 1. Folosește rg/RG cu valori care NU sunt gri (r≠g sau g≠b)
- * 2. Folosește k/K (CMYK) cu c,m,y care nu sunt toate 0
- * 3. Folosește cs/CS cu DeviceRGB sau DeviceCMYK
+ * Verifică dacă un content-stream text conține operatori de culoare
+ * care indică pagină color (nu grayscale).
  */
 function contentStreamHasColor(text: string): boolean {
-  // Check for DeviceRGB fill: "r g b rg" where not all equal (not gray)
-  const rgRegex =
-    /(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+\.?\d*)\s+(rg|RG)\b/g;
+  // DeviceRGB fill/stroke: "r g b rg" or "r g b RG"
+  const rgRegex = new RegExp(
+    `(${NUM})\\s+(${NUM})\\s+(${NUM})\\s+(rg|RG)\\b`,
+    "g"
+  );
   let match: RegExpExecArray | null;
   while ((match = rgRegex.exec(text)) !== null) {
     const r = parseFloat(match[1]);
     const g = parseFloat(match[2]);
     const b = parseFloat(match[3]);
-    // If r, g, b are NOT all equal → it's a color (not grayscale)
     if (r !== g || g !== b) {
       return true;
     }
   }
 
-  // Check for DeviceCMYK: "c m y k k" or "c m y k K"
-  const cmykRegex =
-    /(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+\.?\d*)\s+(k|K)\b/g;
+  // DeviceCMYK: "c m y k k" or "c m y k K"
+  const cmykRegex = new RegExp(
+    `(${NUM})\\s+(${NUM})\\s+(${NUM})\\s+(${NUM})\\s+(k|K)\\b`,
+    "g"
+  );
   while ((match = cmykRegex.exec(text)) !== null) {
     const c = parseFloat(match[1]);
     const m = parseFloat(match[2]);
     const y = parseFloat(match[3]);
-    // If c, m, y are NOT all 0 → it's color (pure black in CMYK is 0,0,0,1)
     if (c !== 0 || m !== 0 || y !== 0) {
       return true;
     }
   }
 
-  // Check for explicit color space setting
-  const csRegex = /\/(DeviceRGB|DeviceCMYK)\s+(cs|CS)\b/g;
-  if (csRegex.test(text)) {
-    return true;
+  // scn/SCN with 3+ args that aren't all equal (color in current space)
+  const scnRegex = new RegExp(
+    `(${NUM})\\s+(${NUM})\\s+(${NUM})(?:\\s+${NUM})?\\s+(scn|SCN)\\b`,
+    "g"
+  );
+  while ((match = scnRegex.exec(text)) !== null) {
+    const a = parseFloat(match[1]);
+    const b = parseFloat(match[2]);
+    const c = parseFloat(match[3]);
+    if (a !== b || b !== c) {
+      return true;
+    }
   }
 
   return false;
 }
 
 /**
- * Verifică dacă Resources-urile paginii conțin color space-uri non-gray.
+ * Resolve all content stream refs from a page's Contents entry.
  */
-function pageResourcesHaveColor(page: PDFPage): boolean {
+function getContentRefs(page: PDFPage): PDFRef[] {
+  const refs: PDFRef[] = [];
   try {
-    const resources = page.node.get(page.doc.context.obj("Resources") as any);
-    if (!resources) return false;
-    const resourcesStr = resources?.toString() ?? "";
-    // Quick heuristic: if Resources reference DeviceRGB or DeviceCMYK
-    if (
-      resourcesStr.includes("DeviceRGB") ||
-      resourcesStr.includes("DeviceCMYK")
-    ) {
+    const contentsEntry = page.node.get(PDFName.of("Contents"));
+    if (!contentsEntry) return refs;
+
+    if (contentsEntry instanceof PDFRef) {
+      refs.push(contentsEntry);
+    } else if (contentsEntry instanceof PDFArray) {
+      for (let j = 0; j < contentsEntry.size(); j++) {
+        const item = contentsEntry.get(j);
+        if (item instanceof PDFRef) {
+          refs.push(item);
+        }
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return refs;
+}
+
+/**
+ * Get the Resources dictionary for a page (handles both direct and indirect).
+ */
+function getResources(page: PDFPage): PDFDict | undefined {
+  try {
+    const res = page.node.get(PDFName.of("Resources"));
+    if (!res) return undefined;
+    if (res instanceof PDFDict) return res;
+    if (res instanceof PDFRef) {
+      const resolved = page.doc.context.lookup(res);
+      if (resolved instanceof PDFDict) return resolved;
+    }
+  } catch {
+    // ignore
+  }
+  return undefined;
+}
+
+/**
+ * Check XObject resources for color content:
+ * - Form XObjects: decode their content stream and scan for color operators
+ * - Image XObjects: check their ColorSpace for non-gray
+ */
+function xobjectsHaveColor(
+  resources: PDFDict,
+  context: PDFDocument["context"],
+  depth = 0
+): boolean {
+  if (depth > 3) return false; // prevent infinite recursion
+
+  try {
+    const xobjectDict = resources.get(PDFName.of("XObject"));
+    if (!xobjectDict) return false;
+
+    const resolved =
+      xobjectDict instanceof PDFRef
+        ? context.lookup(xobjectDict)
+        : xobjectDict;
+    if (!(resolved instanceof PDFDict)) return false;
+
+    const entries = resolved.entries();
+    for (const [, value] of entries) {
+      const ref = value instanceof PDFRef ? value : null;
+      const obj = ref ? context.lookup(ref) : value;
+
+      if (obj instanceof PDFRawStream) {
+        const dict = obj.dict;
+        const subtype = dict.get(PDFName.of("Subtype"));
+        const subtypeStr = subtype?.toString() ?? "";
+
+        if (subtypeStr.includes("Form")) {
+          // Form XObject — decode and scan its content stream
+          const text = getStreamText(obj);
+          if (contentStreamHasColor(text)) return true;
+
+          // Also check the Form's own Resources for nested XObjects
+          const formResources = dict.get(PDFName.of("Resources"));
+          if (formResources instanceof PDFDict) {
+            if (xobjectsHaveColor(formResources, context, depth + 1))
+              return true;
+          } else if (formResources instanceof PDFRef) {
+            const fr = context.lookup(formResources);
+            if (fr instanceof PDFDict) {
+              if (xobjectsHaveColor(fr, context, depth + 1)) return true;
+            }
+          }
+        } else if (subtypeStr.includes("Image")) {
+          // Image XObject — check ColorSpace
+          if (imageHasColor(dict, context)) return true;
+        }
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return false;
+}
+
+/**
+ * Check if an image's ColorSpace indicates color (not gray).
+ */
+function imageHasColor(
+  imageDict: PDFDict,
+  context: PDFDocument["context"]
+): boolean {
+  try {
+    const cs = imageDict.get(PDFName.of("ColorSpace"));
+    if (!cs) return false;
+
+    const csStr = cs.toString();
+
+    // Direct color spaces
+    if (csStr.includes("DeviceRGB") || csStr.includes("DeviceCMYK"))
       return true;
+    if (csStr.includes("DeviceGray")) return false;
+
+    // ICCBased — check the N (number of components)
+    // [/ICCBased <stream ref>] where stream has /N 3 (RGB) or /N 4 (CMYK)
+    if (csStr.includes("ICCBased")) {
+      // If it's an array like [/ICCBased <ref>]
+      if (cs instanceof PDFArray && cs.size() >= 2) {
+        const profileRef = cs.get(1);
+        const profile = profileRef instanceof PDFRef
+          ? context.lookup(profileRef)
+          : profileRef;
+        if (profile instanceof PDFRawStream) {
+          const n = profile.dict.get(PDFName.of("N"));
+          const nStr = n?.toString() ?? "";
+          const nVal = parseInt(nStr, 10);
+          // N=1 is gray, N=3 is RGB, N=4 is CMYK
+          if (nVal >= 3) return true;
+        }
+      }
+      return false;
+    }
+
+    // Indexed color space [/Indexed base hival lookup]
+    if (cs instanceof PDFArray && cs.size() >= 2) {
+      const first = cs.get(0);
+      if (first?.toString().includes("Indexed")) {
+        const base = cs.get(1);
+        const baseStr = base?.toString() ?? "";
+        if (baseStr.includes("DeviceRGB") || baseStr.includes("DeviceCMYK"))
+          return true;
+        if (baseStr.includes("ICCBased") && base instanceof PDFRef) {
+          const profile = context.lookup(base);
+          if (profile instanceof PDFRawStream) {
+            const n = profile.dict.get(PDFName.of("N"));
+            const nVal = parseInt(n?.toString() ?? "", 10);
+            if (nVal >= 3) return true;
+          }
+        }
+      }
     }
   } catch {
     // ignore
@@ -127,11 +273,6 @@ function pageResourcesHaveColor(page: PDFPage): boolean {
 
 /**
  * Analizează fiecare pagină a unui PDF și determină care sunt color vs alb-negru.
- *
- * Scanează content stream-ul fiecărei pagini pentru operatori de culoare:
- * - DeviceRGB (rg/RG) cu valori non-gri → COLOR
- * - DeviceCMYK (k/K) cu c,m,y nenule → COLOR
- * - DeviceGray sau fără operatori de culoare → ALB-NEGRU
  */
 export async function analyzePdfColors(
   file: File | ArrayBuffer
@@ -146,40 +287,29 @@ export async function analyzePdfColors(
     let isColor = false;
 
     try {
-      // Get page content streams
-      const contentsEntry = page.node.get(
-        page.doc.context.obj("Contents") as any
-      );
-
-      if (contentsEntry) {
-        const refs: PDFRef[] = [];
-
-        if (contentsEntry instanceof PDFRef) {
-          refs.push(contentsEntry);
-        } else if (contentsEntry instanceof PDFArray) {
-          for (let j = 0; j < contentsEntry.size(); j++) {
-            const item = contentsEntry.get(j);
-            if (item instanceof PDFRef) {
-              refs.push(item);
-            }
-          }
-        }
-
-        for (const ref of refs) {
-          const stream = pdf.context.lookup(ref);
-          if (stream instanceof PDFRawStream) {
-            const text = getStreamText(stream);
-            if (contentStreamHasColor(text)) {
-              isColor = true;
-              break;
-            }
+      // 1. Scan page content streams for color operators
+      const refs = getContentRefs(page);
+      for (const ref of refs) {
+        const stream = pdf.context.lookup(ref);
+        if (stream instanceof PDFRawStream) {
+          const text = getStreamText(stream);
+          if (contentStreamHasColor(text)) {
+            isColor = true;
+            break;
           }
         }
       }
+
+      // 2. Check XObject resources (images, form xobjects)
+      if (!isColor) {
+        const resources = getResources(page);
+        if (resources) {
+          isColor = xobjectsHaveColor(resources, pdf.context);
+        }
+      }
     } catch {
-      // If we can't parse the content stream, be conservative: mark as color
-      // only if resources suggest color
-      isColor = pageResourcesHaveColor(page);
+      // Conservative fallback: not color unless we can prove it
+      isColor = false;
     }
 
     if (isColor) {
