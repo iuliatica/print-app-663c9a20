@@ -1900,7 +1900,7 @@ export default function Home() {
                           <span className="text-xs font-medium">{label}</span>
                           <span className="text-[11px] opacity-80">
                             {value === "none" && "Doar print"}
-                            {value === "plastic" && "Spiralare"}
+                            {value === "spirala" && "Spiralare"}
                             {value === "perforare2" && "Perforare 2 găuri"}
                             {value === "capsare" && "Capsare (max 240 coli)"}
                           </span>
