@@ -1943,18 +1943,25 @@ export default function Home() {
                         <p className="mb-2 text-sm font-medium text-slate-800">
                           Copertă față
                         </p>
+                        <p className="text-sm text-slate-600 italic">Transparent (standard)</p>
+                      </div>
+
+                      <div>
+                        <p className="mb-2 text-sm font-medium text-slate-800">
+                          Copertă spate
+                        </p>
                         <div className="flex flex-wrap items-center gap-3">
-                          {coverColors.map(({ value, label, circleClass }) => (
+                          {coverBackColors.map(({ value, label, circleClass }) => (
                             <button
                               key={value}
                               type="button"
-                              onClick={() => updateSelectedGroupOptions({ coverFrontColor: value })}
+                              onClick={() => updateSelectedGroupOptions({ coverBackColor: value })}
                               className="flex flex-col items-center gap-1 text-xs"
                               title={label}
                             >
                               <span
                                 className={`flex h-9 w-9 shrink-0 rounded-full transition-all duration-200 ${
-                                  coverFrontColor === value
+                                  coverBackColor === value
                                     ? "ring-3 ring-blue-500 ring-offset-2"
                                     : "ring-2 ring-transparent ring-offset-2 hover:ring-slate-300"
                                 } ${circleClass}`}
