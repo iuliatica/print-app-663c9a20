@@ -545,7 +545,7 @@ export default function Home() {
                 copies: f.copies ?? DEFAULT_PRINT_OPTIONS.copies,
               })),
               spiralType: opts.spiralType,
-              spiralColor: opts.spiralColor,
+              spiralColor: opts.spiralColor ?? "negru",
               coverFrontColor: opts.coverFrontColor,
               coverBackColor: opts.coverBackColor,
             };
