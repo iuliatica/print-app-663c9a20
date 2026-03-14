@@ -16,7 +16,7 @@ import {
   ChevronUp,
   ChevronDown,
 } from "lucide-react";
-import { getPdfPageCount } from "@/lib/pdf-utils";
+import { getPdfPageCount, analyzePdfColors, type PdfColorAnalysis } from "@/lib/pdf-utils";
 
 const PRICE_BW_ONE_SIDE = 0.25;
 const PRICE_BW_DUPLEX = 0.35;
@@ -120,6 +120,8 @@ interface UploadedFile {
   previewOpen?: boolean;
   /** true = acest document formează împreună cu anteriorul un singur volum (set de documente legate împreună) */
   groupWithPrevious: boolean;
+  /** Rezultatul analizei color per pagină (disponibil după scanare) */
+  colorAnalysis?: PdfColorAnalysis;
 }
 
 const DEFAULT_PRINT_OPTIONS = {
@@ -200,10 +202,20 @@ export default function Home() {
       newFiles.map(async (item) => {
         if (item.pages != null) return item;
         try {
-          const pages = await getPdfPageCount(item.file);
-          return { ...item, pages };
+          const colorAnalysis = await analyzePdfColors(item.file);
+          return {
+            ...item,
+            pages: colorAnalysis.totalPages,
+            colorAnalysis,
+          };
         } catch {
-          return { ...item, pages: null, error: "Nu s-a putut citi PDF-ul" };
+          // Fallback: try just counting pages
+          try {
+            const pages = await getPdfPageCount(item.file);
+            return { ...item, pages };
+          } catch {
+            return { ...item, pages: null, error: "Nu s-a putut citi PDF-ul" };
+          }
         }
       })
     );
@@ -215,6 +227,7 @@ export default function Home() {
           ...f,
           pages: loaded.pages ?? f.pages,
           error: loaded.error ?? f.error,
+          colorAnalysis: loaded.colorAnalysis ?? f.colorAnalysis,
         };
       })
     );
@@ -359,6 +372,31 @@ export default function Home() {
     0
   );
 
+  // Calcul pagini color detectate automat (din analiza PDF) — doar pentru fișierele setate pe Color
+  const detectedColorPages = files.reduce((sum, f) => {
+    if (f.pages == null) return sum;
+    const mode = f.printMode ?? DEFAULT_PRINT_OPTIONS.printMode;
+    const copies = f.copies ?? DEFAULT_PRINT_OPTIONS.copies;
+    if (mode === "color" && f.colorAnalysis) {
+      return sum + f.colorAnalysis.colorPages * copies;
+    }
+    return sum;
+  }, 0);
+
+  const detectedBwPages = files.reduce((sum, f) => {
+    if (f.pages == null) return sum;
+    const mode = f.printMode ?? DEFAULT_PRINT_OPTIONS.printMode;
+    const copies = f.copies ?? DEFAULT_PRINT_OPTIONS.copies;
+    if (mode === "color" && f.colorAnalysis) {
+      return sum + f.colorAnalysis.bwPages * copies;
+    }
+    if (mode === "bw") {
+      return sum + f.pages * copies;
+    }
+    // color mode without analysis → treat all as color (0 bw)
+    return sum;
+  }, 0);
+
   // Pagini color pe baza opțiunii alese de utilizator (printMode === "color")
   const userChosenColorPages = files.reduce(
     (sum, f) =>
@@ -369,21 +407,47 @@ export default function Home() {
     0
   );
 
+  /**
+   * Calcul preț per pagină — când modul este "color" și avem analiza PDF,
+   * aplicăm preț color doar paginilor detectate ca fiind color,
+   * iar paginile alb-negru din același document se taxează la tarif A/N.
+   */
   const pagePrice = files.reduce((sum, f) => {
     if (f.pages == null) return sum;
     const mode = f.printMode ?? DEFAULT_PRINT_OPTIONS.printMode;
     const duplex = f.duplex ?? DEFAULT_PRINT_OPTIONS.duplex;
     const copies = f.copies ?? DEFAULT_PRINT_OPTIONS.copies;
+
+    if (mode === "bw") {
+      // Toate paginile sunt A/N
+      const sides = f.pages * copies;
+      if (duplex) {
+        return sum + Math.ceil(sides / 2) * PRICE_BW_DUPLEX;
+      }
+      return sum + sides * PRICE_BW_ONE_SIDE;
+    }
+
+    // mode === "color" — folosim detecția automată dacă e disponibilă
+    if (f.colorAnalysis) {
+      const colorSides = f.colorAnalysis.colorPages * copies;
+      const bwSides = f.colorAnalysis.bwPages * copies;
+      if (duplex) {
+        // Aproximare: paginile color se taxează la preț color, cele A/N la preț A/N
+        // (pe fiecare foaie se va printa la tariful cel mai mare al paginilor de pe foaie,
+        //  dar folosim o aproximare per pagină pentru simplitate)
+        const colorSheets = Math.ceil(colorSides / 2);
+        const bwSheets = Math.ceil(bwSides / 2);
+        return sum + colorSheets * PRICE_COLOR_DUPLEX + bwSheets * PRICE_BW_DUPLEX;
+      }
+      return sum + colorSides * PRICE_COLOR_ONE_SIDE + bwSides * PRICE_BW_ONE_SIDE;
+    }
+
+    // Fără analiza color → toate paginile la tarif color (fallback)
     const sides = f.pages * copies;
     if (duplex) {
-      const sheets = Math.ceil(sides / 2);
-      const perSheet =
-        mode === "bw" ? PRICE_BW_DUPLEX : PRICE_COLOR_DUPLEX;
-      return sum + sheets * perSheet;
+      return sum + Math.ceil(sides / 2) * PRICE_COLOR_DUPLEX;
     }
-    const perSide =
-      mode === "bw" ? PRICE_BW_ONE_SIDE : PRICE_COLOR_ONE_SIDE;
-    return sum + sides * perSide;
+    return sum + sides * PRICE_COLOR_ONE_SIDE;
   }, 0);
   const spiralPrice = useMemo(() => {
     let sum = 0;
@@ -783,6 +847,11 @@ export default function Home() {
                                   {(item.copies ?? 1) > 1 ? "i" : ""} ·{" "}
                                   {(item.printMode ?? DEFAULT_PRINT_OPTIONS.printMode) === "color" ? "Color" : "Alb-negru"}
                                   {(item.duplex ?? DEFAULT_PRINT_OPTIONS.duplex) ? " · Față-verso" : ""}
+                                  {(item.printMode ?? DEFAULT_PRINT_OPTIONS.printMode) === "color" && item.colorAnalysis && (
+                                    <span className="block text-xs text-slate-400 mt-0.5">
+                                      Detectat: {item.colorAnalysis.colorPages} color, {item.colorAnalysis.bwPages} alb-negru
+                                    </span>
+                                  )}
                                 </span>
                               ) : item.error ? (
                                 <span className="text-red-600">{item.error}</span>
@@ -951,12 +1020,21 @@ export default function Home() {
                         {file.name}
                       </p>
                       {file.pages != null && (
-                        <p className="text-xs text-slate-500">
-                          {file.pages} pagini
-                          {opts.printMode === "color" && (
-                            <> · <span className="font-semibold">{file.pages}</span> pagini color pentru acest document</>
+                        <div className="text-xs text-slate-500 space-y-0.5">
+                          <p>{file.pages} pagini</p>
+                          {opts.printMode === "color" && file.colorAnalysis && (
+                            <p className="text-xs">
+                              Detectat automat:{" "}
+                              <span className="font-semibold text-blue-600">{file.colorAnalysis.colorPages}</span> pagini color,{" "}
+                              <span className="font-semibold text-slate-700">{file.colorAnalysis.bwPages}</span> pagini alb-negru
+                            </p>
                           )}
-                        </p>
+                          {opts.printMode === "color" && !file.colorAnalysis && (
+                            <p className="text-xs text-amber-600">
+                              Analiza color nu este disponibilă — toate paginile se taxează ca fiind color.
+                            </p>
+                          )}
+                        </div>
                       )}
                       <p className="mt-1.5 text-xs text-slate-400">
                         Modificările se aplică <strong>doar acestui document</strong>. Celelalte fișiere nu sunt afectate.
@@ -972,12 +1050,10 @@ export default function Home() {
                       <p className="text-xs text-slate-500">
                         Alb-negru: 0,25 / 0,35 lei · Color: 1,5 / 2,5 lei
                       </p>
-                      {userChosenColorPages > 0 && (
-                        <p className="mt-1 text-xs text-slate-500">
-                          În total, <span className="font-semibold">{userChosenColorPages}</span>{" "}
-                          pagini sunt setate pe <span className="font-semibold">Color</span>.
-                        </p>
-                      )}
+                      <p className="mt-1 text-xs text-slate-500">
+                        Când alegi <span className="font-semibold">Color</span>, fiecare pagină este scanată automat.
+                        Paginile alb-negru din document se taxează la tariful A/N.
+                      </p>
                       <div className="mt-3 flex flex-wrap gap-2">
                         <button
                           type="button"
@@ -1266,6 +1342,16 @@ export default function Home() {
               </>
             )}
           </p>
+          {/* Breakdown pagini color vs A/N detectate */}
+          {detectedColorPages > 0 && (
+            <p className="mt-1.5 text-xs text-slate-600">
+              Pagini detectate automat:{" "}
+              <span className="font-semibold text-blue-600">{detectedColorPages} color</span>
+              <span className="mx-1 text-slate-400">·</span>
+              <span className="font-semibold text-slate-700">{detectedBwPages} alb-negru</span>
+              <span className="ml-1 text-slate-400">(prețul reflectă tipul real al fiecărei pagini)</span>
+            </p>
+          )}
           {orderSuccess && <p className="mt-1.5 text-xs font-medium text-green-700">{orderSuccess}</p>}
           {checkoutError && <p className="mt-1.5 text-xs font-medium text-red-600">{checkoutError}</p>}
         </section>
@@ -1287,7 +1373,14 @@ export default function Home() {
                     <p className="mt-1 text-xs text-slate-500">
                       {totalPrice.toFixed(2)} lei printare + {SHIPPING_COST_LEI} lei transport · {totalPages} pagini
                     </p>
-                    {userChosenColorPages > 0 && (
+                    {detectedColorPages > 0 && (
+                      <p className="mt-0.5 text-xs text-slate-500">
+                        Detectat: <span className="font-semibold text-blue-600">{detectedColorPages} pag. color</span>
+                        {" · "}
+                        <span className="font-semibold">{detectedBwPages} pag. alb-negru</span>
+                      </p>
+                    )}
+                    {userChosenColorPages > 0 && detectedColorPages === 0 && (
                       <p className="mt-0.5 text-xs text-slate-500">
                         Ai selectat <span className="font-semibold">{userChosenColorPages}</span>{" "}
                         pagini cu opțiunea <span className="font-semibold">Color</span>.
