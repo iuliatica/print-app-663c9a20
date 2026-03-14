@@ -571,7 +571,7 @@ export default function Home() {
       if (paymentMethod === "ramburs") {
         setOrderSuccessDetails({
           paymentMethod: "ramburs",
-          groups: validBindingGroups.map((grp, groupIndex) => {
+            groups: validBindingGroups.map((grp, groupIndex) => {
             const opts = validBindingOptions[groupIndex] ?? defaultGroupOpts;
             return {
               files: grp.filesInGroup.map((f) => ({
@@ -583,8 +583,7 @@ export default function Home() {
               })),
               spiralType: opts.spiralType,
               spiralColor: opts.spiralColor ?? "negru",
-              coverFrontColor: opts.coverFrontColor,
-              coverBackColor: opts.coverBackColor,
+              coverBackColor: opts.coverBackColor ?? "negru",
             };
           }),
           totalPages,
