@@ -779,11 +779,11 @@ export default function Home() {
               <div className="shrink-0">
                 <div className="grid grid-cols-3 gap-1.5 p-2 text-xs sm:gap-2 sm:p-2.5 sm:text-sm">
                   <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-1.5 py-1 sm:px-2 sm:py-1.5">
-                    <p className="text-slate-600 leading-tight truncate">A/N 1 față</p>
+                    <p className="text-slate-600 leading-tight truncate">Alb-negru 1 față</p>
                     <p className="mt-0.5 font-semibold text-slate-800 tabular-nums">{PRICE_BW_ONE_SIDE} lei</p>
                   </div>
                   <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-1.5 py-1 sm:px-2 sm:py-1.5">
-                    <p className="text-slate-600 leading-tight truncate">A/N față-verso</p>
+                    <p className="text-slate-600 leading-tight truncate">Alb-negru față-verso</p>
                     <p className="mt-0.5 font-semibold text-slate-800 tabular-nums">{PRICE_BW_DUPLEX} lei</p>
                   </div>
                   <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-1.5 py-1 sm:px-2 sm:py-1.5">
@@ -932,7 +932,7 @@ export default function Home() {
                                 {item.pages != null ? (
                                   <span>
                                     {item.pages} pag. · {item.copies ?? 1} {(item.copies ?? 1) > 1 ? "copii" : "copie"} ·{" "}
-                                    {(item.printMode ?? "bw") === "color" ? "Color" : "A/N"}
+                                    {(item.printMode ?? "bw") === "color" ? "Color" : "Alb-negru"}
                                     {item.duplex ? " · Duplex" : ""}
                                   </span>
                                 ) : item.error ? (
@@ -1172,7 +1172,7 @@ export default function Home() {
                     <div className="mt-5 space-y-5 border-t border-slate-200 pt-5">
                       <div>
                         <p className="mb-3 text-sm font-semibold text-slate-700">
-                          Tip legare
+                          Finisare document
                           {selectedGroupIndex !== null && bindingGroups[selectedGroupIndex]?.filesInGroup.length > 1 && (
                             <span className="ml-2 font-normal text-slate-500 text-xs">
                               ({bindingGroups[selectedGroupIndex].filesInGroup.length} fișiere legate)
@@ -1595,7 +1595,7 @@ export default function Home() {
                     <div className="space-y-3 text-xs text-slate-600">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="text-[11px] uppercase tracking-wide text-slate-500">Tip:</span>
-                        <button type="button" onClick={() => setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, printMode: "bw" } : f))} className={`rounded-full px-3 py-1 text-xs font-medium ${file.printMode === "bw" ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>A/N</button>
+                        <button type="button" onClick={() => setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, printMode: "bw" } : f))} className={`rounded-full px-3 py-1 text-xs font-medium ${file.printMode === "bw" ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Alb-negru</button>
                         <button type="button" onClick={() => setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, printMode: "color" } : f))} className={`rounded-full px-3 py-1 text-xs font-medium ${file.printMode === "color" ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Color</button>
                       </div>
                       <label className="flex items-center gap-2">
