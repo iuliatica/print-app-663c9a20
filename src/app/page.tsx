@@ -1275,35 +1275,44 @@ export default function Home() {
                 </section>
 
                 {/* Summary */}
-                <section className="rounded-2xl bg-gradient-to-br from-blue-50/80 to-slate-50/80 p-4 ring-1 ring-slate-200/60 sm:p-5">
+                <section className="bg-gradient-to-br from-blue-50/80 to-slate-50/80 p-4 ring-1 ring-slate-200/60 sm:p-5">
                   <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Rezumat</p>
-                  <p className="mt-1 text-sm text-slate-700">
-                    <span className="font-semibold text-slate-800">{totalPages}</span> pagini
-                    {totalPages > 0 ? (
+                  <div className="mt-2 flex flex-wrap items-center gap-3">
+                    <span className="inline-flex items-center gap-1.5 bg-slate-100 px-3 py-2 text-base font-bold text-slate-800">
+                      <FileText className="h-4 w-4 text-slate-500" />
+                      {totalPages} pagini
+                    </span>
+                    {totalPages > 0 && (
                       <>
-                        <span className="mx-1.5 text-slate-400">·</span>
-                        <span className="font-semibold text-blue-600">{totalPrice.toFixed(2)} lei</span> printare
-                        <span className="mx-1.5 text-slate-400">·</span>
-                        <span className="font-semibold text-slate-800">{totalWithShipping.toFixed(2)} lei</span> total (incl. {SHIPPING_COST_LEI} lei transport)
-                      </>
-                    ) : (
-                      <>
-                        <span className="mx-1.5 text-slate-400">·</span>
-                        <span className="text-slate-500">Transport: {SHIPPING_COST_LEI} lei</span>
+                        <span className="inline-flex items-center gap-1.5 bg-blue-100 px-3 py-2 text-base font-bold text-blue-700">
+                          <CreditCard className="h-4 w-4 text-blue-500" />
+                          {totalPrice.toFixed(2)} lei printare
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 bg-slate-800 px-3 py-2 text-base font-bold text-white">
+                          {totalWithShipping.toFixed(2)} lei total
+                        </span>
                       </>
                     )}
-                  </p>
+                    {totalPages === 0 && (
+                      <span className="text-sm text-slate-500">Transport: {SHIPPING_COST_LEI} lei</span>
+                    )}
+                  </div>
                   {detectedColorPages > 0 && (
-                    <p className="mt-1.5 text-xs text-slate-600">
-                      Detectat: <span className="font-semibold text-blue-600">{detectedColorPages} color</span>
-                      <span className="mx-1 text-slate-400">·</span>
-                      <span className="font-semibold text-slate-700">{detectedBwPages} alb-negru</span>
+                    <p className="mt-2 text-sm text-slate-600">
+                      Detectat: <span className="font-bold text-blue-600">{detectedColorPages} color</span>
+                      <span className="mx-1.5 text-slate-400">·</span>
+                      <span className="font-bold text-slate-700">{detectedBwPages} alb-negru</span>
                     </p>
                   )}
                   {orderSuccess && <p className="mt-1.5 text-xs font-medium text-green-700">{orderSuccess}</p>}
                   {checkoutError && !checkoutModalOpen && <p className="mt-1.5 text-xs font-medium text-red-600">{checkoutError}</p>}
                 </section>
               </div>
+            </div>
+
+            {/* FAQ - shown after files are loaded too */}
+            <div className="mt-6 mx-auto max-w-2xl">
+              <FAQ />
             </div>
           </>
         )}
