@@ -228,7 +228,9 @@ function xobjectsHaveColor(
         if (subtypeStr.includes("Form")) {
           // Form XObject — decode and scan its content stream
           const text = getStreamText(obj);
-          if (contentStreamHasColor(text)) return true;
+          const formRes = dict.get(PDFName.of("Resources"));
+          const formResDict = formRes instanceof PDFDict ? formRes : (formRes instanceof PDFRef ? (context.lookup(formRes) instanceof PDFDict ? context.lookup(formRes) as PDFDict : undefined) : undefined);
+          if (contentStreamHasColor(text, formResDict, context)) return true;
 
           // Also check the Form's own Resources for nested XObjects
           const formResources = dict.get(PDFName.of("Resources"));
