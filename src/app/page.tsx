@@ -1373,7 +1373,14 @@ export default function Home() {
                     <p className="mt-1 text-xs text-slate-500">
                       {totalPrice.toFixed(2)} lei printare + {SHIPPING_COST_LEI} lei transport · {totalPages} pagini
                     </p>
-                    {userChosenColorPages > 0 && (
+                    {detectedColorPages > 0 && (
+                      <p className="mt-0.5 text-xs text-slate-500">
+                        Detectat: <span className="font-semibold text-blue-600">{detectedColorPages} pag. color</span>
+                        {" · "}
+                        <span className="font-semibold">{detectedBwPages} pag. alb-negru</span>
+                      </p>
+                    )}
+                    {userChosenColorPages > 0 && detectedColorPages === 0 && (
                       <p className="mt-0.5 text-xs text-slate-500">
                         Ai selectat <span className="font-semibold">{userChosenColorPages}</span>{" "}
                         pagini cu opțiunea <span className="font-semibold">Color</span>.
