@@ -1186,7 +1186,7 @@ export default function Home() {
               </div>
             </div>
 
-            {spiralType === "plastic" && (
+            {spiralType === "spirala" && (
               <div className="space-y-4">
                 <div>
                   <p className="mb-2 text-sm font-medium text-slate-700">
@@ -1226,34 +1226,7 @@ export default function Home() {
                   <p className="mb-2 text-sm font-medium text-slate-700">
                     Copertă față
                   </p>
-                  <div className="flex flex-wrap items-center gap-4">
-                    {coverColors.map(({ value, label, circleClass }) => (
-                      <label
-                        key={value}
-                        className="flex cursor-pointer flex-col items-center gap-2"
-                        title={label}
-                      >
-                        <input
-                          type="radio"
-                          name="coverFrontColor"
-                          value={value}
-                          checked={coverFrontColor === value}
-                          onChange={() => updateSelectedGroupOptions({ coverFrontColor: value })}
-                          className="sr-only"
-                        />
-                        <span
-                          className={`flex h-11 w-11 shrink-0 rounded-full transition-all duration-200 hover:scale-110 ${
-                            coverFrontColor === value
-                              ? "ring-4 ring-blue-500 ring-offset-2"
-                              : "ring-2 ring-transparent ring-offset-2 hover:ring-slate-300"
-                          } ${circleClass}`}
-                        />
-                        <span className="text-xs font-medium text-slate-600">
-                          {label}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
+                  <p className="text-sm text-slate-600 italic">Transparent (standard)</p>
                 </div>
 
                 <div>
@@ -1261,7 +1234,7 @@ export default function Home() {
                     Copertă spate
                   </p>
                   <div className="flex flex-wrap items-center gap-4">
-                    {coverColors.map(({ value, label, circleClass }) => (
+                    {coverBackColors.map(({ value, label, circleClass }) => (
                       <label
                         key={value}
                         className="flex cursor-pointer flex-col items-center gap-2"
