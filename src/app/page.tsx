@@ -757,7 +757,7 @@ export default function Home() {
         <Toast key={t.id} message={t.message} type={t.type} onClose={() => removeToast(t.id)} />
       ))}
 
-      <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
+      <div className="mx-auto max-w-6xl px-4 py-4 pb-24 sm:px-6 sm:py-6 lg:px-8 lg:pb-6">
         {/* Header */}
         <header className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
            <div className="min-w-0 flex-1 text-center lg:text-left">
