@@ -120,6 +120,8 @@ interface UploadedFile {
   previewOpen?: boolean;
   /** true = acest document formează împreună cu anteriorul un singur volum (set de documente legate împreună) */
   groupWithPrevious: boolean;
+  /** Rezultatul analizei color per pagină (disponibil după scanare) */
+  colorAnalysis?: PdfColorAnalysis;
 }
 
 const DEFAULT_PRINT_OPTIONS = {
