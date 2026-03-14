@@ -202,10 +202,20 @@ export default function Home() {
       newFiles.map(async (item) => {
         if (item.pages != null) return item;
         try {
-          const pages = await getPdfPageCount(item.file);
-          return { ...item, pages };
+          const colorAnalysis = await analyzePdfColors(item.file);
+          return {
+            ...item,
+            pages: colorAnalysis.totalPages,
+            colorAnalysis,
+          };
         } catch {
-          return { ...item, pages: null, error: "Nu s-a putut citi PDF-ul" };
+          // Fallback: try just counting pages
+          try {
+            const pages = await getPdfPageCount(item.file);
+            return { ...item, pages };
+          } catch {
+            return { ...item, pages: null, error: "Nu s-a putut citi PDF-ul" };
+          }
         }
       })
     );
@@ -217,6 +227,7 @@ export default function Home() {
           ...f,
           pages: loaded.pages ?? f.pages,
           error: loaded.error ?? f.error,
+          colorAnalysis: loaded.colorAnalysis ?? f.colorAnalysis,
         };
       })
     );
