@@ -11,7 +11,7 @@ import {
   BookOpen,
   BookMarked,
   Circle,
-  CheckCircle2,
+  Paperclip,
   Settings2,
   ChevronUp,
   ChevronDown,
