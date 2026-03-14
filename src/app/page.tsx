@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { getPdfPageCount, analyzePdfColors, type PdfColorAnalysis } from "@/lib/pdf-utils";
 
+// Constants, types, validation, etc. from lines 21-146
 const PRICE_BW_ONE_SIDE = 0.25;
 const PRICE_BW_DUPLEX = 0.35;
 const PRICE_COLOR_ONE_SIDE = 1.5;
@@ -211,7 +212,6 @@ export default function Home() {
             colorAnalysis,
           };
         } catch {
-          // Fallback: try just counting pages
           try {
             const pages = await getPdfPageCount(item.file);
             return { ...item, pages };
@@ -356,7 +356,6 @@ export default function Home() {
     setScrollToFileId(id);
   };
 
-  // După reordonare, aduce documentul mutat în view în cadrul listei
   useEffect(() => {
     if (!scrollToFileId) return;
     const timer = requestAnimationFrame(() => {
@@ -374,7 +373,6 @@ export default function Home() {
     0
   );
 
-  // Calcul pagini color detectate automat (din analiza PDF) — doar pentru fișierele setate pe Color
   const detectedColorPages = files.reduce((sum, f) => {
     if (f.pages == null) return sum;
     const mode = f.printMode ?? DEFAULT_PRINT_OPTIONS.printMode;
@@ -395,11 +393,9 @@ export default function Home() {
     if (mode === "bw") {
       return sum + f.pages * copies;
     }
-    // color mode without analysis → treat all as color (0 bw)
     return sum;
   }, 0);
 
-  // Pagini color pe baza opțiunii alese de utilizator (printMode === "color")
   const userChosenColorPages = files.reduce(
     (sum, f) =>
       sum +
@@ -409,11 +405,6 @@ export default function Home() {
     0
   );
 
-  /**
-   * Calcul preț per pagină — când modul este "color" și avem analiza PDF,
-   * aplicăm preț color doar paginilor detectate ca fiind color,
-   * iar paginile alb-negru din același document se taxează la tarif A/N.
-   */
   const pagePrice = files.reduce((sum, f) => {
     if (f.pages == null) return sum;
     const mode = f.printMode ?? DEFAULT_PRINT_OPTIONS.printMode;
@@ -421,7 +412,6 @@ export default function Home() {
     const copies = f.copies ?? DEFAULT_PRINT_OPTIONS.copies;
 
     if (mode === "bw") {
-      // Toate paginile sunt A/N
       const sides = f.pages * copies;
       if (duplex) {
         return sum + Math.ceil(sides / 2) * PRICE_BW_DUPLEX;
@@ -429,14 +419,10 @@ export default function Home() {
       return sum + sides * PRICE_BW_ONE_SIDE;
     }
 
-    // mode === "color" — folosim detecția automată dacă e disponibilă
     if (f.colorAnalysis) {
       const colorSides = f.colorAnalysis.colorPages * copies;
       const bwSides = f.colorAnalysis.bwPages * copies;
       if (duplex) {
-        // Aproximare: paginile color se taxează la preț color, cele A/N la preț A/N
-        // (pe fiecare foaie se va printa la tariful cel mai mare al paginilor de pe foaie,
-        //  dar folosim o aproximare per pagină pentru simplitate)
         const colorSheets = Math.ceil(colorSides / 2);
         const bwSheets = Math.ceil(bwSides / 2);
         return sum + colorSheets * PRICE_COLOR_DUPLEX + bwSheets * PRICE_BW_DUPLEX;
@@ -444,13 +430,13 @@ export default function Home() {
       return sum + colorSides * PRICE_COLOR_ONE_SIDE + bwSides * PRICE_BW_ONE_SIDE;
     }
 
-    // Fără analiza color → toate paginile la tarif color (fallback)
     const sides = f.pages * copies;
     if (duplex) {
       return sum + Math.ceil(sides / 2) * PRICE_COLOR_DUPLEX;
     }
     return sum + sides * PRICE_COLOR_ONE_SIDE;
   }, 0);
+
   const spiralPrice = useMemo(() => {
     let sum = 0;
     bindingGroups.forEach((grp, groupIndex) => {
@@ -536,7 +522,6 @@ export default function Home() {
         setIsCheckoutLoading(false);
         return;
       }
-      // Încarcă fișierele pentru orice metodă de plată (pentru salvare comandă)
       const fileList = validFiles.map((f) => f.file);
       let fileUrls: string[] = [];
       if (fileList.length > 0) {
@@ -675,7 +660,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50/80">
       <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
-        {/* Titlu + subtitlu + listă prețuri pe 2 rânduri, doar în spațiul din dreapta titlului */}
+        {/* Titlu + subtitlu + listă prețuri */}
         <header className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
           <div className="min-w-0 flex-1 text-center lg:text-left">
             <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-1.5 text-sm font-medium text-blue-700">
@@ -689,7 +674,6 @@ export default function Home() {
               Încarcă PDF-urile, configurează opțiunile și plătește în siguranță.
             </p>
           </div>
-          {/* Listă prețuri – exact 2 rânduri (4 coloane), înălțime ≤ titlu, doar spațiul după titlu */}
           <section className="shrink-0 w-full max-w-full rounded-2xl border border-slate-200/80 bg-white shadow-sm lg:max-h-[11rem] lg:w-auto lg:self-start">
             <div className="flex flex-col lg:max-h-[11rem]">
               <div className="shrink-0 bg-slate-50/80 px-3 py-2 border-b border-slate-200/80">
@@ -698,20 +682,20 @@ export default function Home() {
               <div className="shrink-0">
                 <div className="grid grid-cols-3 gap-1.5 p-2 text-xs sm:gap-2 sm:p-2.5 sm:text-sm">
                   <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-1.5 py-1 sm:px-2 sm:py-1.5">
-                    <p className="text-slate-600 leading-tight truncate" title="Alb-negru o față">Alb-negru o față</p>
+                    <p className="text-slate-600 leading-tight truncate">A/N 1 față</p>
                     <p className="mt-0.5 font-semibold text-slate-800 tabular-nums">{PRICE_BW_ONE_SIDE} lei</p>
                   </div>
                   <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-1.5 py-1 sm:px-2 sm:py-1.5">
-                    <p className="text-slate-600 leading-tight truncate" title="Alb-negru față-verso">Alb-negru față-verso</p>
+                    <p className="text-slate-600 leading-tight truncate">A/N față-verso</p>
                     <p className="mt-0.5 font-semibold text-slate-800 tabular-nums">{PRICE_BW_DUPLEX} lei</p>
                   </div>
                   <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-1.5 py-1 sm:px-2 sm:py-1.5">
-                    <p className="text-slate-600 leading-tight truncate">Color o față</p>
-                    <p className="mt-0.5 font-semibold text-slate-800 tabular-nums">{PRICE_COLOR_ONE_SIDE} lei</p>
+                    <p className="text-slate-600 leading-tight truncate">Color 1 față</p>
+                    <p className="mt-0.5 font-semibold text-blue-600 tabular-nums">{PRICE_COLOR_ONE_SIDE} lei</p>
                   </div>
                   <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-1.5 py-1 sm:px-2 sm:py-1.5">
                     <p className="text-slate-600 leading-tight truncate">Color față-verso</p>
-                    <p className="mt-0.5 font-semibold text-slate-800 tabular-nums">{PRICE_COLOR_DUPLEX} lei</p>
+                    <p className="mt-0.5 font-semibold text-blue-600 tabular-nums">{PRICE_COLOR_DUPLEX} lei</p>
                   </div>
                   <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-1.5 py-1 sm:px-2 sm:py-1.5">
                     <p className="text-slate-600 leading-tight truncate">Plast. ≤{SPIRAL_PAGE_THRESHOLD}</p>
@@ -721,7 +705,6 @@ export default function Home() {
                     <p className="text-slate-600 leading-tight truncate">Plast. &gt;{SPIRAL_PAGE_THRESHOLD}</p>
                     <p className="mt-0.5 font-semibold text-slate-800 tabular-nums">{SPIRAL_PLASTIC_OVER_200} lei</p>
                   </div>
-                  {/* Opțiunea metalică a fost eliminată din ofertă */}
                 </div>
               </div>
             </div>
@@ -764,7 +747,7 @@ export default function Home() {
           </div>
         ) : (
         <div className="mt-5 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,440px)_1fr] lg:gap-10">
-          {/* Stânga: listă fișiere (îngustă ca dreapta să aibă spațiu pentru configurare) */}
+          {/* Stânga: listă fișiere */}
           <div className="flex min-h-0 flex-col">
             <section className="mt-0 flex min-h-0 flex-1 flex-col">
                 <label
@@ -805,17 +788,44 @@ export default function Home() {
                     {files.length}
                   </span>
                 </h2>
-                <div className="min-h-0 overflow-x-hidden overflow-y-auto rounded-xl border-2 border-slate-200 bg-slate-50/50 pr-1 shadow-inner" style={{ maxHeight: "min(70vh, 560px)" }}>
-                <ul className="space-y-3 py-1">
-                  {bindingGroups.map((group, groupIndex) => {
-                    const startIndex = bindingGroups.slice(0, groupIndex).reduce((acc, g) => acc + g.filesInGroup.length, 0);
-                    const isBinding = group.filesInGroup.length > 1;
 
-                    const renderFileRow = (item: UploadedFile, index: number) => {
-                      const globalIndex = startIndex + index;
-                      return (
+                {/* Banner explicativ când sunt 2+ fișiere */}
+                {files.length >= 2 && (
+                  <div className="mb-3 flex items-start gap-2.5 rounded-xl border border-blue-200 bg-blue-50/80 px-4 py-3">
+                    <Link2 className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
+                    <div className="text-xs text-blue-800">
+                      <p className="font-semibold">Vrei să legi mai multe fișiere într-o singură spirală?</p>
+                      <p className="mt-0.5 text-blue-700">
+                        Apasă butonul <span className="inline-flex items-center gap-0.5 font-semibold"><Link2 className="inline h-3 w-3" /> Leagă împreună</span> dintre două fișiere pentru a le uni într-un singur volum spiralat.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="min-h-0 overflow-x-hidden overflow-y-auto rounded-xl border-2 border-slate-200 bg-slate-50/50 pr-1 shadow-inner" style={{ maxHeight: "min(70vh, 560px)" }}>
+                <ul className="space-y-0 py-1 px-1">
+                  {files.map((item, globalIndex) => {
+                    const groupInfo = bindingGroups.find((g) => g.filesInGroup.some((f) => f.id === item.id));
+                    const isInGroup = groupInfo ? groupInfo.filesInGroup.length > 1 : false;
+                    const isFirstInGroup = isInGroup && groupInfo!.filesInGroup[0].id === item.id;
+                    const isLastInGroup = isInGroup && groupInfo!.filesInGroup[groupInfo!.filesInGroup.length - 1].id === item.id;
+                    const nextItem = globalIndex < files.length - 1 ? files[globalIndex + 1] : null;
+                    const isLinkedToNext = nextItem?.groupWithPrevious === true;
+
+                    return (
+                      <li key={item.id} className="list-none">
+                        {/* Header de grup — doar la primul fișier dintr-un grup */}
+                        {isFirstInGroup && (
+                          <div className="mt-2 flex items-center gap-2 rounded-t-xl border-2 border-b-0 border-blue-300 bg-gradient-to-r from-blue-100 to-blue-50 px-4 py-2.5">
+                            <BookMarked className="h-4 w-4 text-blue-600 shrink-0" />
+                            <span className="text-sm font-bold text-blue-800">
+                              Volum spiralat · {groupInfo!.filesInGroup.length} fișiere legate
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Fișierul propriu-zis */}
                         <div
-                          key={item.id}
                           data-file-id={item.id}
                           role="button"
                           tabIndex={0}
@@ -827,12 +837,18 @@ export default function Home() {
                             }
                           }}
                           className={`file-list-item flex items-center gap-3 px-4 py-3.5 transition-all duration-200 ${
-                            isBinding ? "border-l-4 border-blue-400 bg-white" : ""
-                          } ${
                             selectedFileId === item.id
-                              ? "ring-2 ring-blue-500 ring-offset-2 bg-white shadow-[var(--shadow)]"
+                              ? "ring-2 ring-blue-500 ring-offset-1 bg-white shadow-[var(--shadow)]"
                               : "bg-white shadow-[var(--shadow)] ring-1 ring-slate-200/80 hover:ring-slate-300 hover:shadow-[var(--shadow-md)]"
-                          } ${isBinding && index > 0 ? "border-t border-blue-200/60 rounded-none ring-0 shadow-none" : "rounded-xl"} ${!isBinding ? "rounded-xl" : index === 0 ? "rounded-t-lg" : index === group.filesInGroup.length - 1 ? "rounded-b-lg" : ""}`}
+                          } ${
+                            isInGroup
+                              ? `border-x-2 border-blue-300 ${
+                                  !isFirstInGroup ? "border-t border-t-blue-200/60" : "border-t-0"
+                                } ${
+                                  isLastInGroup ? "border-b-2 rounded-b-xl" : "border-b-0"
+                                } ring-0 shadow-none`
+                              : "rounded-xl"
+                          }`}
                           style={{ animationDelay: `${globalIndex * 60}ms` }}
                         >
                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
@@ -864,37 +880,6 @@ export default function Home() {
                                 </span>
                               )}
                             </p>
-                            {globalIndex >= 1 && (
-                              <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-slate-600">
-                                <span
-                                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                                    item.groupWithPrevious
-                                      ? "bg-blue-100 text-blue-800 border border-blue-200"
-                                      : "bg-slate-100 text-slate-700 border border-slate-200"
-                                  }`}
-                                >
-                                  {item.groupWithPrevious ? "În același volum (set legat împreună)" : "Volum separat"}
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setFiles((prev) =>
-                                      prev.map((f, i) =>
-                                        i === globalIndex
-                                          ? { ...f, groupWithPrevious: !item.groupWithPrevious }
-                                          : f
-                                      )
-                                    );
-                                  }}
-                                  className="text-[11px] font-medium text-blue-600 hover:text-blue-700 hover:underline"
-                                >
-                                  {item.groupWithPrevious
-                                    ? "Separă de volumul de deasupra"
-                                    : "Unește cu volumul de deasupra"}
-                                </button>
-                              </div>
-                            )}
                           </div>
                           <div className="flex shrink-0 items-center gap-0.5">
                             <div className="flex flex-col rounded-lg border border-slate-200 bg-slate-50/80 p-0.5">
@@ -942,30 +927,44 @@ export default function Home() {
                             </button>
                           </div>
                         </div>
-                      );
-                    };
 
-                    if (group.filesInGroup.length === 1) {
-                      return (
-                        <li key={`group-${groupIndex}`} className="list-none">
-                          {renderFileRow(group.filesInGroup[0], 0)}
-                        </li>
-                      );
-                    }
-
-                    return (
-                      <li key={`group-${groupIndex}`} className="list-none">
-                        <div className="rounded-xl border-2 border-blue-200/80 bg-blue-50/50 overflow-hidden shadow-sm">
-                          <div className="flex items-center gap-2 px-3 py-2 bg-blue-100/70 border-b border-blue-200/60">
-                            <BookMarked className="h-4 w-4 text-blue-600 shrink-0" />
-                            <span className="text-sm font-semibold text-blue-800">
-                              Volum (set de documente legate) · {group.filesInGroup.length} fișiere
-                            </span>
+                        {/* Connector vizual între fișiere — buton de legare/dezlegare */}
+                        {nextItem && (
+                          <div className="relative flex items-center justify-center py-1.5">
+                            <div className={`absolute inset-x-8 top-1/2 h-px ${isLinkedToNext ? "bg-blue-300" : "bg-slate-200"}`} />
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setFiles((prev) =>
+                                  prev.map((f, i) =>
+                                    i === globalIndex + 1
+                                      ? { ...f, groupWithPrevious: !nextItem.groupWithPrevious }
+                                      : f
+                                  )
+                                );
+                              }}
+                              className={`relative z-10 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-200 ${
+                                isLinkedToNext
+                                  ? "bg-blue-600 text-white shadow-md hover:bg-blue-700 ring-2 ring-blue-200"
+                                  : "bg-white text-slate-600 shadow-sm ring-1 ring-slate-200 hover:ring-blue-300 hover:text-blue-700 hover:bg-blue-50"
+                              }`}
+                              title={isLinkedToNext ? "Separă aceste fișiere în volume diferite" : "Leagă fișierele într-un singur volum spiralat"}
+                            >
+                              {isLinkedToNext ? (
+                                <>
+                                  <Unlink2 className="h-3.5 w-3.5" />
+                                  Separă
+                                </>
+                              ) : (
+                                <>
+                                  <Link2 className="h-3.5 w-3.5" />
+                                  Leagă împreună
+                                </>
+                              )}
+                            </button>
                           </div>
-                          <div className="p-2 space-y-0">
-                            {group.filesInGroup.map((item, idx) => renderFileRow(item, idx))}
-                          </div>
-                        </div>
+                        )}
                       </li>
                     );
                   })}
@@ -975,11 +974,6 @@ export default function Home() {
                   <p className="mt-3 flex items-center gap-2 text-sm text-slate-500">
                     <Loader2 className="h-4 w-4 animate-spin" />
                     Se procesează fișierele…
-                  </p>
-                )}
-                {files.length > 1 && (
-                  <p className="mt-3 text-xs text-slate-500">
-                    Bifează „Împreună cu documentul anterior” pentru documente care formează o singură îndosariere. Folosește ↑/↓ pentru ordine.
                   </p>
                 )}
               </section>
@@ -1131,7 +1125,6 @@ export default function Home() {
                             const group = groups.find((g) =>
                               g.filesInGroup.some((f) => f.id === file.id)
                             );
-                            // Dacă nu e grup sau este un singur fișier, aplicăm doar pe acel document
                             if (!group || group.filesInGroup.length === 1) {
                               return prev.map((f) =>
                                 f.id === file.id ? { ...f, copies: next } : f
@@ -1140,7 +1133,6 @@ export default function Home() {
                             const idsInGroup = new Set(
                               group.filesInGroup.map((f) => f.id)
                             );
-                            // Pentru documente într-un volum (set legat împreună), numărul de copii este per grup
                             return prev.map((f) =>
                               idsInGroup.has(f.id) ? { ...f, copies: next } : f
                             );
@@ -1325,7 +1317,7 @@ export default function Home() {
         </div>
         </section>
 
-        {/* Rezumat – sub opțiunile de printare și legare */}
+        {/* Rezumat */}
         <section className="rounded-2xl bg-gradient-to-br from-blue-50/80 to-slate-50/80 p-4 ring-1 ring-slate-200/60 sm:p-5">
           <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Rezumat</p>
           <p className="mt-1 text-sm text-slate-700">
@@ -1344,7 +1336,6 @@ export default function Home() {
               </>
             )}
           </p>
-          {/* Breakdown pagini color vs A/N detectate */}
           {detectedColorPages > 0 && (
             <p className="mt-1.5 text-xs text-slate-600">
               Pagini detectate automat:{" "}
@@ -1361,7 +1352,7 @@ export default function Home() {
         </div>
         )}
 
-        {/* Buton principal Revizuitează și plătește – jos */}
+        {/* Buton principal Finalizare Comandă */}
         <section className="mt-10 border-t border-slate-200/80 pt-8 pb-4">
           <div className="mx-auto max-w-2xl rounded-2xl bg-white px-6 py-6 shadow-[var(--shadow-lg)] ring-1 ring-slate-200/80 sm:px-8 sm:py-8">
             <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:justify-between sm:text-left">
@@ -1424,7 +1415,7 @@ export default function Home() {
         </section>
       </div>
 
-      {/* Overlay succes comandă (ramburs) – mulțumire, livrare 3 zile, detalii fișiere și legare */}
+      {/* Overlay succes comandă (ramburs) */}
       {orderSuccessDetails && (
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/60 p-4">
           <div className="my-8 w-full max-w-lg rounded-2xl bg-white shadow-2xl">
@@ -1438,7 +1429,8 @@ export default function Home() {
               </p>
               {orderSuccessDetails.paymentMethod === "ramburs" && (
                 <p className="mt-3 rounded-lg bg-amber-50 px-4 py-2 text-sm font-medium text-amber-800">
-                  Vă vom suna pentru confirmarea comenzii.               </p>
+                  Vă vom suna pentru confirmarea comenzii.
+                </p>
               )}
             </div>
             <div className="max-h-[50vh] overflow-y-auto px-6 py-5 space-y-5">
@@ -1851,12 +1843,6 @@ export default function Home() {
                         <span className="text-[11px] uppercase tracking-wide text-slate-500">
                           Tip:
                         </span>
-                        {userChosenColorPages > 0 && (
-                          <p className="text-[11px] text-slate-500">
-                            În total, <span className="font-semibold">{userChosenColorPages}</span>{" "}
-                            pagini sunt setate pe <span className="font-semibold">Color</span>.
-                          </p>
-                        )}
                         <button
                           type="button"
                           onClick={() =>
