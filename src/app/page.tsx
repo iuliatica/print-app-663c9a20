@@ -1271,7 +1271,7 @@ export default function Home() {
         </section>
           </div>
         </div>
-        ) : null}
+        )}
 
         {/* Buton principal Revizuitează și plătește – jos */}
         <section className="mt-10 border-t border-slate-200/80 pt-8 pb-4">
