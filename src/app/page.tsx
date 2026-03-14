@@ -449,23 +449,17 @@ export default function Home() {
   const totalPrice = pagePrice + spiralPrice;
   const totalWithShipping = totalPrice + SHIPPING_COST_LEI;
 
-  const coverColors: {
-    value: CoverColor;
+  const coverBackColors: {
+    value: CoverBackColor;
     label: string;
     circleClass: string;
   }[] = [
-    {
-      value: "transparent",
-      label: "Fără copertă",
-      circleClass: "bg-slate-100 border-2 border-dashed border-slate-300",
-    },
-    {
-      value: "alb",
-      label: "Alb",
-      circleClass: "bg-white border border-slate-200 shadow-inner",
-    },
     { value: "negru", label: "Negru", circleClass: "bg-slate-800" },
-    { value: "albastru", label: "Albastru", circleClass: "bg-blue-500" },
+    { value: "alb", label: "Alb", circleClass: "bg-white border border-slate-200 shadow-inner" },
+    { value: "albastru_inchis", label: "Albastru închis", circleClass: "bg-blue-900" },
+    { value: "galben", label: "Galben", circleClass: "bg-yellow-400" },
+    { value: "rosu", label: "Roșu", circleClass: "bg-red-500" },
+    { value: "verde", label: "Verde", circleClass: "bg-green-600" },
   ];
 
   const spiralColorOptions: {
@@ -475,8 +469,6 @@ export default function Home() {
   }[] = [
     { value: "negru", label: "Negru", circleClass: "bg-slate-800" },
     { value: "alb", label: "Alb", circleClass: "bg-white border border-slate-200 shadow-inner" },
-    { value: "albastru", label: "Albastru", circleClass: "bg-blue-500" },
-    { value: "rosu", label: "Roșu", circleClass: "bg-red-500" },
   ];
 
   const selectedGroupPages =
