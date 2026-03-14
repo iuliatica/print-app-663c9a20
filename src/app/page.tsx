@@ -1476,8 +1476,8 @@ export default function Home() {
                     const opts = groupOptions[group.groupIndex] ?? defaultGroupOpts;
                     const spiralLabel = spiralOptions.find((o) => o.value === opts.spiralType)?.label ?? "Fără spirală";
                     const spiralColorLabel = opts.spiralType !== "none" ? spiralColorOptions.find((c) => c.value === opts.spiralColor)?.label ?? opts.spiralColor : null;
-                    const coverFrontLabel = coverColors.find((c) => c.value === opts.coverFrontColor)?.label ?? "—";
-                    const coverBackLabel = coverColors.find((c) => c.value === opts.coverBackColor)?.label ?? "—";
+                    const coverFrontLabel = "Transparent";
+                    const coverBackLabel = coverBackColors.find((c) => c.value === opts.coverBackColor)?.label ?? opts.coverBackColor;
                     const isSingleDoc = group.filesInGroup.length === 1;
                     return (
                       <li key={group.groupIndex} className="border-b border-slate-200 pb-4 last:border-0 last:pb-0">
