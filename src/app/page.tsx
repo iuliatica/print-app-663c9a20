@@ -1595,7 +1595,7 @@ export default function Home() {
                     <div className="space-y-3 text-xs text-slate-600">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="text-[11px] uppercase tracking-wide text-slate-500">Tip:</span>
-                        <button type="button" onClick={() => setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, printMode: "bw" } : f))} className={`rounded-full px-3 py-1 text-xs font-medium ${file.printMode === "bw" ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>A/N</button>
+                        <button type="button" onClick={() => setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, printMode: "bw" } : f))} className={`rounded-full px-3 py-1 text-xs font-medium ${file.printMode === "bw" ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Alb-negru</button>
                         <button type="button" onClick={() => setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, printMode: "color" } : f))} className={`rounded-full px-3 py-1 text-xs font-medium ${file.printMode === "color" ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Color</button>
                       </div>
                       <label className="flex items-center gap-2">
