@@ -25,9 +25,7 @@ const PRICE_BW_ONE_SIDE = 0.25;
 const PRICE_BW_DUPLEX = 0.35;
 const PRICE_COLOR_ONE_SIDE = 1.5;
 const PRICE_COLOR_DUPLEX = 2.5;
-const SPIRAL_PLASTIC_UP_TO_200 = 3;
-const SPIRAL_PLASTIC_OVER_200 = 5;
-const SPIRAL_PAGE_THRESHOLD = 200;
+const SPIRAL_PRICE = 3;
 const SHIPPING_COST_LEI = 15;
 
 /** Limită mărime fișier PDF (50 MB). */
