@@ -600,10 +600,7 @@ export default function Home() {
       fileUrls.forEach((url, i) => {
         fileUrlMeta[`file_url_${i}`] = url;
       });
-      const coverColorSummary =
-        coverFrontColor === "transparent" && coverBackColor === "transparent"
-          ? ""
-          : `fata:${coverFrontColor};spate:${coverBackColor}`;
+      const coverColorSummary = `fata:transparent;spate:${coverBackColor}`;
       const amountBani = Math.round(totalWithShipping * 100);
       const res = await fetch("/api/checkout", {
         method: "POST",
