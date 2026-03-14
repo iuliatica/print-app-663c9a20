@@ -1280,27 +1280,37 @@ export default function Home() {
                       <FileText className="h-4 w-4 text-slate-500" />
                       {totalPages} pagini
                     </span>
-                    {totalPages > 0 && (
+                    {detectedColorPages > 0 && (
                       <>
-                        <span className="inline-flex items-center gap-1.5 bg-blue-100 px-3 py-2 text-base font-bold text-blue-700">
-                          <CreditCard className="h-4 w-4 text-blue-500" />
-                          {totalPrice.toFixed(2)} lei printare
+                        <span className="inline-flex items-center gap-1.5 bg-blue-100 px-3 py-2 text-sm font-bold text-blue-700">
+                          {detectedColorPages} color
                         </span>
-                        <span className="inline-flex items-center gap-1.5 bg-slate-800 px-3 py-2 text-base font-bold text-white">
-                          {totalWithShipping.toFixed(2)} lei total
+                        <span className="inline-flex items-center gap-1.5 bg-slate-200 px-3 py-2 text-sm font-bold text-slate-700">
+                          {detectedBwPages} alb-negru
                         </span>
                       </>
                     )}
-                    {totalPages === 0 && (
-                      <span className="text-sm text-slate-500">Transport: {SHIPPING_COST_LEI} lei</span>
-                    )}
                   </div>
-                  {detectedColorPages > 0 && (
-                    <p className="mt-2 text-sm text-slate-600">
-                      Detectat: <span className="font-bold text-blue-600">{detectedColorPages} color</span>
-                      <span className="mx-1.5 text-slate-400">·</span>
-                      <span className="font-bold text-slate-700">{detectedBwPages} alb-negru</span>
-                    </p>
+                  {totalPages > 0 && (
+                    <div className="mt-3 flex flex-wrap items-center gap-3">
+                      <span className="inline-flex items-center gap-1.5 bg-blue-100 px-3 py-2 text-base font-bold text-blue-700">
+                        <CreditCard className="h-4 w-4 text-blue-500" />
+                        {totalPrice.toFixed(2)} lei printare
+                      </span>
+                      <span className="inline-flex items-center gap-1.5 bg-amber-100 px-3 py-2 text-base font-bold text-amber-800">
+                        +{SHIPPING_COST_LEI} lei transport
+                      </span>
+                      <span className="inline-flex items-center gap-1.5 bg-slate-800 px-3 py-2 text-base font-bold text-white">
+                        = {totalWithShipping.toFixed(2)} lei total
+                      </span>
+                    </div>
+                  )}
+                  {totalPages === 0 && (
+                    <div className="mt-3">
+                      <span className="inline-flex items-center gap-1.5 bg-amber-100 px-3 py-2 text-sm font-bold text-amber-800">
+                        Transport: {SHIPPING_COST_LEI} lei
+                      </span>
+                    </div>
                   )}
                   {orderSuccess && <p className="mt-1.5 text-xs font-medium text-green-700">{orderSuccess}</p>}
                   {checkoutError && !checkoutModalOpen && <p className="mt-1.5 text-xs font-medium text-red-600">{checkoutError}</p>}
