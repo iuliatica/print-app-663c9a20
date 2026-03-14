@@ -545,7 +545,7 @@ export default function Home() {
                 copies: f.copies ?? DEFAULT_PRINT_OPTIONS.copies,
               })),
               spiralType: opts.spiralType,
-              spiralColor: opts.spiralColor,
+              spiralColor: opts.spiralColor ?? "negru",
               coverFrontColor: opts.coverFrontColor,
               coverBackColor: opts.coverBackColor,
             };
@@ -1271,7 +1271,7 @@ export default function Home() {
         </section>
           </div>
         </div>
-        ) : null}
+        )}
 
         {/* Buton principal Revizuitează și plătește – jos */}
         <section className="mt-10 border-t border-slate-200/80 pt-8 pb-4">

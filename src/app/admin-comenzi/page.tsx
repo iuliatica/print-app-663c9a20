@@ -35,7 +35,6 @@ type ConfigDetails = {
   coverBackColor?: string;
   /** Număr de fișiere per grup de legare (când există documente standalone + îndosarieri) */
   bindingGroupSizes?: number[];
-  printed_files?: boolean[];
   ramburs_confirmed?: boolean;
   /** Opțiuni spirală/coperți per grup */
   bindingOptions?: Array<{

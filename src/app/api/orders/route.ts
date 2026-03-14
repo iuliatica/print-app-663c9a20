@@ -147,7 +147,7 @@ export async function POST(request: Request) {
     }
     const data = validation.data!;
 
-    const supabase = createClient(supabaseUrl, serviceRoleKey, {
+    const supabase = createClient(supabaseUrl!, serviceRoleKey!, {
       auth: { persistSession: false },
     });
 
