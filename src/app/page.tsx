@@ -847,6 +847,11 @@ export default function Home() {
                                   {(item.copies ?? 1) > 1 ? "i" : ""} ·{" "}
                                   {(item.printMode ?? DEFAULT_PRINT_OPTIONS.printMode) === "color" ? "Color" : "Alb-negru"}
                                   {(item.duplex ?? DEFAULT_PRINT_OPTIONS.duplex) ? " · Față-verso" : ""}
+                                  {(item.printMode ?? DEFAULT_PRINT_OPTIONS.printMode) === "color" && item.colorAnalysis && (
+                                    <span className="block text-xs text-slate-400 mt-0.5">
+                                      Detectat: {item.colorAnalysis.colorPages} color, {item.colorAnalysis.bwPages} alb-negru
+                                    </span>
+                                  )}
                                 </span>
                               ) : item.error ? (
                                 <span className="text-red-600">{item.error}</span>
