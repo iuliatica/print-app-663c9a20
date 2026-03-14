@@ -502,6 +502,21 @@ export default function Home() {
     setCheckoutError(null);
     setIsCheckoutLoading(true);
     const { name, phone, email, address } = shipping;
+
+    // Validare capsare: nu permite dacă vreun grup cu capsare are > 240 coli
+    const capsareError = bindingGroups.some((grp, groupIndex) => {
+      const opts = groupOptions[groupIndex] ?? defaultGroupOpts;
+      if (opts.spiralType !== "capsare") return false;
+      const groupPages = grp.filesInGroup.reduce(
+        (s, f) => s + (f.pages != null ? f.pages * (f.copies ?? DEFAULT_PRINT_OPTIONS.copies) : 0),
+        0
+      );
+      return groupPages > 240;
+    });
+    if (capsareError) {
+      setCheckoutError("Capsarea nu este disponibilă pentru grupuri cu mai mult de 240 de coli. Schimbă tipul de legare.");
+      return;
+    }
     try {
       const validFiles = files.filter((f) => !f.error);
       if (validFiles.length === 0) {
