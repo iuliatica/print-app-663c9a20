@@ -765,7 +765,7 @@ export default function Home() {
               Rapid · Sigur · Stripe
             </div>
             <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-              Printare online
+              Printica
             </h1>
             <p className="mt-2 text-base text-slate-600 sm:text-lg">
               Încarcă PDF-urile, configurează opțiunile și plătește în siguranță.
