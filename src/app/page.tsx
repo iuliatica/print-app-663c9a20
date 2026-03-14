@@ -11,7 +11,7 @@ import {
   BookOpen,
   BookMarked,
   Circle,
-  CheckCircle2,
+  Paperclip,
   Settings2,
   ChevronUp,
   ChevronDown,
@@ -561,9 +561,9 @@ export default function Home() {
 
   const spiralOptions: { value: SpiralType; label: string; icon: React.ReactNode; description: string }[] = [
     { value: "none", label: "Doar print", icon: <BookOpen className="h-6 w-6" />, description: "Fără legare" },
-    { value: "spirala", label: "Spiralare", icon: <Circle className="h-6 w-6" />, description: "3 lei" },
+    { value: "spirala", label: "Spiralare", icon: <Circle className="h-6 w-6" />, description: "+3 lei" },
     { value: "perforare2", label: "Perforare", icon: <BookMarked className="h-6 w-6" />, description: "2 găuri" },
-    { value: "capsare", label: "Capsare", icon: <CheckCircle2 className="h-6 w-6" />, description: "Max 240 coli" },
+    { value: "capsare", label: "Capsare", icon: <Paperclip className="h-6 w-6" />, description: "Max 240 coli" },
   ];
 
   // ─── Checkout handler ──────────────────────────────────────────────────────
