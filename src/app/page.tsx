@@ -838,8 +838,6 @@ export default function Home() {
                 Acceptă mai multe fișiere · Doar PDF · Max 50 MB per fișier
               </p>
             </label>
-
-            <FAQ />
           </div>
         ) : (
           <>
