@@ -96,8 +96,7 @@ type OrderSuccessGroup = {
   files: { name: string; pages: number | null; printMode: string; duplex: boolean; copies: number }[];
   spiralType: SpiralType;
   spiralColor: SpiralColorOption;
-  coverFrontColor: CoverColor;
-  coverBackColor: CoverColor;
+  coverBackColor: CoverBackColor;
 };
 
 type OrderSuccessDetails = {
