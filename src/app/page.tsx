@@ -480,7 +480,7 @@ export default function Home() {
       : totalPages;
   const spiralOptions: { value: SpiralType; label: string; icon: React.ReactNode; description: string }[] = [
     { value: "none", label: "Doar print", icon: <BookOpen className="h-8 w-8" />, description: "Fără legare, doar printare" },
-    { value: "plastic", label: "Spiralare", icon: <Circle className="h-8 w-8" />, description: selectedGroupPages <= SPIRAL_PAGE_THRESHOLD ? "3 lei" : "5 lei" },
+    { value: "spirala", label: "Spiralare", icon: <Circle className="h-8 w-8" />, description: "3 lei" },
     { value: "perforare2", label: "Perforare 2 găuri", icon: <BookMarked className="h-8 w-8" />, description: "Perforare dosar cu 2 găuri" },
     { value: "capsare", label: "Capsare (max 240 coli)", icon: <CheckCircle2 className="h-8 w-8" />, description: "Capsare colț / lateral (maxim 240 coli)" },
   ];
