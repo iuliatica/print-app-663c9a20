@@ -49,7 +49,7 @@ export async function POST(request: Request) {
       customerEmail = metadata.shipping_email.trim().toLowerCase();
     }
 
-    const session = await stripe.checkout.sessions.create({
+    const session = await getStripe().checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: [
         {
