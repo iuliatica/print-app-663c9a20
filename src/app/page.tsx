@@ -24,6 +24,7 @@ import {
   Check,
 } from "lucide-react";
 import { getPdfPageCount, analyzePdfColors, type PdfColorAnalysis } from "@/lib/pdf-utils";
+import printicaLogo from "@/assets/printica-logo.png";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const PRICE_BW_ONE_SIDE = 0.25;
@@ -759,14 +760,17 @@ export default function Home() {
       <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
         {/* Header */}
         <header className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
-          <div className="min-w-0 flex-1 text-center lg:text-left">
+           <div className="min-w-0 flex-1 text-center lg:text-left">
             <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-1.5 text-sm font-medium text-blue-700">
               <Printer className="h-4 w-4" />
               Rapid · Sigur · Stripe
             </div>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-              Printica
-            </h1>
+            <div className="flex items-center justify-center lg:justify-start gap-3">
+              <img src={printicaLogo.src} alt="Printica" className="h-10 w-10 object-contain" />
+              <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+                Printica
+              </h1>
+            </div>
             <p className="mt-2 text-base text-slate-600 sm:text-lg">
               Încarcă PDF-urile, configurează opțiunile și plătește în siguranță.
             </p>
