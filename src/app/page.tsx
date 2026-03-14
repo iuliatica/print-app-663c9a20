@@ -680,12 +680,8 @@ export default function Home() {
                     <p className="mt-0.5 font-semibold text-blue-600 tabular-nums">{PRICE_COLOR_DUPLEX} lei</p>
                   </div>
                   <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-1.5 py-1 sm:px-2 sm:py-1.5">
-                    <p className="text-slate-600 leading-tight truncate">Plast. ≤{SPIRAL_PAGE_THRESHOLD}</p>
-                    <p className="mt-0.5 font-semibold text-slate-800 tabular-nums">{SPIRAL_PLASTIC_UP_TO_200} lei</p>
-                  </div>
-                  <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-1.5 py-1 sm:px-2 sm:py-1.5">
-                    <p className="text-slate-600 leading-tight truncate">Plast. &gt;{SPIRAL_PAGE_THRESHOLD}</p>
-                    <p className="mt-0.5 font-semibold text-slate-800 tabular-nums">{SPIRAL_PLASTIC_OVER_200} lei</p>
+                    <p className="text-slate-600 leading-tight truncate">Spiralare</p>
+                    <p className="mt-0.5 font-semibold text-slate-800 tabular-nums">{SPIRAL_PRICE} lei</p>
                   </div>
                 </div>
               </div>
