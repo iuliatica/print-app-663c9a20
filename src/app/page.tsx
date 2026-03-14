@@ -1359,6 +1359,11 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* FAQ - always visible */}
+        <div className="mx-auto max-w-2xl">
+          <FAQ />
+        </div>
       </div>
 
       {/* ═══ Checkout modal ═══ */}
