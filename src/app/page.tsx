@@ -372,6 +372,31 @@ export default function Home() {
     0
   );
 
+  // Calcul pagini color detectate automat (din analiza PDF) — doar pentru fișierele setate pe Color
+  const detectedColorPages = files.reduce((sum, f) => {
+    if (f.pages == null) return sum;
+    const mode = f.printMode ?? DEFAULT_PRINT_OPTIONS.printMode;
+    const copies = f.copies ?? DEFAULT_PRINT_OPTIONS.copies;
+    if (mode === "color" && f.colorAnalysis) {
+      return sum + f.colorAnalysis.colorPages * copies;
+    }
+    return sum;
+  }, 0);
+
+  const detectedBwPages = files.reduce((sum, f) => {
+    if (f.pages == null) return sum;
+    const mode = f.printMode ?? DEFAULT_PRINT_OPTIONS.printMode;
+    const copies = f.copies ?? DEFAULT_PRINT_OPTIONS.copies;
+    if (mode === "color" && f.colorAnalysis) {
+      return sum + f.colorAnalysis.bwPages * copies;
+    }
+    if (mode === "bw") {
+      return sum + f.pages * copies;
+    }
+    // color mode without analysis → treat all as color (0 bw)
+    return sum;
+  }, 0);
+
   // Pagini color pe baza opțiunii alese de utilizator (printMode === "color")
   const userChosenColorPages = files.reduce(
     (sum, f) =>
@@ -382,21 +407,47 @@ export default function Home() {
     0
   );
 
+  /**
+   * Calcul preț per pagină — când modul este "color" și avem analiza PDF,
+   * aplicăm preț color doar paginilor detectate ca fiind color,
+   * iar paginile alb-negru din același document se taxează la tarif A/N.
+   */
   const pagePrice = files.reduce((sum, f) => {
     if (f.pages == null) return sum;
     const mode = f.printMode ?? DEFAULT_PRINT_OPTIONS.printMode;
     const duplex = f.duplex ?? DEFAULT_PRINT_OPTIONS.duplex;
     const copies = f.copies ?? DEFAULT_PRINT_OPTIONS.copies;
+
+    if (mode === "bw") {
+      // Toate paginile sunt A/N
+      const sides = f.pages * copies;
+      if (duplex) {
+        return sum + Math.ceil(sides / 2) * PRICE_BW_DUPLEX;
+      }
+      return sum + sides * PRICE_BW_ONE_SIDE;
+    }
+
+    // mode === "color" — folosim detecția automată dacă e disponibilă
+    if (f.colorAnalysis) {
+      const colorSides = f.colorAnalysis.colorPages * copies;
+      const bwSides = f.colorAnalysis.bwPages * copies;
+      if (duplex) {
+        // Aproximare: paginile color se taxează la preț color, cele A/N la preț A/N
+        // (pe fiecare foaie se va printa la tariful cel mai mare al paginilor de pe foaie,
+        //  dar folosim o aproximare per pagină pentru simplitate)
+        const colorSheets = Math.ceil(colorSides / 2);
+        const bwSheets = Math.ceil(bwSides / 2);
+        return sum + colorSheets * PRICE_COLOR_DUPLEX + bwSheets * PRICE_BW_DUPLEX;
+      }
+      return sum + colorSides * PRICE_COLOR_ONE_SIDE + bwSides * PRICE_BW_ONE_SIDE;
+    }
+
+    // Fără analiza color → toate paginile la tarif color (fallback)
     const sides = f.pages * copies;
     if (duplex) {
-      const sheets = Math.ceil(sides / 2);
-      const perSheet =
-        mode === "bw" ? PRICE_BW_DUPLEX : PRICE_COLOR_DUPLEX;
-      return sum + sheets * perSheet;
+      return sum + Math.ceil(sides / 2) * PRICE_COLOR_DUPLEX;
     }
-    const perSide =
-      mode === "bw" ? PRICE_BW_ONE_SIDE : PRICE_COLOR_ONE_SIDE;
-    return sum + sides * perSide;
+    return sum + sides * PRICE_COLOR_ONE_SIDE;
   }, 0);
   const spiralPrice = useMemo(() => {
     let sum = 0;
