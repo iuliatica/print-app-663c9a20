@@ -1310,10 +1310,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* FAQ - shown after files are loaded too */}
-            <div className="mt-6 mx-auto max-w-2xl">
-              <FAQ />
-            </div>
           </>
         )}
 
