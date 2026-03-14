@@ -59,7 +59,7 @@ const NUM = "[-]?\\d*\\.?\\d+";
  * Verifică dacă un content-stream text conține operatori de culoare
  * care indică pagină color (nu grayscale).
  */
-function contentStreamHasColor(text: string): boolean {
+function contentStreamHasColor(text: string, resources?: PDFDict, context?: PDFDocument["context"]): boolean {
   // DeviceRGB fill/stroke: "r g b rg" or "r g b RG"
   const rgRegex = new RegExp(
     `(${NUM})\\s+(${NUM})\\s+(${NUM})\\s+(rg|RG)\\b`,
@@ -89,17 +89,61 @@ function contentStreamHasColor(text: string): boolean {
     }
   }
 
-  // scn/SCN with 3+ args that aren't all equal (color in current space)
-  const scnRegex = new RegExp(
-    `(${NUM})\\s+(${NUM})\\s+(${NUM})(?:\\s+${NUM})?\\s+(scn|SCN)\\b`,
+  // sc/SC and scn/SCN with 3+ args that aren't all equal (color in current space)
+  const scRegex = new RegExp(
+    `(${NUM})\\s+(${NUM})\\s+(${NUM})(?:\\s+${NUM})?\\s+(sc|SC|scn|SCN)\\b`,
     "g"
   );
-  while ((match = scnRegex.exec(text)) !== null) {
+  while ((match = scRegex.exec(text)) !== null) {
     const a = parseFloat(match[1]);
     const b = parseFloat(match[2]);
     const c = parseFloat(match[3]);
     if (a !== b || b !== c) {
       return true;
+    }
+  }
+
+  // Check cs/CS operators that set a non-gray color space
+  // This catches cases where color is set via a named color space
+  if (resources && context) {
+    const csRegex = /\/(\S+)\s+(cs|CS)\b/g;
+    while ((match = csRegex.exec(text)) !== null) {
+      const csName = match[1];
+      // Built-in spaces
+      if (csName === "DeviceRGB" || csName === "DeviceCMYK") return true;
+      if (csName === "DeviceGray") continue;
+
+      // Check named color spaces from resources
+      try {
+        const csDict = resources.get(PDFName.of("ColorSpace"));
+        if (csDict) {
+          const resolved = csDict instanceof PDFRef ? context.lookup(csDict) : csDict;
+          if (resolved instanceof PDFDict) {
+            const entry = resolved.get(PDFName.of(csName));
+            if (entry) {
+              const entryStr = entry.toString();
+              if (entryStr.includes("DeviceRGB") || entryStr.includes("DeviceCMYK")) return true;
+              // Resolve array-based color spaces like [/ICCBased <ref>]
+              const entryResolved = entry instanceof PDFRef ? context.lookup(entry) : entry;
+              if (entryResolved instanceof PDFArray && entryResolved.size() >= 2) {
+                const first = entryResolved.get(0)?.toString() ?? "";
+                if (first.includes("ICCBased")) {
+                  const profileRef = entryResolved.get(1);
+                  const profile = profileRef instanceof PDFRef ? context.lookup(profileRef) : profileRef;
+                  if (profile instanceof PDFRawStream) {
+                    const n = profile.dict.get(PDFName.of("N"));
+                    const nVal = parseInt(n?.toString() ?? "", 10);
+                    if (nVal >= 3) return true;
+                  }
+                }
+                if (first.includes("DeviceRGB") || first.includes("DeviceCMYK")) return true;
+              }
+            }
+          }
+        }
+      } catch {
+        // ignore
+      }
     }
   }
 
