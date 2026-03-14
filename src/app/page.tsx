@@ -1342,6 +1342,16 @@ export default function Home() {
               </>
             )}
           </p>
+          {/* Breakdown pagini color vs A/N detectate */}
+          {detectedColorPages > 0 && (
+            <p className="mt-1.5 text-xs text-slate-600">
+              Pagini detectate automat:{" "}
+              <span className="font-semibold text-blue-600">{detectedColorPages} color</span>
+              <span className="mx-1 text-slate-400">·</span>
+              <span className="font-semibold text-slate-700">{detectedBwPages} alb-negru</span>
+              <span className="ml-1 text-slate-400">(prețul reflectă tipul real al fiecărei pagini)</span>
+            </p>
+          )}
           {orderSuccess && <p className="mt-1.5 text-xs font-medium text-green-700">{orderSuccess}</p>}
           {checkoutError && <p className="mt-1.5 text-xs font-medium text-red-600">{checkoutError}</p>}
         </section>
