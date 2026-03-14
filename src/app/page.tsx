@@ -1072,17 +1072,24 @@ export default function Home() {
                         };
                         return (
                           <div key={file.id}>
-                            <div className="mb-4 flex items-center gap-2">
-                              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
-                                <Printer className="h-4 w-4" />
+                            <div className="mb-5 flex items-start gap-3">
+                              <span className="flex h-10 w-10 shrink-0 items-center justify-center bg-blue-100 text-blue-600">
+                                <Printer className="h-5 w-5" />
                               </span>
                               <div className="min-w-0 flex-1">
                                 <h3 className="text-sm font-semibold text-slate-800">Opțiuni de printare</h3>
-                                <p className="truncate text-xs font-medium text-slate-600" title={file.name}>{file.name}</p>
+                                <p className="truncate text-sm font-medium text-slate-600 mt-0.5" title={file.name}>{file.name}</p>
                                 {file.pages != null && (
-                                  <p className="text-xs text-slate-500">
-                                    {file.pages} pagini · <span className="font-semibold text-blue-600">{calculateFilePrice(file).toFixed(2)} lei</span>
-                                  </p>
+                                  <div className="mt-2 flex items-center gap-3">
+                                    <span className="inline-flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 text-sm font-bold text-slate-800">
+                                      <FileText className="h-4 w-4 text-slate-500" />
+                                      {file.pages} pagini
+                                    </span>
+                                    <span className="inline-flex items-center gap-1.5 bg-blue-100 px-3 py-1.5 text-sm font-bold text-blue-700">
+                                      <CreditCard className="h-4 w-4 text-blue-500" />
+                                      {calculateFilePrice(file).toFixed(2)} lei
+                                    </span>
+                                  </div>
                                 )}
                               </div>
                             </div>
