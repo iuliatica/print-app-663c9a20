@@ -172,8 +172,7 @@ export default function Home() {
   const defaultGroupOpts = {
     spiralType: "none" as SpiralType,
     spiralColor: "negru" as SpiralColorOption,
-    coverFrontColor: "transparent" as CoverColor,
-    coverBackColor: "transparent" as CoverColor,
+    coverBackColor: "negru" as CoverBackColor,
   };
   const [groupOptions, setGroupOptions] = useState<Record<number, typeof defaultGroupOpts>>({});
   const bindingGroups = useMemo(() => getBindingGroups(files), [files]);
