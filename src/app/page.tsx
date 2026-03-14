@@ -16,7 +16,7 @@ import {
   ChevronUp,
   ChevronDown,
 } from "lucide-react";
-import { getPdfPageCount } from "@/lib/pdf-utils";
+import { getPdfPageCount, analyzePdfColors, type PdfColorAnalysis } from "@/lib/pdf-utils";
 
 const PRICE_BW_ONE_SIDE = 0.25;
 const PRICE_BW_DUPLEX = 0.35;
