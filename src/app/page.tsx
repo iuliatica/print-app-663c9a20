@@ -88,9 +88,9 @@ function validateShipping(form: ShippingForm): ShippingErrors {
 }
 
 type PrintMode = "color" | "bw";
-type SpiralType = "none" | "plastic" | "perforare2" | "capsare";
-type SpiralColorOption = "negru" | "alb" | "albastru" | "rosu";
-type CoverColor = "transparent" | "alb" | "negru" | "albastru";
+type SpiralType = "none" | "spirala" | "perforare2" | "capsare";
+type SpiralColorOption = "negru" | "alb";
+type CoverBackColor = "negru" | "alb" | "albastru_inchis" | "galben" | "rosu" | "verde";
 
 type OrderSuccessGroup = {
   files: { name: string; pages: number | null; printMode: string; duplex: boolean; copies: number }[];
