@@ -563,7 +563,7 @@ export default function Home() {
     { value: "none", label: "Doar print", icon: <BookOpen className="h-6 w-6" />, description: "Fără legare" },
     { value: "spirala", label: "Spiralare", icon: <Circle className="h-6 w-6" />, description: "+3 lei" },
     { value: "perforare2", label: "Perforare", icon: <BookMarked className="h-6 w-6" />, description: "2 găuri" },
-    { value: "capsare", label: "Capsare", icon: <Paperclip className="h-6 w-6" />, description: "Max 240 coli" },
+    { value: "capsare", label: "Capsare", icon: <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="3" width="16" height="18" rx="1" /><path d="M7 3 L7 7 L11 7" /><line x1="7" y1="3" x2="7" y2="7" strokeWidth="2.5" /><line x1="7" y1="7" x2="11" y2="7" strokeWidth="2.5" /></svg>, description: "Max 240 coli" },
   ];
 
   // ─── Checkout handler ──────────────────────────────────────────────────────
