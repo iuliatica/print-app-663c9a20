@@ -334,12 +334,13 @@ export async function analyzePdfColors(
 
     try {
       // 1. Scan page content streams for color operators
+      const pageResources = getResources(page);
       const refs = getContentRefs(page);
       for (const ref of refs) {
         const stream = pdf.context.lookup(ref);
         if (stream instanceof PDFRawStream) {
           const text = getStreamText(stream);
-          if (contentStreamHasColor(text)) {
+          if (contentStreamHasColor(text, pageResources, pdf.context)) {
             isColor = true;
             break;
           }
