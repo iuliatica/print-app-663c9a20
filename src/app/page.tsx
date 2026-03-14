@@ -15,6 +15,8 @@ import {
   Settings2,
   ChevronUp,
   ChevronDown,
+  Link2,
+  Unlink2,
 } from "lucide-react";
 import { getPdfPageCount, analyzePdfColors, type PdfColorAnalysis } from "@/lib/pdf-utils";
 
