@@ -24,6 +24,7 @@ import {
   Check,
 } from "lucide-react";
 import { getPdfPageCount, analyzePdfColors, type PdfColorAnalysis } from "@/lib/pdf-utils";
+import printicaLogo from "@/assets/printica-logo.png";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const PRICE_BW_ONE_SIDE = 0.25;
