@@ -502,6 +502,21 @@ export default function Home() {
     setCheckoutError(null);
     setIsCheckoutLoading(true);
     const { name, phone, email, address } = shipping;
+
+    // Validare capsare: nu permite dacă vreun grup cu capsare are > 240 coli
+    const capsareError = bindingGroups.some((grp, groupIndex) => {
+      const opts = groupOptions[groupIndex] ?? defaultGroupOpts;
+      if (opts.spiralType !== "capsare") return false;
+      const groupPages = grp.filesInGroup.reduce(
+        (s, f) => s + (f.pages != null ? f.pages * (f.copies ?? DEFAULT_PRINT_OPTIONS.copies) : 0),
+        0
+      );
+      return groupPages > 240;
+    });
+    if (capsareError) {
+      setCheckoutError("Capsarea nu este disponibilă pentru grupuri cu mai mult de 240 de coli. Schimbă tipul de legare.");
+      return;
+    }
     try {
       const validFiles = files.filter((f) => !f.error);
       if (validFiles.length === 0) {
@@ -1148,21 +1163,28 @@ export default function Home() {
                 )}
               </p>
               <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-1">
-                {spiralOptions.map(({ value, label, icon, description }) => (
+                {spiralOptions.map(({ value, label, icon, description }) => {
+                  const isCapsareDisabled = value === "capsare" && selectedGroupPages > 240;
+                  return (
                   <label
                     key={value}
-                    className={`min-w-[150px] flex-1 sm:flex-none flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 p-3 transition-all duration-200 sm:p-4 ${
-                      spiralType === value
-                        ? "border-blue-500 bg-blue-50/90 text-blue-700 shadow-sm ring-2 ring-blue-500/20"
-                        : "border-slate-200 bg-slate-50/50 text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                    className={`min-w-[150px] flex-1 sm:flex-none flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-all duration-200 sm:p-4 ${
+                      isCapsareDisabled
+                        ? "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400 opacity-60"
+                        : spiralType === value
+                        ? "cursor-pointer border-blue-500 bg-blue-50/90 text-blue-700 shadow-sm ring-2 ring-blue-500/20"
+                        : "cursor-pointer border-slate-200 bg-slate-50/50 text-slate-600 hover:border-slate-300 hover:bg-slate-50"
                     }`}
+                    title={isCapsareDisabled ? `Capsarea nu este disponibilă pentru mai mult de 240 de coli (ai ${selectedGroupPages})` : undefined}
                   >
                     <input
                       type="radio"
                       name="spiralType"
                       value={value}
                       checked={spiralType === value}
+                      disabled={isCapsareDisabled}
                       onChange={() => {
+                        if (isCapsareDisabled) return;
                         updateSelectedGroupOptions({
                           spiralType: value,
                           ...(value !== "none" ? { spiralColor: "negru" } : {}),
@@ -1172,17 +1194,18 @@ export default function Home() {
                     />
                     <span
                       className={`flex h-12 w-12 items-center justify-center ${
-                        spiralType === value ? "text-blue-600" : "text-slate-500"
+                        isCapsareDisabled ? "text-slate-400" : spiralType === value ? "text-blue-600" : "text-slate-500"
                       }`}
                     >
                       {icon}
                     </span>
                     <span className="text-center font-medium">{label}</span>
                     <span className="text-xs text-slate-500">
-                      {description}
+                      {isCapsareDisabled ? `Indisponibil (${selectedGroupPages} coli)` : description}
                     </span>
                   </label>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
