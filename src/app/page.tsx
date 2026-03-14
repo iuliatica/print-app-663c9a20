@@ -1020,12 +1020,21 @@ export default function Home() {
                         {file.name}
                       </p>
                       {file.pages != null && (
-                        <p className="text-xs text-slate-500">
-                          {file.pages} pagini
-                          {opts.printMode === "color" && (
-                            <> · <span className="font-semibold">{file.pages}</span> pagini color pentru acest document</>
+                        <div className="text-xs text-slate-500 space-y-0.5">
+                          <p>{file.pages} pagini</p>
+                          {opts.printMode === "color" && file.colorAnalysis && (
+                            <p className="text-xs">
+                              Detectat automat:{" "}
+                              <span className="font-semibold text-blue-600">{file.colorAnalysis.colorPages}</span> pagini color,{" "}
+                              <span className="font-semibold text-slate-700">{file.colorAnalysis.bwPages}</span> pagini alb-negru
+                            </p>
                           )}
-                        </p>
+                          {opts.printMode === "color" && !file.colorAnalysis && (
+                            <p className="text-xs text-amber-600">
+                              Analiza color nu este disponibilă — toate paginile se taxează ca fiind color.
+                            </p>
+                          )}
+                        </div>
                       )}
                       <p className="mt-1.5 text-xs text-slate-400">
                         Modificările se aplică <strong>doar acestui document</strong>. Celelalte fișiere nu sunt afectate.
@@ -1041,12 +1050,10 @@ export default function Home() {
                       <p className="text-xs text-slate-500">
                         Alb-negru: 0,25 / 0,35 lei · Color: 1,5 / 2,5 lei
                       </p>
-                      {userChosenColorPages > 0 && (
-                        <p className="mt-1 text-xs text-slate-500">
-                          În total, <span className="font-semibold">{userChosenColorPages}</span>{" "}
-                          pagini sunt setate pe <span className="font-semibold">Color</span>.
-                        </p>
-                      )}
+                      <p className="mt-1 text-xs text-slate-500">
+                        Când alegi <span className="font-semibold">Color</span>, fiecare pagină este scanată automat.
+                        Paginile alb-negru din document se taxează la tariful A/N.
+                      </p>
                       <div className="mt-3 flex flex-wrap gap-2">
                         <button
                           type="button"
