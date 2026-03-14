@@ -1412,11 +1412,11 @@ export default function Home() {
                           <p>
                             <span className="font-medium text-slate-700">{isSingleDoc ? "Legare:" : "Legare (acest grup):"}</span>{" "}
                             {group.spiralType === "none" && "Doar print"}
-                            {group.spiralType === "plastic" && (
+                            {group.spiralType === "spirala" && (
                               <>
                                 Spiralare{group.spiralColor ? ` · Culoare ${group.spiralColor}` : ""}
                                 {" · "}
-                                Copertă față: {group.coverFrontColor === "transparent" ? "Fără" : group.coverFrontColor} · Copertă spate: {group.coverBackColor === "transparent" ? "Fără" : group.coverBackColor}
+                                Copertă față: Transparent · Copertă spate: {coverBackColors.find(c => c.value === group.coverBackColor)?.label ?? group.coverBackColor}
                               </>
                             )}
                             {group.spiralType === "perforare2" && "Perforare cu 2 găuri"}
