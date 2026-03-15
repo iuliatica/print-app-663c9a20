@@ -1010,6 +1010,8 @@ export default function Home() {
                             onClick={() => setSelectedFileId(item.id)}
                             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSelectedFileId(item.id); } }}
                             className={`file-list-item flex items-center gap-3 px-4 py-3 transition-all duration-200 ${
+                              removingFileId === item.id ? "opacity-0 scale-95 -translate-x-4" : ""
+                            } ${
                               selectedFileId === item.id
                                 ? "ring-2 ring-blue-500 ring-offset-1 bg-white shadow-[var(--shadow)]"
                                 : "bg-white shadow-[var(--shadow)] ring-1 ring-slate-200/80 hover:ring-slate-300 hover:shadow-[var(--shadow-md)]"

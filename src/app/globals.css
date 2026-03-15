@@ -62,6 +62,12 @@ body {
 .file-list-item {
   animation: fade-in 0.35s ease-out forwards;
   opacity: 0;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+/* Optimistic button press */
+button:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 .drop-zone-icon {
