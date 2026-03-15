@@ -512,6 +512,30 @@ export default function Home() {
     return () => cancelAnimationFrame(timer);
   }, [scrollToFileId]);
 
+  // ─── localStorage persistence ──────────────────────────────────────────────
+  useEffect(() => {
+    try { localStorage.setItem(LS_KEY_SHIPPING, JSON.stringify(shipping)); } catch { /* ignore */ }
+  }, [shipping]);
+
+  useEffect(() => {
+    try { localStorage.setItem(LS_KEY_PAYMENT, paymentMethod); } catch { /* ignore */ }
+  }, [paymentMethod]);
+
+  useEffect(() => {
+    try { localStorage.setItem(LS_KEY_GROUP_OPTS, JSON.stringify(groupOptions)); } catch { /* ignore */ }
+  }, [groupOptions]);
+
+  // ─── Optimistic file removal with animation ───────────────────────────────
+  const [removingFileId, setRemovingFileId] = useState<string | null>(null);
+
+  const removeFileAnimated = useCallback((id: string) => {
+    setRemovingFileId(id);
+    setTimeout(() => {
+      removeFile(id);
+      setRemovingFileId(null);
+    }, 250);
+  }, []);
+
   // ─── Price calculations ────────────────────────────────────────────────────
   const totalPages = files.reduce(
     (sum, f) => sum + (f.pages != null ? f.pages * (f.copies ?? DEFAULT_PRINT_OPTIONS.copies) : 0),
