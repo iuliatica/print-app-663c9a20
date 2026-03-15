@@ -887,23 +887,51 @@ export default function Home() {
               onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
               onDragLeave={() => setIsDragging(false)}
               onDrop={onDrop}
-              className={`drop-zone flex min-h-[240px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed transition-all duration-300 ${
+              className={`drop-zone flex min-h-[280px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed transition-all duration-300 ${
                 isDragging
                   ? "border-blue-500 bg-blue-50/90 shadow-inner scale-[1.01]"
                   : "border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/50 hover:shadow-[var(--shadow)]"
               }`}
             >
               <input type="file" accept="application/pdf" multiple onChange={onFileInput} className="hidden" />
-              <FileUp className={`drop-zone-icon mb-3 h-14 w-14 ${isDragging ? "text-blue-500" : "text-slate-400"}`} />
-              <p className="text-center text-slate-600 text-sm sm:text-base">
-                Trage fișiere PDF aici sau{" "}
+              {/* Custom illustration */}
+              <div className="relative mb-4">
+                <div className={`drop-zone-icon flex h-24 w-24 items-center justify-center rounded-2xl ${isDragging ? "bg-blue-100" : "bg-gradient-to-br from-blue-50 to-slate-100"} transition-colors`}>
+                  <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    {/* Paper stack */}
+                    <rect x="14" y="12" width="28" height="36" rx="3" fill="#e2e8f0" stroke="#94a3b8" strokeWidth="1.5"/>
+                    <rect x="11" y="9" width="28" height="36" rx="3" fill="#f1f5f9" stroke="#94a3b8" strokeWidth="1.5"/>
+                    <rect x="8" y="6" width="28" height="36" rx="3" fill="white" stroke="#64748b" strokeWidth="1.5"/>
+                    {/* Lines on paper */}
+                    <line x1="14" y1="16" x2="30" y2="16" stroke="#cbd5e1" strokeWidth="1.5" strokeLinecap="round"/>
+                    <line x1="14" y1="21" x2="28" y2="21" stroke="#cbd5e1" strokeWidth="1.5" strokeLinecap="round"/>
+                    <line x1="14" y1="26" x2="26" y2="26" stroke="#cbd5e1" strokeWidth="1.5" strokeLinecap="round"/>
+                    <line x1="14" y1="31" x2="24" y2="31" stroke="#e2e8f0" strokeWidth="1.5" strokeLinecap="round"/>
+                    {/* Upload arrow */}
+                    <circle cx="38" cy="38" r="12" fill="#2563eb" opacity="0.9"/>
+                    <path d="M38 44V33M38 33L33 38M38 33L43 38" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <div className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-white shadow-md">
+                  <Plus className="h-4 w-4" />
+                </div>
+              </div>
+              <p className="text-center text-slate-700 text-base font-semibold">
+                Trage fișierele PDF aici
+              </p>
+              <p className="mt-1 text-center text-slate-500 text-sm">
+                sau{" "}
                 <span className="font-semibold text-blue-600 underline decoration-blue-600/30 underline-offset-2">
                   click pentru a selecta
                 </span>
               </p>
-              <p className="mt-1.5 text-xs text-slate-500 sm:text-sm">
-                Acceptă mai multe fișiere · Doar PDF · Max 50 MB per fișier
-              </p>
+              <div className="mt-4 flex items-center gap-3 text-xs text-slate-400">
+                <span className="flex items-center gap-1"><FileText className="h-3.5 w-3.5" /> Doar PDF</span>
+                <span className="h-3 w-px bg-slate-300" />
+                <span>Max 50 MB / fișier</span>
+                <span className="h-3 w-px bg-slate-300" />
+                <span>Până la 20 fișiere</span>
+              </div>
             </label>
           </div>
         ) : (
