@@ -22,6 +22,11 @@ import {
   HelpCircle,
   Upload,
   Check,
+  Truck,
+  Shield,
+  Clock,
+  Star,
+  Lock,
 } from "lucide-react";
 import { getPdfPageCount, analyzePdfColors, type PdfColorAnalysis } from "@/lib/pdf-utils";
 import printicaLogo from "@/assets/printica-logo.png";
