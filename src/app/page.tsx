@@ -315,9 +315,23 @@ export default function Home() {
   const [previewFromCheckout, setPreviewFromCheckout] = useState(false);
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
   const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
-  const [shipping, setShipping] = useState<ShippingForm>({ name: "", phone: "", email: "", address: "" });
+  const [shipping, setShipping] = useState<ShippingForm>(() => {
+    if (typeof window === "undefined") return { name: "", phone: "", email: "", address: "" };
+    try {
+      const saved = localStorage.getItem(LS_KEY_SHIPPING);
+      if (saved) return JSON.parse(saved) as ShippingForm;
+    } catch { /* ignore */ }
+    return { name: "", phone: "", email: "", address: "" };
+  });
   const [shippingErrors, setShippingErrors] = useState<ShippingErrors>({});
-  const [paymentMethod, setPaymentMethod] = useState<"stripe" | "ramburs">("stripe");
+  const [paymentMethod, setPaymentMethod] = useState<"stripe" | "ramburs">(() => {
+    if (typeof window === "undefined") return "stripe";
+    try {
+      const saved = localStorage.getItem(LS_KEY_PAYMENT);
+      if (saved === "ramburs") return "ramburs";
+    } catch { /* ignore */ }
+    return "stripe";
+  });
   const [orderSuccess, setOrderSuccess] = useState<string | null>(null);
   const [orderSuccessDetails, setOrderSuccessDetails] = useState<OrderSuccessDetails | null>(null);
   const [scrollToFileId, setScrollToFileId] = useState<string | null>(null);
