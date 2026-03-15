@@ -22,6 +22,11 @@ import {
   HelpCircle,
   Upload,
   Check,
+  Truck,
+  Shield,
+  Clock,
+  Star,
+  Lock,
 } from "lucide-react";
 import { getPdfPageCount, analyzePdfColors, type PdfColorAnalysis } from "@/lib/pdf-utils";
 import printicaLogo from "@/assets/printica-logo.png";
@@ -808,6 +813,26 @@ export default function Home() {
           </section>
         </header>
 
+        {/* ═══ Delivery Banner ═══ */}
+        <div className="mt-4 rounded-xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50 px-4 py-3 sm:px-6">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
+            <div className="flex items-center gap-2">
+              <Truck className="h-4 w-4 text-emerald-600" />
+              <span className="font-medium text-emerald-800">Livrare în 2-4 zile lucrătoare</span>
+            </div>
+            <div className="hidden sm:block h-4 w-px bg-emerald-300" />
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-emerald-600" />
+              <span className="text-emerald-700">Comandă acum, printăm azi</span>
+            </div>
+            <div className="hidden sm:block h-4 w-px bg-emerald-300" />
+            <div className="flex items-center gap-2">
+              <Shield className="h-4 w-4 text-emerald-600" />
+              <span className="text-emerald-700">Transport {SHIPPING_COST_LEI} lei</span>
+            </div>
+          </div>
+        </div>
+
         {/* Progress Stepper */}
         <div className="mt-6">
           <ProgressStepper currentStep={currentStep} />
@@ -1367,6 +1392,40 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* ═══ Trust Badges ═══ */}
+        <div className="mt-12 mx-auto max-w-3xl">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-white p-4 text-center shadow-sm">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50">
+                <Lock className="h-5 w-5 text-blue-600" />
+              </div>
+              <span className="text-xs font-semibold text-slate-700">Plată securizată</span>
+              <span className="text-[10px] text-slate-500">100% criptat via Stripe</span>
+            </div>
+            <div className="flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-white p-4 text-center shadow-sm">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50">
+                <Truck className="h-5 w-5 text-emerald-600" />
+              </div>
+              <span className="text-xs font-semibold text-slate-700">Livrare rapidă</span>
+              <span className="text-[10px] text-slate-500">2-4 zile lucrătoare</span>
+            </div>
+            <div className="flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-white p-4 text-center shadow-sm">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-50">
+                <Star className="h-5 w-5 text-amber-500" />
+              </div>
+              <span className="text-xs font-semibold text-slate-700">Calitate premium</span>
+              <span className="text-[10px] text-slate-500">Imprimantă profesională</span>
+            </div>
+            <div className="flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-white p-4 text-center shadow-sm">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-50">
+                <Shield className="h-5 w-5 text-purple-600" />
+              </div>
+              <span className="text-xs font-semibold text-slate-700">Date protejate</span>
+              <span className="text-[10px] text-slate-500">GDPR compliant</span>
+            </div>
+          </div>
+        </div>
 
         {/* FAQ - always visible */}
         <div className="mx-auto max-w-2xl">
