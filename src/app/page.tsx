@@ -813,6 +813,26 @@ export default function Home() {
           </section>
         </header>
 
+        {/* ═══ Delivery Banner ═══ */}
+        <div className="mt-4 rounded-xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50 px-4 py-3 sm:px-6">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
+            <div className="flex items-center gap-2">
+              <Truck className="h-4 w-4 text-emerald-600" />
+              <span className="font-medium text-emerald-800">Livrare în 2-4 zile lucrătoare</span>
+            </div>
+            <div className="hidden sm:block h-4 w-px bg-emerald-300" />
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-emerald-600" />
+              <span className="text-emerald-700">Comandă acum, printăm azi</span>
+            </div>
+            <div className="hidden sm:block h-4 w-px bg-emerald-300" />
+            <div className="flex items-center gap-2">
+              <Shield className="h-4 w-4 text-emerald-600" />
+              <span className="text-emerald-700">Transport {SHIPPING_COST_LEI} lei</span>
+            </div>
+          </div>
+        </div>
+
         {/* Progress Stepper */}
         <div className="mt-6">
           <ProgressStepper currentStep={currentStep} />
