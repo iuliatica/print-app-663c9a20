@@ -1393,6 +1393,40 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ═══ Trust Badges ═══ */}
+        <div className="mt-12 mx-auto max-w-3xl">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-white p-4 text-center shadow-sm">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50">
+                <Lock className="h-5 w-5 text-blue-600" />
+              </div>
+              <span className="text-xs font-semibold text-slate-700">Plată securizată</span>
+              <span className="text-[10px] text-slate-500">100% criptat via Stripe</span>
+            </div>
+            <div className="flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-white p-4 text-center shadow-sm">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50">
+                <Truck className="h-5 w-5 text-emerald-600" />
+              </div>
+              <span className="text-xs font-semibold text-slate-700">Livrare rapidă</span>
+              <span className="text-[10px] text-slate-500">2-4 zile lucrătoare</span>
+            </div>
+            <div className="flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-white p-4 text-center shadow-sm">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-50">
+                <Star className="h-5 w-5 text-amber-500" />
+              </div>
+              <span className="text-xs font-semibold text-slate-700">Calitate premium</span>
+              <span className="text-[10px] text-slate-500">Imprimantă profesională</span>
+            </div>
+            <div className="flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-white p-4 text-center shadow-sm">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-50">
+                <Shield className="h-5 w-5 text-purple-600" />
+              </div>
+              <span className="text-xs font-semibold text-slate-700">Date protejate</span>
+              <span className="text-[10px] text-slate-500">GDPR compliant</span>
+            </div>
+          </div>
+        </div>
+
         {/* FAQ - always visible */}
         <div className="mx-auto max-w-2xl">
           <FAQ />
