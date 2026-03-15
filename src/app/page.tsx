@@ -309,6 +309,7 @@ export default function Home() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [previewFileId, setPreviewFileId] = useState<string | null>(null);
+  const [previewFromCheckout, setPreviewFromCheckout] = useState(false);
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
   const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
   const [shipping, setShipping] = useState<ShippingForm>({ name: "", phone: "", email: "", address: "" });
@@ -1505,7 +1506,7 @@ export default function Home() {
                                   <span className="font-medium text-slate-800 truncate">{f.name}</span>
                                   <button
                                     type="button"
-                                    onClick={() => { setCheckoutModalOpen(false); setPreviewFileId(f.id); }}
+                                    onClick={() => { setCheckoutModalOpen(false); setPreviewFileId(f.id); setPreviewFromCheckout(true); }}
                                     className="shrink-0 inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600 hover:bg-blue-50 hover:text-blue-700 transition-colors"
                                     title="Preview document"
                                   >
@@ -1702,9 +1703,21 @@ export default function Home() {
                     <p className="truncate text-xs text-slate-500">{file.name} {file.pages != null && `· ${file.pages} pagini`}</p>
                   </div>
                 </div>
-                <button type="button" onClick={() => setPreviewFileId(null)} className="rounded-xl p-2.5 text-slate-500 hover:bg-white hover:text-slate-800" aria-label="Închide">
-                  <X className="h-5 w-5" />
-                </button>
+                <div className="flex items-center gap-2">
+                  {previewFromCheckout && (
+                    <button
+                      type="button"
+                      onClick={() => { setPreviewFileId(null); setPreviewFromCheckout(false); setCheckoutModalOpen(true); }}
+                      className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700 transition-colors"
+                    >
+                      <ChevronRight className="h-3.5 w-3.5 rotate-180" />
+                      Înapoi la comandă
+                    </button>
+                  )}
+                  <button type="button" onClick={() => { setPreviewFileId(null); setPreviewFromCheckout(false); }} className="rounded-xl p-2.5 text-slate-500 hover:bg-white hover:text-slate-800" aria-label="Închide">
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
               </div>
               <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto bg-slate-50/60 p-4 md:flex-row">
                 <div className="min-h-0 flex-1 overflow-auto rounded-xl border border-slate-200 bg-white">
