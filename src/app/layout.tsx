@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Footer } from "@/components/Footer";
 import { ErrorBoundaryWrapper } from "@/components/ErrorBoundaryWrapper";
+import { CookieBanner } from "@/components/CookieBanner";
 
 export const metadata: Metadata = {
   title: "Printica | Printare online · Încarcă PDF · Plătește sigur",
