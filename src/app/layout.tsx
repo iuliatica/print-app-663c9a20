@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Footer } from "@/components/Footer";
 import { ErrorBoundaryWrapper } from "@/components/ErrorBoundaryWrapper";
+import { CookieBanner } from "@/components/CookieBanner";
 
 export const metadata: Metadata = {
   title: "Printica | Printare online · Încarcă PDF · Plătește sigur",
@@ -19,6 +20,7 @@ export default function RootLayout({
         <ErrorBoundaryWrapper>
           <div className="flex-1 flex flex-col">{children}</div>
           <Footer />
+          <CookieBanner />
         </ErrorBoundaryWrapper>
       </body>
     </html>
