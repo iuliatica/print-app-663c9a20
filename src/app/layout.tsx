@@ -20,6 +20,7 @@ export default function RootLayout({
         <ErrorBoundaryWrapper>
           <div className="flex-1 flex flex-col">{children}</div>
           <Footer />
+          <CookieBanner />
         </ErrorBoundaryWrapper>
       </body>
     </html>
