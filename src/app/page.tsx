@@ -1146,10 +1146,15 @@ export default function Home() {
                                   </button>
                                 </div>
                                 {opts.printMode === "color" && file.colorAnalysis && (
-                                  <p className="mt-2 text-xs text-slate-500">
-                                    Detectat: <span className="font-semibold text-blue-600">{file.colorAnalysis.colorPages}</span> color,{" "}
-                                    <span className="font-semibold text-slate-700">{file.colorAnalysis.bwPages}</span> alb-negru
-                                  </p>
+                                  <div className="mt-2 flex items-center gap-2 rounded-lg bg-blue-50 border border-blue-200 px-3 py-2">
+                                    <span className="text-xs font-bold text-blue-700">
+                                      {file.colorAnalysis.colorPages} pag. color
+                                    </span>
+                                    <span className="text-xs text-slate-400">·</span>
+                                    <span className="text-xs font-bold text-slate-700">
+                                      {file.colorAnalysis.bwPages} pag. alb-negru
+                                    </span>
+                                  </div>
                                 )}
                               </div>
 
