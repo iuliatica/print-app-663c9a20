@@ -309,6 +309,7 @@ export default function Home() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [previewFileId, setPreviewFileId] = useState<string | null>(null);
+  const [previewFromCheckout, setPreviewFromCheckout] = useState(false);
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
   const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
   const [shipping, setShipping] = useState<ShippingForm>({ name: "", phone: "", email: "", address: "" });
