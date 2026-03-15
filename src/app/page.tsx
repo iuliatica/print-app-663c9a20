@@ -1506,7 +1506,7 @@ export default function Home() {
                                   <span className="font-medium text-slate-800 truncate">{f.name}</span>
                                   <button
                                     type="button"
-                                    onClick={() => { setCheckoutModalOpen(false); setPreviewFileId(f.id); }}
+                                    onClick={() => { setCheckoutModalOpen(false); setPreviewFileId(f.id); setPreviewFromCheckout(true); }}
                                     className="shrink-0 inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600 hover:bg-blue-50 hover:text-blue-700 transition-colors"
                                     title="Preview document"
                                   >
