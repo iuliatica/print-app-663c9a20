@@ -756,6 +756,8 @@ export default function Home() {
       fileUrls.forEach((url, i) => { fileUrlMeta[`file_url_${i}`] = url; });
       const coverColorSummary = `fata:transparent;spate:${coverBackColor}`;
       const amountBani = Math.round(totalWithShipping * 100);
+      const orderId = orderData.id;
+
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -763,6 +765,7 @@ export default function Home() {
           amount: amountBani,
           currency: "ron",
           metadata: {
+            order_id: orderId,
             total_pages: String(totalPages),
             print_mode: files[0]?.printMode ?? "bw",
             duplex: String(files[0]?.duplex ?? false),
@@ -781,6 +784,16 @@ export default function Home() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Eroare la plată");
+
+      // Legăm sesiunea Stripe de comandă
+      if (data.id && orderId) {
+        await fetch(`/api/orders/${orderId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ stripe_session_id: data.id }),
+        });
+      }
+
       if (data.url) {
         window.location.href = data.url;
       } else {
