@@ -630,6 +630,42 @@ export default function AdminComenziPage() {
     setTimeout(() => setDownloadingUrl(null), 800);
   }, []);
 
+  const [uploadingDoc, setUploadingDoc] = useState<string | null>(null); // "awb-{id}" or "factura-{id}"
+  const awbInputRef = useRef<Record<string, HTMLInputElement | null>>({});
+  const facturaInputRef = useRef<Record<string, HTMLInputElement | null>>({});
+
+  const handleDocUpload = useCallback(async (orderId: string, docType: "awb" | "factura", file: File) => {
+    const key = `${docType}-${orderId}`;
+    setUploadingDoc(key);
+    try {
+      const token = sessionStorage.getItem("admin_token");
+      const formData = new FormData();
+      formData.append("orderId", orderId);
+      formData.append("docType", docType);
+      formData.append("file", file);
+
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Eroare la încărcare.");
+
+      setOrders((prev) =>
+        prev.map((o) =>
+          o.id === orderId
+            ? { ...o, [docType === "awb" ? "awb_url" : "factura_url"]: data.url }
+            : o
+        )
+      );
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Eroare la încărcarea documentului.");
+    } finally {
+      setUploadingDoc(null);
+    }
+  }, []);
+
   const copyToClipboard = useCallback((text: string, orderId: string) => {
     navigator.clipboard.writeText(text).then(() => {
       setCopiedId(orderId);
