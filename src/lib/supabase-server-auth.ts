@@ -16,7 +16,7 @@ export async function createServerSupabaseAuth() {
     throw new Error("NEXT_PUBLIC_SUPABASE_URL și cheia anonimă trebuie setate.");
   }
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    supabaseUrl,
     anonKey,
     {
       cookies: {
