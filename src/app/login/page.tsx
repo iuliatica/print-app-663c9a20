@@ -53,7 +53,7 @@ export default function LoginPage() {
         router.replace("/admin-comenzi");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Eroare la autentificare.");
+      setError(err instanceof Error ? err.message : "A apărut o problemă la autentificare. Încearcă din nou.");
     } finally {
       setIsLoadingLogin(false);
     }
