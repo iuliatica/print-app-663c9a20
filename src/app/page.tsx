@@ -722,7 +722,7 @@ export default function Home() {
         }),
       });
       const orderData = await orderRes.json();
-      if (!orderRes.ok) throw new Error(orderData.error ?? "Eroare la salvare comanda.");
+      if (!orderRes.ok) throw new Error("Nu am putut salva comanda. Verifică conexiunea la internet și încearcă din nou.");
 
       if (paymentMethod === "ramburs") {
         setOrderSuccessDetails({
