@@ -801,8 +801,9 @@ export default function Home() {
         throw new Error("Nu s-a putut deschide pagina de plată. Încearcă din nou.");
       }
     } catch (e) {
-      setCheckoutError(e instanceof Error ? e.message : "Eroare la plată");
-      addToast(e instanceof Error ? e.message : "Eroare la plată", "error");
+      const friendlyMsg = e instanceof Error ? e.message : "A apărut o problemă. Te rugăm încearcă din nou.";
+      setCheckoutError(friendlyMsg);
+      addToast(friendlyMsg, "error");
     } finally {
       setIsCheckoutLoading(false);
     }
