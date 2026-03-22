@@ -30,21 +30,9 @@ export async function POST(request: Request) {
 
     const origin = request.headers.get("origin") ?? "";
 
-    // Încearcă să obții email-ul utilizatorului logat din Supabase.
-    // Dacă nu există, folosește email-ul din metadata (formularul de comandă).
+    // Folosește email-ul din metadata (formularul de comandă).
     let customerEmail: string | undefined;
-    try {
-      const supabase = await createServerSupabaseAuth();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user?.email) {
-        customerEmail = user.email.trim().toLowerCase();
-      }
-    } catch {
-      // Ignorăm erorile – nu vrem să blocăm plata dacă nu putem citi sesiunea
-    }
-    if (!customerEmail && metadata.shipping_email) {
+    if (metadata.shipping_email) {
       customerEmail = metadata.shipping_email.trim().toLowerCase();
     }
 
