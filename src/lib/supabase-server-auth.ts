@@ -1,8 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
-import { cookies } from "next/headers";
+import { headers } from "next/headers";
 import { getServerSupabase } from "@/lib/supabase-server";
-
-const COOKIE_NAME = "admin_token";
 
 function getSupabaseConfig() {
   const supabaseUrl = (() => {
@@ -18,9 +16,6 @@ function getSupabaseConfig() {
   return { supabaseUrl, anonKey };
 }
 
-/**
- * Verifică dacă un email este admin consultând tabelul admin_emails din DB.
- */
 async function isAdminEmail(email: string): Promise<boolean> {
   const supabase = getServerSupabase();
   const { data, error } = await supabase
@@ -36,14 +31,17 @@ async function isAdminEmail(email: string): Promise<boolean> {
 }
 
 /**
- * Verifică dacă requestul curent vine de la un admin autentificat.
- * Citește cookie-ul admin_token, verifică JWT-ul cu Supabase, apoi verifică emailul în DB.
+ * Reads the Bearer token from Authorization header, verifies it with Supabase,
+ * and checks that the user's email is in the admin_emails table.
  */
 export async function requireAdminEmail(): Promise<
   { ok: true; email: string } | { ok: false; status: number }
 > {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(COOKIE_NAME)?.value;
+  const hdrs = await headers();
+  const authHeader = hdrs.get("authorization") ?? "";
+  const token = authHeader.startsWith("Bearer ")
+    ? authHeader.slice(7).trim()
+    : "";
 
   if (!token) {
     return { ok: false, status: 403 };

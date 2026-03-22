@@ -5,11 +5,6 @@ import { useRouter } from "next/navigation";
 import { getSupabaseClient } from "@/lib/supabase-client";
 import { Loader2 } from "lucide-react";
 
-function isAdmin(user: { app_metadata?: Record<string, unknown>; user_metadata?: Record<string, unknown> }): boolean {
-  const role = user?.app_metadata?.role ?? user?.user_metadata?.role;
-  return role === "admin";
-}
-
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -17,7 +12,6 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isLoadingLogin, setIsLoadingLogin] = useState(false);
-  const [isLoadingSignUp, setIsLoadingSignUp] = useState(false);
   const [isLoadingForgot, setIsLoadingForgot] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -33,11 +27,7 @@ export default function LoginPage() {
       const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          email: email.trim().toLowerCase(),
-          password,
-        }),
+        body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
       });
 
       const data = await res.json();
@@ -47,12 +37,12 @@ export default function LoginPage() {
         return;
       }
 
-      if (typeof window !== "undefined") {
-        window.location.assign(data.redirectTo ?? "/admin-comenzi");
-        return;
+      // Store the token so admin pages can send it as Authorization header
+      if (data.token) {
+        sessionStorage.setItem("admin_token", data.token);
       }
 
-      router.replace(data.redirectTo ?? "/admin-comenzi");
+      window.location.assign(data.redirectTo ?? "/admin-comenzi");
     } catch (err) {
       setError(err instanceof Error ? err.message : "A apărut o problemă la autentificare. Încearcă din nou.");
     } finally {
@@ -87,46 +77,11 @@ export default function LoginPage() {
     }
   };
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setMessage(null);
-    if (!email.trim() || !password) {
-      setError("Te rugăm completează emailul și parola.");
-      return;
-    }
-    if (password.length < 6) {
-      setError("Parola trebuie să aibă cel puțin 6 caractere.");
-      return;
-    }
-    setIsLoadingSignUp(true);
-    try {
-      const supabase = getSupabaseClient();
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email: email.trim().toLowerCase(),
-        password,
-      });
-      if (signUpError) {
-        setError(signUpError.message);
-        return;
-      }
-      if (data.user && !data.session) {
-        setMessage("Cont creat. Verifică emailul pentru confirmare (dacă este activată).");
-      } else if (data.session) {
-        router.replace("/admin-comenzi");
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "A apărut o problemă la înregistrare. Încearcă din nou.");
-    } finally {
-      setIsLoadingSignUp(false);
-    }
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 to-slate-100/80 px-4">
       <div className="w-full max-w-sm rounded-2xl border border-slate-200/80 bg-white p-6 shadow-lg sm:p-8">
-        <h1 className="text-xl font-bold text-slate-800 sm:text-2xl">Autentificare</h1>
-        <p className="mt-1 text-sm text-slate-500">Introdu emailul și parola</p>
+        <h1 className="text-xl font-bold text-slate-800 sm:text-2xl">Autentificare Admin</h1>
+        <p className="mt-1 text-sm text-slate-500">Introdu emailul și parola de admin</p>
 
         <form className="mt-6 space-y-4" onSubmit={handleLogin}>
           <label className="block">
@@ -153,7 +108,7 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={handleForgotPassword}
-              disabled={isLoadingForgot || isLoadingLogin || isLoadingSignUp}
+              disabled={isLoadingForgot || isLoadingLogin}
               className="mt-1.5 text-sm font-medium text-blue-600 hover:underline disabled:opacity-50"
             >
               {isLoadingForgot ? "Se trimite…" : "Ai uitat parola?"}
@@ -171,27 +126,16 @@ export default function LoginPage() {
             </p>
           )}
 
-          <div className="flex flex-col gap-3 pt-2">
+          <div className="pt-2">
             <button
               type="submit"
-              disabled={isLoadingLogin || isLoadingSignUp || isLoadingForgot}
+              disabled={isLoadingLogin || isLoadingForgot}
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-50"
             >
               {isLoadingLogin ? (
                 <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
               ) : null}
-              Login
-            </button>
-            <button
-              type="button"
-              onClick={handleSignUp}
-              disabled={isLoadingLogin || isLoadingSignUp || isLoadingForgot}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-white py-3 font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
-            >
-              {isLoadingSignUp ? (
-                <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
-              ) : null}
-              Sign Up
+              Autentificare
             </button>
           </div>
         </form>
