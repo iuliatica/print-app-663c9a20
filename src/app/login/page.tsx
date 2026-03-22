@@ -25,7 +25,7 @@ export default function LoginPage() {
     setError(null);
     setMessage(null);
     if (!email.trim() || !password) {
-      setError("Completează emailul și parola.");
+      setError("Te rugăm completează emailul și parola.");
       return;
     }
     setIsLoadingLogin(true);
