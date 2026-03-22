@@ -18,6 +18,9 @@ import {
   User,
   MapPin,
   Upload,
+  Trash2,
+  AlertTriangle,
+  Eye,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getSupabaseClient } from "@/lib/supabase-client";
@@ -63,6 +66,7 @@ type OrderRow = {
   change_logs?: unknown[];
   awb_url?: string | null;
   factura_url?: string | null;
+  files_deleted_at?: string | null;
 };
 
 const STATUS_OPTIONS = ["Nou", "În lucru", "Gata"] as const;
@@ -630,7 +634,26 @@ export default function AdminComenziPage() {
     setTimeout(() => setDownloadingUrl(null), 800);
   }, []);
 
-  const [uploadingDoc, setUploadingDoc] = useState<string | null>(null); // "awb-{id}" or "factura-{id}"
+  const [previewDeletedId, setPreviewDeletedId] = useState<string | null>(null);
+  const [cleaningUp, setCleaningUp] = useState(false);
+
+  const handleCleanup = useCallback(async () => {
+    if (!confirm("Sigur vrei să ștergi fișierele comenzilor mai vechi de 30 de zile?\n\nNumele fișierelor și detaliile comenzii rămân vizibile.")) return;
+    setCleaningUp(true);
+    try {
+      const res = await fetch("/api/admin/cleanup", { method: "POST", headers: getAdminHeaders() });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Eroare la curățare.");
+      alert(data.message);
+      fetchOrders();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Eroare la curățare.");
+    } finally {
+      setCleaningUp(false);
+    }
+  }, [fetchOrders]);
+
+  const [uploadingDoc, setUploadingDoc] = useState<string | null>(null);
   const awbInputRef = useRef<Record<string, HTMLInputElement | null>>({});
   const facturaInputRef = useRef<Record<string, HTMLInputElement | null>>({});
 
@@ -707,14 +730,26 @@ export default function AdminComenziPage() {
               <p className="text-sm text-slate-500">Gestionează comenzile clienților</p>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
-          >
-            <LogOut className="h-4 w-4" />
-            Ieșire
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleCleanup}
+              disabled={cleaningUp}
+              className="flex items-center gap-2 rounded-xl border border-orange-300 bg-orange-50 px-4 py-2.5 text-sm font-medium text-orange-700 hover:bg-orange-100 disabled:opacity-50"
+              title="Șterge fișierele comenzilor mai vechi de 30 de zile"
+            >
+              {cleaningUp ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+              Curățare fișiere vechi
+            </button>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            >
+              <LogOut className="h-4 w-4" />
+              Ieșire
+            </button>
+          </div>
         </div>
 
         {/* Cifre rapide + filtre */}
@@ -971,8 +1006,54 @@ export default function AdminComenziPage() {
                                   <span className="text-slate-500">Total</span>
                                   <p className="font-medium text-slate-800">{Number(order.total_price).toFixed(2)} lei</p>
                                 </div>
+                                {(() => {
+                                  const isDeleted = !!order.files_deleted_at || previewDeletedId === order.id;
+                                  const deletedDate = order.files_deleted_at ? formatDate(order.files_deleted_at) : previewDeletedId === order.id ? "Preview — așa va arăta după ștergere" : null;
+                                  return (
                                 <div className="sm:col-span-2 lg:col-span-3">
-                                  <h4 className="text-sm font-semibold text-slate-600 mb-2">Documente comandă</h4>
+                                  <div className="flex items-center gap-3 mb-2">
+                                    <h4 className="text-sm font-semibold text-slate-600">Documente comandă</h4>
+                                    {!order.files_deleted_at && (
+                                      <button
+                                        type="button"
+                                        onClick={() => setPreviewDeletedId(previewDeletedId === order.id ? null : order.id)}
+                                        className="inline-flex items-center gap-1 rounded-md border border-purple-300 bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 hover:bg-purple-100"
+                                        title="Vezi cum va arăta comanda după ștergerea automată a fișierelor"
+                                      >
+                                        <Eye className="h-3 w-3" />
+                                        {previewDeletedId === order.id ? "Ascunde preview" : "Preview ștergere"}
+                                      </button>
+                                    )}
+                                  </div>
+
+                                  {isDeleted ? (
+                                    <div className="rounded-lg border border-orange-200 bg-orange-50 p-3">
+                                      <div className="flex items-start gap-2 mb-2">
+                                        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-orange-500" />
+                                        <div>
+                                          <p className="text-sm font-medium text-orange-800">
+                                            Fișierele acestei comenzi au fost șterse automat
+                                          </p>
+                                          <p className="text-xs text-orange-600 mt-0.5">
+                                            {deletedDate}
+                                          </p>
+                                          <p className="text-xs text-orange-600 mt-1">
+                                            Numele fișierelor și detaliile printării rămân mai jos pentru referință.
+                                          </p>
+                                        </div>
+                                      </div>
+                                      <div className="mt-2 flex flex-wrap gap-3 text-sm text-slate-500">
+                                        <span className="flex items-center gap-1.5">
+                                          <FileText className="h-3.5 w-3.5" />
+                                          AWB: <span className="italic">șters</span>
+                                        </span>
+                                        <span className="flex items-center gap-1.5">
+                                          <FileText className="h-3.5 w-3.5" />
+                                          Factură: <span className="italic">ștearsă</span>
+                                        </span>
+                                      </div>
+                                    </div>
+                                  ) : (
                                   <div className="flex flex-wrap gap-3">
                                     {/* AWB */}
                                     <div className="flex items-center gap-2">
@@ -1051,10 +1132,25 @@ export default function AdminComenziPage() {
                                       </button>
                                     </div>
                                   </div>
+                                  )}
                                 </div>
+                                  );
+                                })()}
+                                {(() => {
+                                  const isDeletedPrint = !!order.files_deleted_at || previewDeletedId === order.id;
+                                  return (
                                 <div className="sm:col-span-2 lg:col-span-3">
-                                    <h4 className="text-sm font-semibold text-slate-600 mb-2">Configurare printare, îndosariere și descărcare</h4>
-                                    <p className="text-xs text-slate-500 mb-2">Bifează „Printat” când documentul a fost printat.</p>
+                                    <h4 className="text-sm font-semibold text-slate-600 mb-2">
+                                      {isDeletedPrint ? 'Configurare printare (fișiere șterse)' : 'Configurare printare, îndosariere și descărcare'}
+                                    </h4>
+                                    {isDeletedPrint ? (
+                                      <p className="text-xs text-orange-600 mb-2 flex items-center gap-1">
+                                        <AlertTriangle className="h-3 w-3" />
+                                        Fișierele PDF au fost șterse automat — doar numele și setările sunt vizibile.
+                                      </p>
+                                    ) : (
+                                      <p className="text-xs text-slate-500 mb-2">Bifează „Printat” când documentul a fost printat.</p>
+                                    )}
                                     <div className="space-y-1.5 text-[15px] leading-relaxed text-slate-800">
                                       {getConfigRowsWithFileIndices(order.config_details).map((row, i) =>
                                         row.kind === "text" ? (
@@ -1066,11 +1162,11 @@ export default function AdminComenziPage() {
                                             </p>
                                           )
                                         ) : (
-<div
+                                          <div
                                             key={`${order.id}-cfg-${i}`}
                                             className="flex flex-wrap items-center gap-2 py-1 border-b border-slate-100 last:border-0"
                                           >
-                                            {row.fileIndex < fileUrls.length && (
+                                            {!isDeletedPrint && row.fileIndex < fileUrls.length && (
                                               <button
                                                 type="button"
                                                 onClick={() => handleDownloadPdf(fileUrls[row.fileIndex])}
@@ -1086,20 +1182,28 @@ export default function AdminComenziPage() {
                                                 <span className="truncate max-w-[140px]">PDF</span>
                                               </button>
                                             )}
-                                            <label className="flex shrink-0 items-center gap-1.5 cursor-pointer">
-                                              <input
-                                                type="checkbox"
-                                                checked={order.config_details?.printed_files?.[row.fileIndex] === true}
-                                                onChange={() => handlePrintedToggle(order.id, row.fileIndex, fileUrls.length)}
-                                                disabled={updatingId === order.id}
-                                                className="h-4 w-4 rounded border-slate-300 text-green-600 focus:ring-green-500"
-                                              />
-                                              <span className="text-sm font-medium text-slate-600 whitespace-nowrap">Printat</span>
-                                            </label>
+                                            {isDeletedPrint && (
+                                              <span className="shrink-0 inline-flex items-center gap-1 rounded-lg bg-slate-100 px-2.5 py-1.5 text-xs text-slate-400 italic">
+                                                <FileText className="h-3.5 w-3.5" />
+                                                șters
+                                              </span>
+                                            )}
+                                            {!isDeletedPrint && (
+                                              <label className="flex shrink-0 items-center gap-1.5 cursor-pointer">
+                                                <input
+                                                  type="checkbox"
+                                                  checked={order.config_details?.printed_files?.[row.fileIndex] === true}
+                                                  onChange={() => handlePrintedToggle(order.id, row.fileIndex, fileUrls.length)}
+                                                  disabled={updatingId === order.id}
+                                                  className="h-4 w-4 rounded border-slate-300 text-green-600 focus:ring-green-500"
+                                                />
+                                                <span className="text-sm font-medium text-slate-600 whitespace-nowrap">Printat</span>
+                                              </label>
+                                            )}
                                             {row.kind === "file" && row.optionText != null && (
                                               <span className="shrink-0 text-sm font-bold text-slate-700">{row.optionText}</span>
                                             )}
-                                            <span className="min-w-0 flex-1 truncate text-slate-800">
+                                            <span className={`min-w-0 flex-1 truncate ${isDeletedPrint ? "text-slate-400 line-through" : "text-slate-800"}`}>
                                               {row.line}
                                             </span>
                                           </div>
@@ -1107,6 +1211,8 @@ export default function AdminComenziPage() {
                                       )}
                                     </div>
                                   </div>
+                                  );
+                                })()}
                               </div>
                               {logs.length > 0 && (
                                 <div className="mt-4 border-t border-slate-200 pt-4">
