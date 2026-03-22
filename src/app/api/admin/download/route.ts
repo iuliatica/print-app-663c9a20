@@ -35,7 +35,7 @@ export async function GET(request: Request) {
   }
 
   const fileUrl = decodeURIComponent(rawUrl.trim());
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || "https://opwtigccuxvfnkjykjdg.supabase.co";
   const isSupabaseStorage =
     supabaseUrl && fileUrl.startsWith(supabaseUrl) && fileUrl.includes("/storage/v1/object/");
 
