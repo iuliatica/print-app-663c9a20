@@ -18,6 +18,9 @@ import {
   User,
   MapPin,
   Upload,
+  Trash2,
+  AlertTriangle,
+  Eye,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getSupabaseClient } from "@/lib/supabase-client";
