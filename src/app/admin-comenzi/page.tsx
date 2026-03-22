@@ -61,6 +61,8 @@ type OrderRow = {
   file_url: string;
   config_details: ConfigDetails | null;
   change_logs?: unknown[];
+  awb_url?: string | null;
+  factura_url?: string | null;
 };
 
 const STATUS_OPTIONS = ["Nou", "În lucru", "Gata"] as const;
