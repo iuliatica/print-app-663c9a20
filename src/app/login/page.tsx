@@ -78,7 +78,7 @@ export default function LoginPage() {
         setError(resetError.message);
         return;
       }
-      setMessage("Verifică emailul – ai primit un link pentru resetarea parolei.");
+      setMessage("Verifică-ți emailul – ți-am trimis un link pentru resetarea parolei.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Eroare la trimitere.");
     } finally {
