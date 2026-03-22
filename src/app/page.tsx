@@ -625,7 +625,7 @@ export default function Home() {
     const errors = validateShipping(shipping);
     if (Object.keys(errors).length > 0) {
       setShippingErrors(errors);
-      setCheckoutError("Completează corect toate câmpurile obligatorii pentru livrare.");
+      setCheckoutError("Te rugăm completează corect toate câmpurile pentru livrare (nume, telefon, email, adresă).");
       return;
     }
     setShippingErrors({});
