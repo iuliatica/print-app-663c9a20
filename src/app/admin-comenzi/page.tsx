@@ -450,7 +450,7 @@ export default function AdminComenziPage() {
       if (!res.ok) throw new Error(data.error ?? "Nu am putut încărca comenzile. Încearcă din nou.");
       setOrders(data.orders ?? []);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Eroare la încărcarea comenzilor.");
+      setError(e instanceof Error ? e.message : "Nu am putut încărca comenzile. Verifică conexiunea și încearcă din nou.");
       setOrders([]);
     } finally {
       setLoading(false);
