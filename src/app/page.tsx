@@ -27,6 +27,7 @@ import {
   Clock,
   Star,
   Lock,
+  Phone,
 } from "lucide-react";
 import { getPdfPageCount, analyzePdfColors, type PdfColorAnalysis } from "@/lib/pdf-utils";
 import printicaLogo from "@/assets/printica-logo.png";
