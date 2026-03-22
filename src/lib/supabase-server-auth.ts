@@ -11,7 +11,12 @@ export async function createServerSupabaseAuth() {
   const cookieStore = await cookies();
   const anonKey =
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? "sb_publishable_dUizLOaLXpqNwvCHk2mhOg_TSqoquBF";
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "https://opwtigccuxvfnkjykjdg.supabase.co";
+  const supabaseUrl = (() => {
+    const value = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+    return value && /^https?:\/\//i.test(value)
+      ? value
+      : "https://opwtigccuxvfnkjykjdg.supabase.co";
+  })();
   if (!supabaseUrl || !anonKey) {
     throw new Error("NEXT_PUBLIC_SUPABASE_URL și cheia anonimă trebuie setate.");
   }
