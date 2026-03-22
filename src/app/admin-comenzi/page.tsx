@@ -530,7 +530,7 @@ export default function AdminComenziPage() {
         prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
       );
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Eroare la actualizare status.");
+      setError(e instanceof Error ? e.message : "Nu am putut schimba statusul comenzii.");
     } finally {
       setUpdatingId(null);
     }
