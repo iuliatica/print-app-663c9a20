@@ -418,6 +418,13 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+function getAdminHeaders(): HeadersInit {
+  const token = typeof window !== "undefined" ? sessionStorage.getItem("admin_token") : null;
+  const h: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) h["Authorization"] = `Bearer ${token}`;
+  return h;
+}
+
 export default function AdminComenziPage() {
   const router = useRouter();
   const [orders, setOrders] = useState<OrderRow[]>([]);
@@ -439,7 +446,7 @@ export default function AdminComenziPage() {
     setError(null);
     setAccessDenied(false);
     try {
-      const res = await fetch("/api/admin/orders", { credentials: "include" });
+      const res = await fetch("/api/admin/orders", { headers: getAdminHeaders() });
       if (res.status === 401 || res.status === 403) {
         setAccessDenied(true);
         setOrders([]);
