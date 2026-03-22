@@ -44,7 +44,12 @@ export default function LoginPage() {
         }
         return;
       }
-      if (data.user) {
+      if (data.session || data.user) {
+        await supabase.auth.getSession();
+        if (typeof window !== "undefined") {
+          window.location.assign("/admin-comenzi");
+          return;
+        }
         router.replace("/admin-comenzi");
       }
     } catch (err) {
