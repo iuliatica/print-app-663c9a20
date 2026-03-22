@@ -559,7 +559,7 @@ export default function AdminComenziPage() {
           return;
         }
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error ?? "Eroare la actualizare.");
+        if (!res.ok) throw new Error(data.error ?? "Nu am putut actualiza. Încearcă din nou.");
         setOrders((prev) =>
           prev.map((o) =>
             o.id === orderId
