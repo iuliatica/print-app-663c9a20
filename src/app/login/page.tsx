@@ -45,11 +45,7 @@ export default function LoginPage() {
         return;
       }
       if (data.user) {
-        if (isAdmin(data.user)) {
-          router.replace("/admin-comenzi");
-        } else {
-          router.replace("/");
-        }
+        router.replace("/admin-comenzi");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Eroare la autentificare.");
