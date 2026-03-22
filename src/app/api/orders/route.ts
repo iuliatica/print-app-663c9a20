@@ -183,8 +183,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ id: row?.id }, { status: 201 });
   } catch (err) {
     console.error("Orders API error:", err);
+    const message = err instanceof Error ? err.message : String(err);
     return NextResponse.json(
-      { error: "Eroare la salvare comanda." },
+      { error: message || "Eroare la salvare comanda." },
       { status: 500 }
     );
   }
