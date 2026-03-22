@@ -465,8 +465,13 @@ export default function AdminComenziPage() {
   }, []);
 
   useEffect(() => {
+    const token = sessionStorage.getItem("admin_token");
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
     fetchOrders();
-  }, [fetchOrders]);
+  }, [fetchOrders, router]);
 
   const statusCounts = useMemo(() => {
     const counts = { all: orders.length, Nou: 0, "În lucru": 0, Gata: 0 };
