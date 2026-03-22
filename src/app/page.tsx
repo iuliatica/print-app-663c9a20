@@ -883,11 +883,6 @@ export default function Home() {
             </div>
             <div className="hidden sm:block h-4 w-px bg-emerald-300" />
             <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-emerald-600" />
-              <span className="text-emerald-700">Comandă acum, printăm azi</span>
-            </div>
-            <div className="hidden sm:block h-4 w-px bg-emerald-300" />
-            <div className="flex items-center gap-2">
               <Shield className="h-4 w-4 text-emerald-600" />
               <span className="text-emerald-700">Transport {SHIPPING_COST_LEI} lei</span>
             </div>
