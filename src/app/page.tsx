@@ -643,7 +643,7 @@ export default function Home() {
       return groupPages > 240;
     });
     if (capsareError) {
-      setCheckoutError("Capsarea nu este disponibilă pentru grupuri cu mai mult de 240 de coli.");
+      setCheckoutError("Capsarea nu este disponibilă pentru documente cu mai mult de 240 de coli. Alege alt tip de legare.");
       setIsCheckoutLoading(false);
       return;
     }
