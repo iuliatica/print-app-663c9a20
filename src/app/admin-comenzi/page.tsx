@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState, useRef } from "react";
 import {
   Loader2,
   Download,
@@ -17,6 +17,7 @@ import {
   FileText,
   User,
   MapPin,
+  Upload,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getSupabaseClient } from "@/lib/supabase-client";
@@ -60,6 +61,8 @@ type OrderRow = {
   file_url: string;
   config_details: ConfigDetails | null;
   change_logs?: unknown[];
+  awb_url?: string | null;
+  factura_url?: string | null;
 };
 
 const STATUS_OPTIONS = ["Nou", "În lucru", "Gata"] as const;
@@ -627,6 +630,42 @@ export default function AdminComenziPage() {
     setTimeout(() => setDownloadingUrl(null), 800);
   }, []);
 
+  const [uploadingDoc, setUploadingDoc] = useState<string | null>(null); // "awb-{id}" or "factura-{id}"
+  const awbInputRef = useRef<Record<string, HTMLInputElement | null>>({});
+  const facturaInputRef = useRef<Record<string, HTMLInputElement | null>>({});
+
+  const handleDocUpload = useCallback(async (orderId: string, docType: "awb" | "factura", file: File) => {
+    const key = `${docType}-${orderId}`;
+    setUploadingDoc(key);
+    try {
+      const token = sessionStorage.getItem("admin_token");
+      const formData = new FormData();
+      formData.append("orderId", orderId);
+      formData.append("docType", docType);
+      formData.append("file", file);
+
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Eroare la încărcare.");
+
+      setOrders((prev) =>
+        prev.map((o) =>
+          o.id === orderId
+            ? { ...o, [docType === "awb" ? "awb_url" : "factura_url"]: data.url }
+            : o
+        )
+      );
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Eroare la încărcarea documentului.");
+    } finally {
+      setUploadingDoc(null);
+    }
+  }, []);
+
   const copyToClipboard = useCallback((text: string, orderId: string) => {
     navigator.clipboard.writeText(text).then(() => {
       setCopiedId(orderId);
@@ -931,6 +970,87 @@ export default function AdminComenziPage() {
                                 <div>
                                   <span className="text-slate-500">Total</span>
                                   <p className="font-medium text-slate-800">{Number(order.total_price).toFixed(2)} lei</p>
+                                </div>
+                                <div className="sm:col-span-2 lg:col-span-3">
+                                  <h4 className="text-sm font-semibold text-slate-600 mb-2">Documente comandă</h4>
+                                  <div className="flex flex-wrap gap-3">
+                                    {/* AWB */}
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-sm text-slate-600 font-medium w-16">AWB:</span>
+                                      {order.awb_url ? (
+                                        <button
+                                          type="button"
+                                          onClick={() => handleDownloadPdf(order.awb_url!)}
+                                          className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+                                        >
+                                          <Download className="h-3.5 w-3.5" />
+                                          Descarcă AWB
+                                        </button>
+                                      ) : null}
+                                      <input
+                                        type="file"
+                                        accept=".pdf"
+                                        className="hidden"
+                                        ref={(el) => { awbInputRef.current[order.id] = el; }}
+                                        onChange={(e) => {
+                                          const f = e.target.files?.[0];
+                                          if (f) handleDocUpload(order.id, "awb", f);
+                                          e.target.value = "";
+                                        }}
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={() => awbInputRef.current[order.id]?.click()}
+                                        disabled={uploadingDoc === `awb-${order.id}`}
+                                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                                      >
+                                        {uploadingDoc === `awb-${order.id}` ? (
+                                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                        ) : (
+                                          <Upload className="h-3.5 w-3.5" />
+                                        )}
+                                        {order.awb_url ? "Înlocuiește" : "Încarcă AWB"}
+                                      </button>
+                                    </div>
+                                    {/* Factura */}
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-sm text-slate-600 font-medium w-16">Factură:</span>
+                                      {order.factura_url ? (
+                                        <button
+                                          type="button"
+                                          onClick={() => handleDownloadPdf(order.factura_url!)}
+                                          className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+                                        >
+                                          <Download className="h-3.5 w-3.5" />
+                                          Descarcă factura
+                                        </button>
+                                      ) : null}
+                                      <input
+                                        type="file"
+                                        accept=".pdf"
+                                        className="hidden"
+                                        ref={(el) => { facturaInputRef.current[order.id] = el; }}
+                                        onChange={(e) => {
+                                          const f = e.target.files?.[0];
+                                          if (f) handleDocUpload(order.id, "factura", f);
+                                          e.target.value = "";
+                                        }}
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={() => facturaInputRef.current[order.id]?.click()}
+                                        disabled={uploadingDoc === `factura-${order.id}`}
+                                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                                      >
+                                        {uploadingDoc === `factura-${order.id}` ? (
+                                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                        ) : (
+                                          <Upload className="h-3.5 w-3.5" />
+                                        )}
+                                        {order.factura_url ? "Înlocuiește" : "Încarcă factură"}
+                                      </button>
+                                    </div>
+                                  </div>
                                 </div>
                                 <div className="sm:col-span-2 lg:col-span-3">
                                     <h4 className="text-sm font-semibold text-slate-600 mb-2">Configurare printare, îndosariere și descărcare</h4>
