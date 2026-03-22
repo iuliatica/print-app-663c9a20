@@ -631,31 +631,16 @@ export default function AdminComenziPage() {
     router.replace("/login");
   };
 
+  useEffect(() => {
+    if (accessDenied) {
+      router.replace("/login");
+    }
+  }, [accessDenied, router]);
+
   if (accessDenied) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-100 p-4">
-        <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg ring-1 ring-slate-200 text-center">
-          <h1 className="text-xl font-bold text-red-600">Acces interzis</h1>
-          <p className="mt-2 text-slate-600">
-            Trebuie să te autentifici cu emailul de admin (Supabase). Parola este cea setată în Supabase Dashboard → Authentication → Users.
-          </p>
-          <div className="mt-6 flex flex-col gap-3">
-            <button
-              type="button"
-              onClick={() => router.push("/login")}
-              className="w-full rounded-xl bg-blue-600 px-4 py-3 text-sm font-medium text-white hover:bg-blue-700"
-            >
-              Autentificare (email + parolă)
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push("/")}
-              className="w-full rounded-xl bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300"
-            >
-              Pagina principală
-            </button>
-          </div>
-        </div>
+        <Loader2 className="h-10 w-10 animate-spin text-blue-600" aria-hidden />
       </div>
     );
   }
