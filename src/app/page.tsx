@@ -27,6 +27,7 @@ import {
   Clock,
   Star,
   Lock,
+  Phone,
 } from "lucide-react";
 import { getPdfPageCount, analyzePdfColors, type PdfColorAnalysis } from "@/lib/pdf-utils";
 import printicaLogo from "@/assets/printica-logo.png";
@@ -834,6 +835,10 @@ export default function Home() {
             <p className="mt-2 text-base text-slate-600 sm:text-lg">
               Încarcă PDF-urile, configurează opțiunile și plătește în siguranță.
             </p>
+            <a href="/contact" className="mt-2 inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition-colors font-medium">
+              <Phone className="h-3.5 w-3.5" />
+              Contact
+            </a>
           </div>
           <section className="shrink-0 w-full max-w-full rounded-2xl border border-slate-200/80 bg-white shadow-sm lg:max-h-[11rem] lg:w-auto lg:self-start">
             <div className="flex flex-col lg:max-h-[11rem]">

@@ -9,6 +9,12 @@ export function Footer() {
       <div className="mx-auto max-w-4xl px-4">
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-slate-600">
           <Link
+            href="/contact"
+            className="hover:text-slate-900 underline-offset-2 hover:underline"
+          >
+            Contact
+          </Link>
+          <Link
             href="/legal/termeni-si-conditii"
             className="hover:text-slate-900 underline-offset-2 hover:underline"
           >
