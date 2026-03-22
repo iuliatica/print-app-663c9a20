@@ -392,7 +392,7 @@ export default function Home() {
             const pages = await getPdfPageCount(item.file);
             return { ...item, pages };
           } catch {
-            return { ...item, pages: null, error: "Nu s-a putut citi PDF-ul" };
+            return { ...item, pages: null, error: "Nu am putut citi acest fișier. Verifică dacă e un PDF valid." };
           }
         }
       })
