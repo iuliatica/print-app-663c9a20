@@ -16,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ro">
-      <body className="antialiased min-h-screen flex flex-col bg-[var(--background)] text-[var(--foreground)]">
+      <body suppressHydrationWarning className="antialiased min-h-screen flex flex-col bg-[var(--background)] text-[var(--foreground)]">
         <ErrorBoundaryWrapper>
           <div className="flex-1 flex flex-col">{children}</div>
           <Footer />
