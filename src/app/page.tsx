@@ -798,7 +798,7 @@ export default function Home() {
       if (data.url) {
         window.location.href = data.url;
       } else {
-        throw new Error("Nu s-a primit link de plată");
+        throw new Error("Nu s-a putut deschide pagina de plată. Încearcă din nou.");
       }
     } catch (e) {
       setCheckoutError(e instanceof Error ? e.message : "Eroare la plată");
