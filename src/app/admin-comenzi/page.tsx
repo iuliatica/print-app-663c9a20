@@ -63,6 +63,7 @@ type OrderRow = {
   change_logs?: unknown[];
   awb_url?: string | null;
   factura_url?: string | null;
+  files_deleted_at?: string | null;
 };
 
 const STATUS_OPTIONS = ["Nou", "În lucru", "Gata"] as const;
