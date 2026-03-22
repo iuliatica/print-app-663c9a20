@@ -173,9 +173,9 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
-      console.error("Supabase orders insert error:", error);
+      console.error("Supabase orders insert error:", JSON.stringify(error));
       return NextResponse.json(
-        { error: error.message || "Eroare la salvare comanda." },
+        { error: error.message || "Eroare la salvare comanda.", details: error.details, hint: error.hint, code: error.code },
         { status: 500 }
       );
     }
