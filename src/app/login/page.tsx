@@ -115,7 +115,7 @@ export default function LoginPage() {
         router.replace("/admin-comenzi");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Eroare la înregistrare.");
+      setError(err instanceof Error ? err.message : "A apărut o problemă la înregistrare. Încearcă din nou.");
     } finally {
       setIsLoadingSignUp(false);
     }

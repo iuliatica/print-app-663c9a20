@@ -656,7 +656,7 @@ export default function AdminComenziPage() {
             </span>
             <div>
               <h1 className="text-xl font-bold text-slate-800 sm:text-2xl">Admin Comenzi</h1>
-              <p className="text-sm text-slate-500">Gestionează comenzile din tabelul orders</p>
+              <p className="text-sm text-slate-500">Gestionează comenzile clienților</p>
             </div>
           </div>
           <button
