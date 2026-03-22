@@ -554,10 +554,9 @@ export default function AdminComenziPage() {
       body.status = hasAnyPrinted ? "În lucru" : "Nou";
       setUpdatingId(orderId);
       try {
-        const res = await fetch(`/api/admin/orders/${orderId}`, {
+         const res = await fetch(`/api/admin/orders/${orderId}`, {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
+          headers: getAdminHeaders(),
           body: JSON.stringify(body),
         });
         if (res.status === 401 || res.status === 403) {
