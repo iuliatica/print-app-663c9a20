@@ -40,7 +40,7 @@ export async function GET() {
     const supabase = getServerSupabase();
     const { data, error } = await supabase
       .from("orders")
-      .select("id, created_at, phone, customer_email, total_price, payment_method, status, file_url, config_details")
+      .select("id, created_at, phone, customer_email, total_price, payment_method, status, file_url, config_details, awb_url, factura_url")
       .order("created_at", { ascending: false });
 
     if (error) {
