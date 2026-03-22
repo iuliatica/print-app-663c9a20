@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { createClient } from "@supabase/supabase-js";
 import { getServerSupabase } from "@/lib/supabase-server";
+
+const COOKIE_NAME = "admin_token";
 
 function getSupabaseConfig() {
   const supabaseUrl = (() => {
@@ -10,12 +11,10 @@ function getSupabaseConfig() {
       ? value
       : "https://opwtigccuxvfnkjykjdg.supabase.co";
   })();
-
   const anonKey =
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() ||
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim() ||
     "sb_publishable_dUizLOaLXpqNwvCHk2mhOg_TSqoquBF";
-
   return { supabaseUrl, anonKey };
 }
 
@@ -26,12 +25,10 @@ async function isAdminEmail(email: string): Promise<boolean> {
     .select("id")
     .eq("email", email.trim().toLowerCase())
     .maybeSingle();
-
   if (error) {
-    console.error("Admin login check error:", error.message);
+    console.error("Admin email check error:", error.message);
     return false;
   }
-
   return !!data;
 }
 
@@ -48,53 +45,56 @@ export async function POST(request: Request) {
       );
     }
 
-    const cookieStore = await cookies();
     const { supabaseUrl, anonKey } = getSupabaseConfig();
 
-    let response = NextResponse.json({ ok: true, redirectTo: "/admin-comenzi" });
-
-    const supabase = createServerClient(supabaseUrl, anonKey, {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet: Array<{ name: string; value: string; options?: Record<string, unknown> }>) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options);
-            response.cookies.set(name, value, options);
-          });
-        },
-      },
+    // Login cu un client simplu (fără SSR cookies)
+    const supabase = createClient(supabaseUrl, anonKey, {
+      auth: { persistSession: false },
     });
 
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
       const msg = error.message.toLowerCase();
-      const friendly = msg.includes("invalid") && msg.includes("credentials")
-        ? "Email sau parolă greșită. Verifică datele introduse și încearcă din nou."
-        : "Nu am putut face autentificarea acum. Încearcă din nou.";
-
+      const friendly =
+        msg.includes("invalid") && msg.includes("credentials")
+          ? "Email sau parolă greșită. Verifică datele introduse și încearcă din nou."
+          : "Nu am putut face autentificarea acum. Încearcă din nou.";
       return NextResponse.json({ error: friendly }, { status: 401 });
+    }
+
+    if (!data.session) {
+      return NextResponse.json(
+        { error: "Nu am putut crea sesiunea. Încearcă din nou." },
+        { status: 500 }
+      );
     }
 
     const userEmail = data.user?.email?.trim().toLowerCase();
     if (!userEmail) {
-      await supabase.auth.signOut();
       return NextResponse.json(
-        { error: "Contul nu a putut fi verificat. Încearcă din nou." },
+        { error: "Contul nu a putut fi verificat." },
         { status: 401 }
       );
     }
 
     const adminAllowed = await isAdminEmail(userEmail);
     if (!adminAllowed) {
-      await supabase.auth.signOut();
       return NextResponse.json(
         { error: "Acest cont nu are acces la pagina de administrare." },
         { status: 403 }
       );
     }
+
+    // Setăm access token-ul ca un cookie simplu httpOnly
+    const response = NextResponse.json({ ok: true, redirectTo: "/admin-comenzi" });
+    response.cookies.set(COOKIE_NAME, data.session.access_token, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: data.session.expires_in,
+    });
 
     return response;
   } catch (err) {
