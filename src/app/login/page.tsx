@@ -45,11 +45,7 @@ export default function LoginPage() {
         return;
       }
       if (data.user) {
-        if (isAdmin(data.user)) {
-          router.replace("/admin-comenzi");
-        } else {
-          router.replace("/");
-        }
+        router.replace("/admin-comenzi");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Eroare la autentificare.");
@@ -111,11 +107,7 @@ export default function LoginPage() {
       if (data.user && !data.session) {
         setMessage("Cont creat. Verifică emailul pentru confirmare (dacă este activată).");
       } else if (data.session) {
-        if (data.user && isAdmin(data.user)) {
-          router.replace("/admin-comenzi");
-        } else {
-          router.replace("/");
-        }
+        router.replace("/admin-comenzi");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Eroare la înregistrare.");
