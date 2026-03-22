@@ -64,7 +64,7 @@ export default function LoginPage() {
     setError(null);
     setMessage(null);
     if (!email.trim()) {
-      setError("Introdu emailul pentru resetarea parolei.");
+      setError("Introdu adresa de email pentru a primi linkul de resetare.");
       return;
     }
     setIsLoadingForgot(true);
