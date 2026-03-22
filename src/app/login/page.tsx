@@ -30,28 +30,29 @@ export default function LoginPage() {
     }
     setIsLoadingLogin(true);
     try {
-      const supabase = getSupabaseClient();
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase(),
-        password,
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          password,
+        }),
       });
-      if (signInError) {
-        const msg = signInError.message || "";
-        if (msg.toLowerCase().includes("invalid") && msg.toLowerCase().includes("credentials")) {
-          setError("Email sau parolă greșită. Verifică datele sau folosește „Ai uitat parola?”.");
-        } else {
-          setError(signInError.message);
-        }
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error ?? "A apărut o problemă la autentificare. Încearcă din nou.");
         return;
       }
-      if (data.session || data.user) {
-        await supabase.auth.getSession();
-        if (typeof window !== "undefined") {
-          window.location.assign("/admin-comenzi");
-          return;
-        }
-        router.replace("/admin-comenzi");
+
+      if (typeof window !== "undefined") {
+        window.location.assign(data.redirectTo ?? "/admin-comenzi");
+        return;
       }
+
+      router.replace(data.redirectTo ?? "/admin-comenzi");
     } catch (err) {
       setError(err instanceof Error ? err.message : "A apărut o problemă la autentificare. Încearcă din nou.");
     } finally {
