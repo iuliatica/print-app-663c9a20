@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { createServerSupabaseAuth } from "@/lib/supabase-server-auth";
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
