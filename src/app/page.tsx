@@ -651,7 +651,7 @@ export default function Home() {
     try {
       const validFiles = files.filter((f) => !f.error);
       if (validFiles.length === 0) {
-        setCheckoutError("Adaugă fișiere PDF valide (max 50 MB per fișier).");
+        setCheckoutError("Adaugă cel puțin un fișier PDF valid (max 50 MB per fișier).");
         setIsCheckoutLoading(false);
         return;
       }
