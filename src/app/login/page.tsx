@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
+import { getSupabaseClient } from "@/lib/supabase-client";
 import { Loader2 } from "lucide-react";
 
 function isAdmin(user: { app_metadata?: Record<string, unknown>; user_metadata?: Record<string, unknown> }): boolean {

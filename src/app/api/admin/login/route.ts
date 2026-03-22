@@ -51,7 +51,7 @@ export async function POST(request: Request) {
     const cookieStore = await cookies();
     const { supabaseUrl, anonKey } = getSupabaseConfig();
 
-    let response = NextResponse.json({ ok: true });
+    let response = NextResponse.json({ ok: true, redirectTo: "/admin-comenzi" });
 
     const supabase = createServerClient(supabaseUrl, anonKey, {
       cookies: {
@@ -94,27 +94,6 @@ export async function POST(request: Request) {
         { error: "Acest cont nu are acces la pagina de administrare." },
         { status: 403 }
       );
-    }
-
-    response = NextResponse.json({ ok: true, redirectTo: "/admin-comenzi" });
-
-    const { data: sessionData } = await supabase.auth.getSession();
-    const session = sessionData.session;
-    if (session) {
-      response.cookies.set("sb-access-token", session.access_token, {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-        maxAge: session.expires_in,
-      });
-      response.cookies.set("sb-refresh-token", session.refresh_token, {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 30,
-      });
     }
 
     return response;
