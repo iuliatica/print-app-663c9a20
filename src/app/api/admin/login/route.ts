@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { getServerSupabase } from "@/lib/supabase-server";
 
-const COOKIE_NAME = "admin_token";
-
 function getSupabaseConfig() {
   const supabaseUrl = (() => {
     const value = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
@@ -47,7 +45,6 @@ export async function POST(request: Request) {
 
     const { supabaseUrl, anonKey } = getSupabaseConfig();
 
-    // Login cu un client simplu (fără SSR cookies)
     const supabase = createClient(supabaseUrl, anonKey, {
       auth: { persistSession: false },
     });
@@ -86,17 +83,12 @@ export async function POST(request: Request) {
       );
     }
 
-    // Setăm access token-ul ca un cookie simplu httpOnly
-    const response = NextResponse.json({ ok: true, redirectTo: "/admin-comenzi" });
-    response.cookies.set(COOKIE_NAME, data.session.access_token, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: data.session.expires_in,
+    // Return the token in response body so client can store and send as Authorization header
+    return NextResponse.json({
+      ok: true,
+      redirectTo: "/admin-comenzi",
+      token: data.session.access_token,
     });
-
-    return response;
   } catch (err) {
     console.error("Admin login API error:", err);
     return NextResponse.json(

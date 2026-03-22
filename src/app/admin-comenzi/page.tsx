@@ -418,6 +418,13 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+function getAdminHeaders(): HeadersInit {
+  const token = typeof window !== "undefined" ? sessionStorage.getItem("admin_token") : null;
+  const h: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) h["Authorization"] = `Bearer ${token}`;
+  return h;
+}
+
 export default function AdminComenziPage() {
   const router = useRouter();
   const [orders, setOrders] = useState<OrderRow[]>([]);
@@ -439,7 +446,7 @@ export default function AdminComenziPage() {
     setError(null);
     setAccessDenied(false);
     try {
-      const res = await fetch("/api/admin/orders", { credentials: "include" });
+      const res = await fetch("/api/admin/orders", { headers: getAdminHeaders() });
       if (res.status === 401 || res.status === 403) {
         setAccessDenied(true);
         setOrders([]);
@@ -458,8 +465,13 @@ export default function AdminComenziPage() {
   }, []);
 
   useEffect(() => {
+    const token = sessionStorage.getItem("admin_token");
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
     fetchOrders();
-  }, [fetchOrders]);
+  }, [fetchOrders, router]);
 
   const statusCounts = useMemo(() => {
     const counts = { all: orders.length, Nou: 0, "În lucru": 0, Gata: 0 };
@@ -516,8 +528,7 @@ export default function AdminComenziPage() {
     try {
       const res = await fetch(`/api/admin/orders/${orderId}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        headers: getAdminHeaders(),
         body: JSON.stringify({ status: newStatus }),
       });
       if (res.status === 401 || res.status === 403) {
@@ -548,10 +559,9 @@ export default function AdminComenziPage() {
       body.status = hasAnyPrinted ? "În lucru" : "Nou";
       setUpdatingId(orderId);
       try {
-        const res = await fetch(`/api/admin/orders/${orderId}`, {
+         const res = await fetch(`/api/admin/orders/${orderId}`, {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
+          headers: getAdminHeaders(),
           body: JSON.stringify(body),
         });
         if (res.status === 401 || res.status === 403) {
@@ -585,8 +595,7 @@ export default function AdminComenziPage() {
       try {
         const res = await fetch(`/api/admin/orders/${orderId}`, {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
+          headers: getAdminHeaders(),
           body: JSON.stringify({ ramburs_confirmed: newValue }),
         });
         if (res.status === 401 || res.status === 403) {
