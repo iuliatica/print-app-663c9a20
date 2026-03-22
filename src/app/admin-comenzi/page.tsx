@@ -525,7 +525,7 @@ export default function AdminComenziPage() {
         return;
       }
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Eroare la actualizare.");
+      if (!res.ok) throw new Error(data.error ?? "Nu am putut schimba statusul. Încearcă din nou.");
       setOrders((prev) =>
         prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
       );
