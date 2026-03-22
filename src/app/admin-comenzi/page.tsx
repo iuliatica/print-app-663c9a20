@@ -523,8 +523,7 @@ export default function AdminComenziPage() {
     try {
       const res = await fetch(`/api/admin/orders/${orderId}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        headers: getAdminHeaders(),
         body: JSON.stringify({ status: newStatus }),
       });
       if (res.status === 401 || res.status === 403) {
