@@ -447,7 +447,7 @@ export default function AdminComenziPage() {
       }
       const text = await res.text();
       const data = text ? JSON.parse(text) : {};
-      if (!res.ok) throw new Error(data.error ?? "Eroare la încărcare.");
+      if (!res.ok) throw new Error(data.error ?? "Nu am putut încărca comenzile. Încearcă din nou.");
       setOrders(data.orders ?? []);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Eroare la încărcarea comenzilor.");
