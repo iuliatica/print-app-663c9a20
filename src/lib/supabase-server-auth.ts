@@ -1,7 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-
-const ALLOWED_ADMIN_EMAIL = "iulia.tica05@gmail.com";
+import { getServerSupabase } from "@/lib/supabase-server";
 
 /**
  * Client Supabase pentru server care citește sesiunea din cookies (anon key).
@@ -43,7 +42,25 @@ export async function createServerSupabaseAuth() {
 }
 
 /**
- * Verifică dacă utilizatorul curent (din cookies) este admin (email permis).
+ * Verifică dacă un email este admin consultând tabelul admin_emails din DB.
+ * Folosește service role key (bypass RLS).
+ */
+async function isAdminEmail(email: string): Promise<boolean> {
+  const supabase = getServerSupabase();
+  const { data, error } = await supabase
+    .from("admin_emails")
+    .select("id")
+    .eq("email", email.trim().toLowerCase())
+    .maybeSingle();
+  if (error) {
+    console.error("Admin email check error:", error.message);
+    return false;
+  }
+  return !!data;
+}
+
+/**
+ * Verifică dacă utilizatorul curent (din cookies) este admin (email în tabelul admin_emails).
  * Returnează { ok: true } sau { ok: false, status: 403 }.
  */
 export async function requireAdminEmail(): Promise<
@@ -56,8 +73,8 @@ export async function requireAdminEmail(): Promise<
   if (!user?.email) {
     return { ok: false, status: 403 };
   }
-  const emailNormalized = user.email.trim().toLowerCase();
-  if (emailNormalized !== ALLOWED_ADMIN_EMAIL.toLowerCase()) {
+  const allowed = await isAdminEmail(user.email);
+  if (!allowed) {
     return { ok: false, status: 403 };
   }
   return { ok: true, email: user.email };
