@@ -1136,9 +1136,21 @@ export default function AdminComenziPage() {
                                 </div>
                                   );
                                 })()}
+                                {(() => {
+                                  const isDeletedPrint = !!order.files_deleted_at || previewDeletedId === order.id;
+                                  return (
                                 <div className="sm:col-span-2 lg:col-span-3">
-                                    <h4 className="text-sm font-semibold text-slate-600 mb-2">Configurare printare, îndosariere și descărcare</h4>
-                                    <p className="text-xs text-slate-500 mb-2">Bifează „Printat” când documentul a fost printat.</p>
+                                    <h4 className="text-sm font-semibold text-slate-600 mb-2">
+                                      {isDeletedPrint ? 'Configurare printare (fișiere șterse)' : 'Configurare printare, îndosariere și descărcare'}
+                                    </h4>
+                                    {isDeletedPrint ? (
+                                      <p className="text-xs text-orange-600 mb-2 flex items-center gap-1">
+                                        <AlertTriangle className="h-3 w-3" />
+                                        Fișierele PDF au fost șterse automat — doar numele și setările sunt vizibile.
+                                      </p>
+                                    ) : (
+                                      <p className="text-xs text-slate-500 mb-2">Bifează „Printat” când documentul a fost printat.</p>
+                                    )}
                                     <div className="space-y-1.5 text-[15px] leading-relaxed text-slate-800">
                                       {getConfigRowsWithFileIndices(order.config_details).map((row, i) =>
                                         row.kind === "text" ? (
@@ -1150,11 +1162,11 @@ export default function AdminComenziPage() {
                                             </p>
                                           )
                                         ) : (
-<div
+                                          <div
                                             key={`${order.id}-cfg-${i}`}
                                             className="flex flex-wrap items-center gap-2 py-1 border-b border-slate-100 last:border-0"
                                           >
-                                            {row.fileIndex < fileUrls.length && (
+                                            {!isDeletedPrint && row.fileIndex < fileUrls.length && (
                                               <button
                                                 type="button"
                                                 onClick={() => handleDownloadPdf(fileUrls[row.fileIndex])}
@@ -1170,20 +1182,28 @@ export default function AdminComenziPage() {
                                                 <span className="truncate max-w-[140px]">PDF</span>
                                               </button>
                                             )}
-                                            <label className="flex shrink-0 items-center gap-1.5 cursor-pointer">
-                                              <input
-                                                type="checkbox"
-                                                checked={order.config_details?.printed_files?.[row.fileIndex] === true}
-                                                onChange={() => handlePrintedToggle(order.id, row.fileIndex, fileUrls.length)}
-                                                disabled={updatingId === order.id}
-                                                className="h-4 w-4 rounded border-slate-300 text-green-600 focus:ring-green-500"
-                                              />
-                                              <span className="text-sm font-medium text-slate-600 whitespace-nowrap">Printat</span>
-                                            </label>
+                                            {isDeletedPrint && (
+                                              <span className="shrink-0 inline-flex items-center gap-1 rounded-lg bg-slate-100 px-2.5 py-1.5 text-xs text-slate-400 italic">
+                                                <FileText className="h-3.5 w-3.5" />
+                                                șters
+                                              </span>
+                                            )}
+                                            {!isDeletedPrint && (
+                                              <label className="flex shrink-0 items-center gap-1.5 cursor-pointer">
+                                                <input
+                                                  type="checkbox"
+                                                  checked={order.config_details?.printed_files?.[row.fileIndex] === true}
+                                                  onChange={() => handlePrintedToggle(order.id, row.fileIndex, fileUrls.length)}
+                                                  disabled={updatingId === order.id}
+                                                  className="h-4 w-4 rounded border-slate-300 text-green-600 focus:ring-green-500"
+                                                />
+                                                <span className="text-sm font-medium text-slate-600 whitespace-nowrap">Printat</span>
+                                              </label>
+                                            )}
                                             {row.kind === "file" && row.optionText != null && (
                                               <span className="shrink-0 text-sm font-bold text-slate-700">{row.optionText}</span>
                                             )}
-                                            <span className="min-w-0 flex-1 truncate text-slate-800">
+                                            <span className={`min-w-0 flex-1 truncate ${isDeletedPrint ? "text-slate-400 line-through" : "text-slate-800"}`}>
                                               {row.line}
                                             </span>
                                           </div>
@@ -1191,6 +1211,8 @@ export default function AdminComenziPage() {
                                       )}
                                     </div>
                                   </div>
+                                  );
+                                })()}
                               </div>
                               {logs.length > 0 && (
                                 <div className="mt-4 border-t border-slate-200 pt-4">
