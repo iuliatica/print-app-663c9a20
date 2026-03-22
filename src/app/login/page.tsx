@@ -25,7 +25,7 @@ export default function LoginPage() {
     setError(null);
     setMessage(null);
     if (!email.trim() || !password) {
-      setError("Completează emailul și parola.");
+      setError("Te rugăm completează emailul și parola.");
       return;
     }
     setIsLoadingLogin(true);
@@ -53,7 +53,7 @@ export default function LoginPage() {
         router.replace("/admin-comenzi");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Eroare la autentificare.");
+      setError(err instanceof Error ? err.message : "A apărut o problemă la autentificare. Încearcă din nou.");
     } finally {
       setIsLoadingLogin(false);
     }
@@ -64,7 +64,7 @@ export default function LoginPage() {
     setError(null);
     setMessage(null);
     if (!email.trim()) {
-      setError("Introdu emailul pentru resetarea parolei.");
+      setError("Introdu adresa de email pentru a primi linkul de resetare.");
       return;
     }
     setIsLoadingForgot(true);
@@ -78,9 +78,9 @@ export default function LoginPage() {
         setError(resetError.message);
         return;
       }
-      setMessage("Verifică emailul – ai primit un link pentru resetarea parolei.");
+      setMessage("Verifică-ți emailul – ți-am trimis un link pentru resetarea parolei.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Eroare la trimitere.");
+      setError(err instanceof Error ? err.message : "Nu am putut trimite emailul. Încearcă din nou.");
     } finally {
       setIsLoadingForgot(false);
     }
@@ -91,7 +91,7 @@ export default function LoginPage() {
     setError(null);
     setMessage(null);
     if (!email.trim() || !password) {
-      setError("Completează emailul și parola.");
+      setError("Te rugăm completează emailul și parola.");
       return;
     }
     if (password.length < 6) {
@@ -115,7 +115,7 @@ export default function LoginPage() {
         router.replace("/admin-comenzi");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Eroare la înregistrare.");
+      setError(err instanceof Error ? err.message : "A apărut o problemă la înregistrare. Încearcă din nou.");
     } finally {
       setIsLoadingSignUp(false);
     }

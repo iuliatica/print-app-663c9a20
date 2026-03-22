@@ -447,10 +447,10 @@ export default function AdminComenziPage() {
       }
       const text = await res.text();
       const data = text ? JSON.parse(text) : {};
-      if (!res.ok) throw new Error(data.error ?? "Eroare la încărcare.");
+      if (!res.ok) throw new Error(data.error ?? "Nu am putut încărca comenzile. Încearcă din nou.");
       setOrders(data.orders ?? []);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Eroare la încărcarea comenzilor.");
+      setError(e instanceof Error ? e.message : "Nu am putut încărca comenzile. Verifică conexiunea și încearcă din nou.");
       setOrders([]);
     } finally {
       setLoading(false);
@@ -525,12 +525,12 @@ export default function AdminComenziPage() {
         return;
       }
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Eroare la actualizare.");
+      if (!res.ok) throw new Error(data.error ?? "Nu am putut schimba statusul. Încearcă din nou.");
       setOrders((prev) =>
         prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
       );
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Eroare la actualizare status.");
+      setError(e instanceof Error ? e.message : "Nu am putut schimba statusul comenzii.");
     } finally {
       setUpdatingId(null);
     }
@@ -559,7 +559,7 @@ export default function AdminComenziPage() {
           return;
         }
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error ?? "Eroare la actualizare.");
+        if (!res.ok) throw new Error(data.error ?? "Nu am putut actualiza. Încearcă din nou.");
         setOrders((prev) =>
           prev.map((o) =>
             o.id === orderId
@@ -656,7 +656,7 @@ export default function AdminComenziPage() {
             </span>
             <div>
               <h1 className="text-xl font-bold text-slate-800 sm:text-2xl">Admin Comenzi</h1>
-              <p className="text-sm text-slate-500">Gestionează comenzile din tabelul orders</p>
+              <p className="text-sm text-slate-500">Gestionează comenzile clienților</p>
             </div>
           </div>
           <button

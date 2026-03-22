@@ -392,7 +392,7 @@ export default function Home() {
             const pages = await getPdfPageCount(item.file);
             return { ...item, pages };
           } catch {
-            return { ...item, pages: null, error: "Nu s-a putut citi PDF-ul" };
+            return { ...item, pages: null, error: "Nu am putut citi acest fișier. Verifică dacă e un PDF valid." };
           }
         }
       })
@@ -625,7 +625,7 @@ export default function Home() {
     const errors = validateShipping(shipping);
     if (Object.keys(errors).length > 0) {
       setShippingErrors(errors);
-      setCheckoutError("Completează corect toate câmpurile obligatorii pentru livrare.");
+      setCheckoutError("Te rugăm completează corect toate câmpurile pentru livrare (nume, telefon, email, adresă).");
       return;
     }
     setShippingErrors({});
@@ -643,7 +643,7 @@ export default function Home() {
       return groupPages > 240;
     });
     if (capsareError) {
-      setCheckoutError("Capsarea nu este disponibilă pentru grupuri cu mai mult de 240 de coli.");
+      setCheckoutError("Capsarea nu este disponibilă pentru documente cu mai mult de 240 de coli. Alege alt tip de legare.");
       setIsCheckoutLoading(false);
       return;
     }
@@ -651,7 +651,7 @@ export default function Home() {
     try {
       const validFiles = files.filter((f) => !f.error);
       if (validFiles.length === 0) {
-        setCheckoutError("Adaugă fișiere PDF valide (max 50 MB per fișier).");
+        setCheckoutError("Adaugă cel puțin un fișier PDF valid (max 50 MB per fișier).");
         setIsCheckoutLoading(false);
         return;
       }
@@ -669,7 +669,7 @@ export default function Home() {
           fileList.forEach((file) => formData.append("files", file));
           const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
           const uploadData = await uploadRes.json();
-          if (!uploadRes.ok) throw new Error(uploadData.error ?? "Eroare la încărcare");
+          if (!uploadRes.ok) throw new Error("Nu am putut încărca fișierele. Te rugăm încearcă din nou.");
           fileUrls = uploadData.urls ?? [];
           setUploadProgress(100);
         } finally {
@@ -722,7 +722,7 @@ export default function Home() {
         }),
       });
       const orderData = await orderRes.json();
-      if (!orderRes.ok) throw new Error(orderData.error ?? "Eroare la salvare comanda.");
+      if (!orderRes.ok) throw new Error("Nu am putut salva comanda. Verifică conexiunea la internet și încearcă din nou.");
 
       if (paymentMethod === "ramburs") {
         setOrderSuccessDetails({
@@ -784,7 +784,7 @@ export default function Home() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Eroare la plată");
+      if (!res.ok) throw new Error("Nu am putut iniția plata. Încearcă din nou.");
 
       // Legăm sesiunea Stripe de comandă
       if (data.id && orderId) {
@@ -798,11 +798,12 @@ export default function Home() {
       if (data.url) {
         window.location.href = data.url;
       } else {
-        throw new Error("Nu s-a primit link de plată");
+        throw new Error("Nu s-a putut deschide pagina de plată. Încearcă din nou.");
       }
     } catch (e) {
-      setCheckoutError(e instanceof Error ? e.message : "Eroare la plată");
-      addToast(e instanceof Error ? e.message : "Eroare la plată", "error");
+      const friendlyMsg = e instanceof Error ? e.message : "A apărut o problemă. Te rugăm încearcă din nou.";
+      setCheckoutError(friendlyMsg);
+      addToast(friendlyMsg, "error");
     } finally {
       setIsCheckoutLoading(false);
     }
