@@ -26,6 +26,8 @@ export type AdminOrderRow = {
   status: string;
   file_url: string;
   config_details: ConfigDetails | null;
+  awb_url: string | null;
+  factura_url: string | null;
 };
 
 export async function GET() {
