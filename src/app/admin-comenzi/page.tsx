@@ -1006,8 +1006,54 @@ export default function AdminComenziPage() {
                                   <span className="text-slate-500">Total</span>
                                   <p className="font-medium text-slate-800">{Number(order.total_price).toFixed(2)} lei</p>
                                 </div>
+                                {(() => {
+                                  const isDeleted = !!order.files_deleted_at || previewDeletedId === order.id;
+                                  const deletedDate = order.files_deleted_at ? formatDate(order.files_deleted_at) : previewDeletedId === order.id ? "Preview — așa va arăta după ștergere" : null;
+                                  return (
                                 <div className="sm:col-span-2 lg:col-span-3">
-                                  <h4 className="text-sm font-semibold text-slate-600 mb-2">Documente comandă</h4>
+                                  <div className="flex items-center gap-3 mb-2">
+                                    <h4 className="text-sm font-semibold text-slate-600">Documente comandă</h4>
+                                    {!order.files_deleted_at && (
+                                      <button
+                                        type="button"
+                                        onClick={() => setPreviewDeletedId(previewDeletedId === order.id ? null : order.id)}
+                                        className="inline-flex items-center gap-1 rounded-md border border-purple-300 bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 hover:bg-purple-100"
+                                        title="Vezi cum va arăta comanda după ștergerea automată a fișierelor"
+                                      >
+                                        <Eye className="h-3 w-3" />
+                                        {previewDeletedId === order.id ? "Ascunde preview" : "Preview ștergere"}
+                                      </button>
+                                    )}
+                                  </div>
+
+                                  {isDeleted ? (
+                                    <div className="rounded-lg border border-orange-200 bg-orange-50 p-3">
+                                      <div className="flex items-start gap-2 mb-2">
+                                        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-orange-500" />
+                                        <div>
+                                          <p className="text-sm font-medium text-orange-800">
+                                            Fișierele acestei comenzi au fost șterse automat
+                                          </p>
+                                          <p className="text-xs text-orange-600 mt-0.5">
+                                            {deletedDate}
+                                          </p>
+                                          <p className="text-xs text-orange-600 mt-1">
+                                            Numele fișierelor și detaliile printării rămân mai jos pentru referință.
+                                          </p>
+                                        </div>
+                                      </div>
+                                      <div className="mt-2 flex flex-wrap gap-3 text-sm text-slate-500">
+                                        <span className="flex items-center gap-1.5">
+                                          <FileText className="h-3.5 w-3.5" />
+                                          AWB: <span className="italic">șters</span>
+                                        </span>
+                                        <span className="flex items-center gap-1.5">
+                                          <FileText className="h-3.5 w-3.5" />
+                                          Factură: <span className="italic">ștearsă</span>
+                                        </span>
+                                      </div>
+                                    </div>
+                                  ) : (
                                   <div className="flex flex-wrap gap-3">
                                     {/* AWB */}
                                     <div className="flex items-center gap-2">
@@ -1086,7 +1132,10 @@ export default function AdminComenziPage() {
                                       </button>
                                     </div>
                                   </div>
+                                  )}
                                 </div>
+                                  );
+                                })()}
                                 <div className="sm:col-span-2 lg:col-span-3">
                                     <h4 className="text-sm font-semibold text-slate-600 mb-2">Configurare printare, îndosariere și descărcare</h4>
                                     <p className="text-xs text-slate-500 mb-2">Bifează „Printat” când documentul a fost printat.</p>
