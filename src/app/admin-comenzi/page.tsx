@@ -972,6 +972,87 @@ export default function AdminComenziPage() {
                                   <p className="font-medium text-slate-800">{Number(order.total_price).toFixed(2)} lei</p>
                                 </div>
                                 <div className="sm:col-span-2 lg:col-span-3">
+                                  <h4 className="text-sm font-semibold text-slate-600 mb-2">Documente comandă</h4>
+                                  <div className="flex flex-wrap gap-3">
+                                    {/* AWB */}
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-sm text-slate-600 font-medium w-16">AWB:</span>
+                                      {order.awb_url ? (
+                                        <button
+                                          type="button"
+                                          onClick={() => handleDownloadPdf(order.awb_url!)}
+                                          className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+                                        >
+                                          <Download className="h-3.5 w-3.5" />
+                                          Descarcă AWB
+                                        </button>
+                                      ) : null}
+                                      <input
+                                        type="file"
+                                        accept=".pdf"
+                                        className="hidden"
+                                        ref={(el) => { awbInputRef.current[order.id] = el; }}
+                                        onChange={(e) => {
+                                          const f = e.target.files?.[0];
+                                          if (f) handleDocUpload(order.id, "awb", f);
+                                          e.target.value = "";
+                                        }}
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={() => awbInputRef.current[order.id]?.click()}
+                                        disabled={uploadingDoc === `awb-${order.id}`}
+                                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                                      >
+                                        {uploadingDoc === `awb-${order.id}` ? (
+                                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                        ) : (
+                                          <Upload className="h-3.5 w-3.5" />
+                                        )}
+                                        {order.awb_url ? "Înlocuiește" : "Încarcă AWB"}
+                                      </button>
+                                    </div>
+                                    {/* Factura */}
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-sm text-slate-600 font-medium w-16">Factură:</span>
+                                      {order.factura_url ? (
+                                        <button
+                                          type="button"
+                                          onClick={() => handleDownloadPdf(order.factura_url!)}
+                                          className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+                                        >
+                                          <Download className="h-3.5 w-3.5" />
+                                          Descarcă factura
+                                        </button>
+                                      ) : null}
+                                      <input
+                                        type="file"
+                                        accept=".pdf"
+                                        className="hidden"
+                                        ref={(el) => { facturaInputRef.current[order.id] = el; }}
+                                        onChange={(e) => {
+                                          const f = e.target.files?.[0];
+                                          if (f) handleDocUpload(order.id, "factura", f);
+                                          e.target.value = "";
+                                        }}
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={() => facturaInputRef.current[order.id]?.click()}
+                                        disabled={uploadingDoc === `factura-${order.id}`}
+                                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                                      >
+                                        {uploadingDoc === `factura-${order.id}` ? (
+                                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                        ) : (
+                                          <Upload className="h-3.5 w-3.5" />
+                                        )}
+                                        {order.factura_url ? "Înlocuiește" : "Încarcă factură"}
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="sm:col-span-2 lg:col-span-3">
                                     <h4 className="text-sm font-semibold text-slate-600 mb-2">Configurare printare, îndosariere și descărcare</h4>
                                     <p className="text-xs text-slate-500 mb-2">Bifează „Printat” când documentul a fost printat.</p>
                                     <div className="space-y-1.5 text-[15px] leading-relaxed text-slate-800">
