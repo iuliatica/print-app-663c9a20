@@ -24,7 +24,7 @@ import {
   Check,
   Truck,
   Shield,
-  Clock,
+  
   Star,
   Lock,
   Phone,
