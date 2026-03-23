@@ -636,24 +636,10 @@ export default function AdminComenziPage() {
     setTimeout(() => setDownloadingUrl(null), 800);
   }, []);
 
-  const [previewDeletedId, setPreviewDeletedId] = useState<string | null>(null);
-  const [cleaningUp, setCleaningUp] = useState(false);
-
-  const handleCleanup = useCallback(async () => {
-    if (!confirm("Sigur vrei să ștergi fișierele comenzilor mai vechi de 30 de zile?\n\nNumele fișierelor și detaliile comenzii rămân vizibile.")) return;
-    setCleaningUp(true);
-    try {
-      const res = await fetch("/api/admin/cleanup", { method: "POST", headers: getAdminHeaders() });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Eroare la curățare.");
-      alert(data.message);
-      fetchOrders();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Eroare la curățare.");
-    } finally {
-      setCleaningUp(false);
-    }
-  }, [fetchOrders]);
+  // Auto-cleanup: trigger silently on page load
+  useEffect(() => {
+    fetch("/api/admin/cleanup", { method: "POST", headers: getAdminHeaders() }).catch(() => {});
+  }, []);
 
   const [uploadingDoc, setUploadingDoc] = useState<string | null>(null);
   const awbInputRef = useRef<Record<string, HTMLInputElement | null>>({});
