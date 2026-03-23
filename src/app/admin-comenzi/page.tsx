@@ -1086,12 +1086,11 @@ export default function AdminComenziPage() {
                                       </button>
                                     </div>
                                   </div>
-                                  )}
                                 </div>
                                   );
                                 })()}
                                 {(() => {
-                                  const isDeletedPrint = !!order.files_deleted_at || previewDeletedId === order.id;
+                                  const isDeletedPrint = !!order.files_deleted_at;
                                   return (
                                 <div className="sm:col-span-2 lg:col-span-3">
                                     <h4 className="text-sm font-semibold text-slate-600 mb-2">
