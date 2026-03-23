@@ -985,24 +985,27 @@ export default function AdminComenziPage() {
                                   <p className="font-medium text-slate-800">{Number(order.total_price).toFixed(2)} lei</p>
                                 </div>
                                 {(() => {
-                                  const isDeleted = !!order.files_deleted_at || previewDeletedId === order.id;
-                                  const deletedDate = order.files_deleted_at ? formatDate(order.files_deleted_at) : previewDeletedId === order.id ? "Preview — așa va arăta după ștergere" : null;
+                                  const isDeleted = !!order.files_deleted_at;
+                                  const deletedDate = order.files_deleted_at ? formatDate(order.files_deleted_at) : null;
                                   return (
                                 <div className="sm:col-span-2 lg:col-span-3">
-                                  <div className="flex items-center gap-3 mb-2">
-                                    <h4 className="text-sm font-semibold text-slate-600">Documente comandă</h4>
-                                    {!order.files_deleted_at && (
-                                      <button
-                                        type="button"
-                                        onClick={() => setPreviewDeletedId(previewDeletedId === order.id ? null : order.id)}
-                                        className="inline-flex items-center gap-1 rounded-md border border-purple-300 bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 hover:bg-purple-100"
-                                        title="Vezi cum va arăta comanda după ștergerea automată a fișierelor"
-                                      >
-                                        <Eye className="h-3 w-3" />
-                                        {previewDeletedId === order.id ? "Ascunde preview" : "Preview ștergere"}
-                                      </button>
-                                    )}
-                                  </div>
+                                  <h4 className="text-sm font-semibold text-slate-600 mb-2">Documente comandă</h4>
+
+                                  {isDeleted && (
+                                    <div className="rounded-lg border border-orange-200 bg-orange-50 p-3 mb-3">
+                                      <div className="flex items-start gap-2">
+                                        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-orange-500" />
+                                        <div>
+                                          <p className="text-sm font-medium text-orange-800">
+                                            Fișierele clientului au fost șterse automat
+                                          </p>
+                                          <p className="text-xs text-orange-600 mt-0.5">
+                                            {deletedDate}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
 
                                   {isDeleted ? (
                                     <div className="rounded-lg border border-orange-200 bg-orange-50 p-3">
