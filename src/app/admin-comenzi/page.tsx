@@ -58,6 +58,8 @@ type OrderRow = {
   created_at: string;
   phone: string;
   customer_email: string;
+  customer_name: string | null;
+  shipping_address: string | null;
   total_price: number;
   payment_method: string;
   status: string;
