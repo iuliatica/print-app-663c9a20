@@ -4,8 +4,8 @@ export default function PoliticaConfidentialitatePage() {
       <h1 className="text-2xl font-bold text-slate-900 mb-4">Politica de confidențialitate</h1>
 
       <p>
-        Această politică descrie modul în care <strong>[Nume Firmă] SRL</strong>, CUI{" "}
-        <strong>[CUI]</strong> (denumită în continuare „Operatorul”) prelucrează datele cu caracter
+        Această politică descrie modul în care <strong>Tica M. Genoveva PFA</strong>, CUI{" "}
+        <strong>51541140</strong> (denumită în continuare „Operatorul”) prelucrează datele cu caracter
         personal ale utilizatorilor platformei de printare online.
       </p>
 
