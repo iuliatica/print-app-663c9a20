@@ -21,6 +21,8 @@ export type AdminOrderRow = {
   created_at: string;
   phone: string;
   customer_email: string;
+  customer_name: string | null;
+  shipping_address: string | null;
   total_price: number;
   payment_method: string;
   status: string;
@@ -40,7 +42,7 @@ export async function GET() {
     const supabase = getServerSupabase();
     const { data, error } = await supabase
       .from("orders")
-      .select("id, created_at, phone, customer_email, total_price, payment_method, status, file_url, config_details, awb_url, factura_url, files_deleted_at")
+      .select("id, created_at, phone, customer_email, customer_name, shipping_address, total_price, payment_method, status, file_url, config_details, awb_url, factura_url, files_deleted_at")
       .order("created_at", { ascending: false });
 
     if (error) {

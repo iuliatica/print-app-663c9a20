@@ -6,8 +6,8 @@ export default function TermeniSiConditiiPage() {
       <h1 className="text-2xl font-bold text-slate-900 mb-4">Termeni și condiții</h1>
 
       <p>
-        Acest site aparține și este operat de <strong>[Nume Firmă] SRL</strong>, societate înregistrată în
-        România, având CUI <strong>[CUI]</strong> (denumită în continuare „Furnizorul” sau „Centrul de
+        Acest site aparține și este operat de <strong>Tica M. Genoveva PFA</strong>, înregistrată în
+        România, având CUI <strong>51541140</strong> (denumită în continuare „Furnizorul” sau „Centrul de
         printare”). Prin utilizarea platformei și plasarea de comenzi, sunteți de acord cu prezentele
         Termene și Condiții.
       </p>

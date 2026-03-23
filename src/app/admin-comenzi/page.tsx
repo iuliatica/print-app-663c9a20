@@ -18,9 +18,7 @@ import {
   User,
   MapPin,
   Upload,
-  Trash2,
   AlertTriangle,
-  Eye,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getSupabaseClient } from "@/lib/supabase-client";
@@ -58,6 +56,8 @@ type OrderRow = {
   created_at: string;
   phone: string;
   customer_email: string;
+  customer_name: string | null;
+  shipping_address: string | null;
   total_price: number;
   payment_method: string;
   status: string;
@@ -634,24 +634,10 @@ export default function AdminComenziPage() {
     setTimeout(() => setDownloadingUrl(null), 800);
   }, []);
 
-  const [previewDeletedId, setPreviewDeletedId] = useState<string | null>(null);
-  const [cleaningUp, setCleaningUp] = useState(false);
-
-  const handleCleanup = useCallback(async () => {
-    if (!confirm("Sigur vrei să ștergi fișierele comenzilor mai vechi de 30 de zile?\n\nNumele fișierelor și detaliile comenzii rămân vizibile.")) return;
-    setCleaningUp(true);
-    try {
-      const res = await fetch("/api/admin/cleanup", { method: "POST", headers: getAdminHeaders() });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Eroare la curățare.");
-      alert(data.message);
-      fetchOrders();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Eroare la curățare.");
-    } finally {
-      setCleaningUp(false);
-    }
-  }, [fetchOrders]);
+  // Auto-cleanup: trigger silently on page load
+  useEffect(() => {
+    fetch("/api/admin/cleanup", { method: "POST", headers: getAdminHeaders() }).catch(() => {});
+  }, []);
 
   const [uploadingDoc, setUploadingDoc] = useState<string | null>(null);
   const awbInputRef = useRef<Record<string, HTMLInputElement | null>>({});
@@ -731,16 +717,6 @@ export default function AdminComenziPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleCleanup}
-              disabled={cleaningUp}
-              className="flex items-center gap-2 rounded-xl border border-orange-300 bg-orange-50 px-4 py-2.5 text-sm font-medium text-orange-700 hover:bg-orange-100 disabled:opacity-50"
-              title="Șterge fișierele comenzilor mai vechi de 30 de zile"
-            >
-              {cleaningUp ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-              Curățare fișiere vechi
-            </button>
             <button
               type="button"
               onClick={handleLogout}
@@ -955,7 +931,7 @@ export default function AdminComenziPage() {
                                   <User className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
                                   <div>
                                     <span className="text-slate-500">Nume</span>
-                                    <p className="font-medium text-slate-800">{(order as { customer_name?: string }).customer_name || "—"}</p>
+                                    <p className="font-medium text-slate-800">{order.customer_name || "—"}</p>
                                   </div>
                                 </div>
                                 <div className="flex items-start gap-2">
@@ -993,7 +969,7 @@ export default function AdminComenziPage() {
                                   <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
                                   <div className="min-w-0 flex-1">
                                     <span className="text-slate-500">Adresă livrare</span>
-                                    <p className="font-medium text-slate-800">{(order as { shipping_address?: string }).shipping_address || "—"}</p>
+                                    <p className="font-medium text-slate-800">{order.shipping_address || "—"}</p>
                                   </div>
                                 </div>
                                 <div>
@@ -1007,53 +983,29 @@ export default function AdminComenziPage() {
                                   <p className="font-medium text-slate-800">{Number(order.total_price).toFixed(2)} lei</p>
                                 </div>
                                 {(() => {
-                                  const isDeleted = !!order.files_deleted_at || previewDeletedId === order.id;
-                                  const deletedDate = order.files_deleted_at ? formatDate(order.files_deleted_at) : previewDeletedId === order.id ? "Preview — așa va arăta după ștergere" : null;
+                                  const isDeleted = !!order.files_deleted_at;
+                                  const deletedDate = order.files_deleted_at ? formatDate(order.files_deleted_at) : null;
                                   return (
                                 <div className="sm:col-span-2 lg:col-span-3">
-                                  <div className="flex items-center gap-3 mb-2">
-                                    <h4 className="text-sm font-semibold text-slate-600">Documente comandă</h4>
-                                    {!order.files_deleted_at && (
-                                      <button
-                                        type="button"
-                                        onClick={() => setPreviewDeletedId(previewDeletedId === order.id ? null : order.id)}
-                                        className="inline-flex items-center gap-1 rounded-md border border-purple-300 bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 hover:bg-purple-100"
-                                        title="Vezi cum va arăta comanda după ștergerea automată a fișierelor"
-                                      >
-                                        <Eye className="h-3 w-3" />
-                                        {previewDeletedId === order.id ? "Ascunde preview" : "Preview ștergere"}
-                                      </button>
-                                    )}
-                                  </div>
+                                  <h4 className="text-sm font-semibold text-slate-600 mb-2">Documente comandă</h4>
 
-                                  {isDeleted ? (
-                                    <div className="rounded-lg border border-orange-200 bg-orange-50 p-3">
-                                      <div className="flex items-start gap-2 mb-2">
+                                  {isDeleted && (
+                                    <div className="rounded-lg border border-orange-200 bg-orange-50 p-3 mb-3">
+                                      <div className="flex items-start gap-2">
                                         <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-orange-500" />
                                         <div>
                                           <p className="text-sm font-medium text-orange-800">
-                                            Fișierele acestei comenzi au fost șterse automat
+                                            Fișierele clientului au fost șterse automat
                                           </p>
                                           <p className="text-xs text-orange-600 mt-0.5">
                                             {deletedDate}
                                           </p>
-                                          <p className="text-xs text-orange-600 mt-1">
-                                            Numele fișierelor și detaliile printării rămân mai jos pentru referință.
-                                          </p>
                                         </div>
                                       </div>
-                                      <div className="mt-2 flex flex-wrap gap-3 text-sm text-slate-500">
-                                        <span className="flex items-center gap-1.5">
-                                          <FileText className="h-3.5 w-3.5" />
-                                          AWB: <span className="italic">șters</span>
-                                        </span>
-                                        <span className="flex items-center gap-1.5">
-                                          <FileText className="h-3.5 w-3.5" />
-                                          Factură: <span className="italic">ștearsă</span>
-                                        </span>
-                                      </div>
                                     </div>
-                                  ) : (
+                                  )}
+
+                                  {/* AWB & Factura always visible */}
                                   <div className="flex flex-wrap gap-3">
                                     {/* AWB */}
                                     <div className="flex items-center gap-2">
@@ -1132,12 +1084,11 @@ export default function AdminComenziPage() {
                                       </button>
                                     </div>
                                   </div>
-                                  )}
                                 </div>
                                   );
                                 })()}
                                 {(() => {
-                                  const isDeletedPrint = !!order.files_deleted_at || previewDeletedId === order.id;
+                                  const isDeletedPrint = !!order.files_deleted_at;
                                   return (
                                 <div className="sm:col-span-2 lg:col-span-3">
                                     <h4 className="text-sm font-semibold text-slate-600 mb-2">
