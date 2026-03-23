@@ -48,10 +48,10 @@ export default function PoliticaConfidentialitatePage() {
       <section className="space-y-2">
         <h2 className="text-lg font-semibold text-slate-900">4. Stocarea și perioada de păstrare</h2>
         <p>
-          Fișierele încărcate și comenzile sunt păstrate pe perioada necesară prestării serviciului
-          și, ulterior, pentru termenul prevăzut de lege pentru documentele financiar-contabile.
-          Documentele PDF pot fi șterse automat după o perioadă rezonabilă de timp de la livrare,
-          cu excepția metadatelor necesare pentru evidență.
+          Fișierele PDF încărcate de utilizatori sunt <strong>șterse automat după 30 de zile</strong> de la
+          plasarea comenzii. După ștergere, doar metadatele comenzii (numele fișierelor, numărul de pagini,
+          opțiunile de printare) rămân stocate pentru evidență internă. Documentele fiscale (facturi) sunt
+          păstrate conform termenelor prevăzute de legislația financiar-contabilă în vigoare.
         </p>
       </section>
 

@@ -90,13 +90,11 @@ export async function POST() {
         }
       }
 
-      // Mark order as cleaned - nullify URLs but keep config_details intact
+      // Mark order as cleaned - nullify user file URLs but keep AWB and factura
       const { error: updateErr } = await supabase
         .from("orders")
         .update({
-          file_url: order.file_url, // keep original URLs for reference
-          awb_url: null,
-          factura_url: null,
+          file_url: null,
           files_deleted_at: new Date().toISOString(),
         })
         .eq("id", order.id);
