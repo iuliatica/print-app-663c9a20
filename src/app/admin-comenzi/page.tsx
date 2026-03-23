@@ -971,7 +971,7 @@ export default function AdminComenziPage() {
                                   <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
                                   <div className="min-w-0 flex-1">
                                     <span className="text-slate-500">Adresă livrare</span>
-                                    <p className="font-medium text-slate-800">{(order as { shipping_address?: string }).shipping_address || "—"}</p>
+                                    <p className="font-medium text-slate-800">{order.shipping_address || "—"}</p>
                                   </div>
                                 </div>
                                 <div>
