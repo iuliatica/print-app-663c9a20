@@ -933,7 +933,7 @@ export default function AdminComenziPage() {
                                   <User className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
                                   <div>
                                     <span className="text-slate-500">Nume</span>
-                                    <p className="font-medium text-slate-800">{(order as { customer_name?: string }).customer_name || "—"}</p>
+                                    <p className="font-medium text-slate-800">{order.customer_name || "—"}</p>
                                   </div>
                                 </div>
                                 <div className="flex items-start gap-2">
