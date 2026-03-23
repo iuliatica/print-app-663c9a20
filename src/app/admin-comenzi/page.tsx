@@ -1007,34 +1007,7 @@ export default function AdminComenziPage() {
                                     </div>
                                   )}
 
-                                  {isDeleted ? (
-                                    <div className="rounded-lg border border-orange-200 bg-orange-50 p-3">
-                                      <div className="flex items-start gap-2 mb-2">
-                                        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-orange-500" />
-                                        <div>
-                                          <p className="text-sm font-medium text-orange-800">
-                                            Fișierele acestei comenzi au fost șterse automat
-                                          </p>
-                                          <p className="text-xs text-orange-600 mt-0.5">
-                                            {deletedDate}
-                                          </p>
-                                          <p className="text-xs text-orange-600 mt-1">
-                                            Numele fișierelor și detaliile printării rămân mai jos pentru referință.
-                                          </p>
-                                        </div>
-                                      </div>
-                                      <div className="mt-2 flex flex-wrap gap-3 text-sm text-slate-500">
-                                        <span className="flex items-center gap-1.5">
-                                          <FileText className="h-3.5 w-3.5" />
-                                          AWB: <span className="italic">șters</span>
-                                        </span>
-                                        <span className="flex items-center gap-1.5">
-                                          <FileText className="h-3.5 w-3.5" />
-                                          Factură: <span className="italic">ștearsă</span>
-                                        </span>
-                                      </div>
-                                    </div>
-                                  ) : (
+                                  {/* AWB & Factura always visible */}
                                   <div className="flex flex-wrap gap-3">
                                     {/* AWB */}
                                     <div className="flex items-center gap-2">
