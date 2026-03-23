@@ -721,16 +721,6 @@ export default function AdminComenziPage() {
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={handleCleanup}
-              disabled={cleaningUp}
-              className="flex items-center gap-2 rounded-xl border border-orange-300 bg-orange-50 px-4 py-2.5 text-sm font-medium text-orange-700 hover:bg-orange-100 disabled:opacity-50"
-              title="Șterge fișierele comenzilor mai vechi de 30 de zile"
-            >
-              {cleaningUp ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-              Curățare fișiere vechi
-            </button>
-            <button
-              type="button"
               onClick={handleLogout}
               className="flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
             >
