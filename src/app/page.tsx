@@ -718,6 +718,8 @@ export default function Home() {
           status: "pending",
           customer_email: email.trim().toLowerCase(),
           phone: phone.trim().replace(/\s/g, ""),
+          customer_name: name.trim(),
+          shipping_address: address.trim(),
           config_details,
         }),
       });
