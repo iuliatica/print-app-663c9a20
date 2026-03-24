@@ -79,7 +79,7 @@ function validateShipping(form: ShippingForm): ShippingErrors {
 
 type PrintMode = "color" | "bw";
 type SpiralType = "none" | "spirala" | "perforare2" | "capsare";
-type SpiralColorOption = "negru" | "alb";
+type SpiralColorOption = "negru";
 type CoverBackColor = "negru" | "alb" | "albastru_inchis" | "galben" | "rosu" | "verde";
 
 type OrderSuccessGroup = {
