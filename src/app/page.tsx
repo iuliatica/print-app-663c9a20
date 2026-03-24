@@ -1830,7 +1830,9 @@ export default function Home() {
               <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto bg-slate-50/60 p-4 md:flex-row">
                 <div className="min-h-0 flex-1 overflow-auto rounded-xl border border-slate-200 bg-white">
                   {file.previewUrl ? (
-                    <iframe src={file.previewUrl} className="h-full min-h-[400px] w-full" title={`Preview ${file.name}`} />
+                    <object data={file.previewUrl} type="application/pdf" className="h-full min-h-[400px] w-full">
+                      <iframe src={file.previewUrl} className="h-full min-h-[400px] w-full" title={`Preview ${file.name}`} />
+                    </object>
                   ) : (
                     <div className="flex h-full items-center justify-center text-sm text-slate-500">Preview indisponibil</div>
                   )}
