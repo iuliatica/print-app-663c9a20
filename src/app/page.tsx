@@ -596,7 +596,6 @@ export default function Home() {
 
   const spiralColorOptions: { value: SpiralColorOption; label: string; circleClass: string }[] = [
     { value: "negru", label: "Negru", circleClass: "bg-slate-800" },
-    { value: "alb", label: "Alb", circleClass: "bg-white border border-slate-200 shadow-inner" },
   ];
 
   const selectedGroupPages =
