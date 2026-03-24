@@ -725,6 +725,28 @@ export default function Home() {
       const orderData = await orderRes.json();
       if (!orderRes.ok) throw new Error("Nu am putut salva comanda. Verifică conexiunea la internet și încearcă din nou.");
 
+      // Send confirmation email (fire-and-forget)
+      fetch("/api/send-confirmation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: email.trim().toLowerCase(),
+          customerName: name.trim(),
+          totalPrice: totalWithShipping,
+          paymentMethod,
+          files: validFiles.map((f) => ({
+            name: f.name,
+            pages: f.pages,
+            printMode: f.printMode ?? "bw",
+            duplex: f.duplex ?? false,
+            copies: f.copies ?? 1,
+          })),
+          spiralType: validBindingOptions[0]?.spiralType ?? "none",
+          spiralColor: validBindingOptions[0]?.spiralColor,
+          coverBackColor: validBindingOptions[0]?.coverBackColor,
+          shippingAddress: address.trim(),
+        }),
+      }).catch(() => {});
       if (paymentMethod === "ramburs") {
         setOrderSuccessDetails({
           paymentMethod: "ramburs",
