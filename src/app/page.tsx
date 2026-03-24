@@ -79,7 +79,7 @@ function validateShipping(form: ShippingForm): ShippingErrors {
 
 type PrintMode = "color" | "bw";
 type SpiralType = "none" | "spirala" | "perforare2" | "capsare";
-type SpiralColorOption = "negru" | "alb";
+type SpiralColorOption = "negru";
 type CoverBackColor = "negru" | "alb" | "albastru_inchis" | "galben" | "rosu" | "verde";
 
 type OrderSuccessGroup = {
@@ -596,7 +596,6 @@ export default function Home() {
 
   const spiralColorOptions: { value: SpiralColorOption; label: string; circleClass: string }[] = [
     { value: "negru", label: "Negru", circleClass: "bg-slate-800" },
-    { value: "alb", label: "Alb", circleClass: "bg-white border border-slate-200 shadow-inner" },
   ];
 
   const selectedGroupPages =
@@ -726,6 +725,28 @@ export default function Home() {
       const orderData = await orderRes.json();
       if (!orderRes.ok) throw new Error("Nu am putut salva comanda. Verifică conexiunea la internet și încearcă din nou.");
 
+      // Send confirmation email (fire-and-forget)
+      fetch("/api/send-confirmation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: email.trim().toLowerCase(),
+          customerName: name.trim(),
+          totalPrice: totalWithShipping,
+          paymentMethod,
+          files: validFiles.map((f) => ({
+            name: f.name,
+            pages: f.pages,
+            printMode: f.printMode ?? "bw",
+            duplex: f.duplex ?? false,
+            copies: f.copies ?? 1,
+          })),
+          spiralType: validBindingOptions[0]?.spiralType ?? "none",
+          spiralColor: validBindingOptions[0]?.spiralColor,
+          coverBackColor: validBindingOptions[0]?.coverBackColor,
+          shippingAddress: address.trim(),
+        }),
+      }).catch(() => {});
       if (paymentMethod === "ramburs") {
         setOrderSuccessDetails({
           paymentMethod: "ramburs",
@@ -1809,7 +1830,9 @@ export default function Home() {
               <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto bg-slate-50/60 p-4 md:flex-row">
                 <div className="min-h-0 flex-1 overflow-auto rounded-xl border border-slate-200 bg-white">
                   {file.previewUrl ? (
-                    <iframe src={file.previewUrl} className="h-full min-h-[400px] w-full" title={`Preview ${file.name}`} />
+                    <object data={file.previewUrl} type="application/pdf" className="h-full min-h-[400px] w-full">
+                      <iframe src={file.previewUrl} className="h-full min-h-[400px] w-full" title={`Preview ${file.name}`} />
+                    </object>
                   ) : (
                     <div className="flex h-full items-center justify-center text-sm text-slate-500">Preview indisponibil</div>
                   )}

@@ -627,11 +627,34 @@ export default function AdminComenziPage() {
     [orders]
   );
 
-  const handleDownloadPdf = useCallback((url: string) => {
+  const handleDownloadPdf = useCallback(async (url: string) => {
     setDownloadingUrl(url);
-    const downloadApiUrl = `/api/admin/download?url=${encodeURIComponent(url)}`;
-    window.open(downloadApiUrl, "_blank", "noopener,noreferrer");
-    setTimeout(() => setDownloadingUrl(null), 800);
+    try {
+      const token = sessionStorage.getItem("admin_token");
+      const headers: Record<string, string> = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      const res = await fetch(`/api/admin/download?url=${encodeURIComponent(url)}`, { headers });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error ?? "Eroare la descărcare.");
+      }
+      const blob = await res.blob();
+      const contentDisposition = res.headers.get("Content-Disposition");
+      const filenameMatch = contentDisposition?.match(/filename="?([^"]+)"?/);
+      const filename = filenameMatch?.[1] ?? "document.pdf";
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Eroare la descărcarea fișierului.");
+    } finally {
+      setDownloadingUrl(null);
+    }
   }, []);
 
   // Auto-cleanup: trigger silently on page load
