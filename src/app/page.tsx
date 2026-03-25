@@ -779,7 +779,7 @@ export default function Home() {
       const fileUrlMeta: Record<string, string> = {};
       fileUrls.forEach((url, i) => { fileUrlMeta[`file_url_${i}`] = url; });
       const coverColorSummary = `fata:transparent;spate:${coverBackColor}`;
-      const amountBani = Math.round(totalWithShipping * 100);
+      
       const orderId = orderData.id;
 
       const res = await fetch("/api/checkout", {
