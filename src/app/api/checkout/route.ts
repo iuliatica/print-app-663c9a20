@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { getServerSupabase } from "@/lib/supabase-server";
+
+const SHIPPING_COST_LEI = 15;
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -8,31 +11,65 @@ function getStripe() {
 }
 
 export type CheckoutBody = {
-  /** Sumă de încasat, în unități minime ale monedei (ex: bani pentru RON – 10.50 lei = 1050). */
-  amount: number;
-  /** Cod monedă (ex: "ron"). */
-  currency: string;
-  /** Metadata (detalii printare etc.) – chei și valori string. */
+  /** ID-ul comenzii din Supabase – prețul se preia server-side. */
+  order_id: string;
+  /** Metadata suplimentară (opțional). */
   metadata?: Record<string, string>;
 };
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as CheckoutBody;
-    const { amount, currency, metadata = {} } = body;
+    const { order_id, metadata = {} } = body;
 
-    if (typeof amount !== "number" || amount <= 0 || !currency?.trim()) {
+    if (!order_id || typeof order_id !== "string" || !UUID_REGEX.test(order_id)) {
       return NextResponse.json(
-        { error: "amount (number > 0) și currency sunt obligatorii." },
+        { error: "order_id (UUID valid) este obligatoriu." },
         { status: 400 }
       );
     }
 
+    // Look up the order's total_price server-side
+    const supabase = getServerSupabase();
+    const { data: order, error: dbError } = await supabase
+      .from("orders")
+      .select("id, total_price, status, customer_email")
+      .eq("id", order_id)
+      .single();
+
+    if (dbError || !order) {
+      return NextResponse.json(
+        { error: "Comanda nu a fost găsită." },
+        { status: 404 }
+      );
+    }
+
+    if (order.status === "paid") {
+      return NextResponse.json(
+        { error: "Comanda a fost deja plătită." },
+        { status: 400 }
+      );
+    }
+
+    const totalPrice = Number(order.total_price);
+    if (!totalPrice || totalPrice <= 0) {
+      return NextResponse.json(
+        { error: "Prețul comenzii este invalid." },
+        { status: 400 }
+      );
+    }
+
+    // Convert lei to bani (subunits)
+    const amountBani = Math.round(totalPrice * 100);
+
     const origin = request.headers.get("origin") ?? "";
 
-    // Folosește email-ul din metadata (formularul de comandă).
     let customerEmail: string | undefined;
-    if (metadata.shipping_email) {
+    if (order.customer_email) {
+      customerEmail = String(order.customer_email).trim().toLowerCase();
+    } else if (metadata.shipping_email) {
       customerEmail = metadata.shipping_email.trim().toLowerCase();
     }
 
@@ -41,12 +78,12 @@ export async function POST(request: Request) {
       line_items: [
         {
           price_data: {
-            currency: currency.toLowerCase(),
+            currency: "ron",
             product_data: {
               name: "Printare documente",
               description: "Detalii în metadata",
             },
-            unit_amount: Math.round(amount),
+            unit_amount: amountBani,
           },
           quantity: 1,
         },
@@ -54,7 +91,7 @@ export async function POST(request: Request) {
       mode: "payment",
       success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/`,
-      metadata,
+      metadata: { ...metadata, order_id },
       ...(customerEmail ? { customer_email: customerEmail } : {}),
     });
 

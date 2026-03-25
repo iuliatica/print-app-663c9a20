@@ -6,6 +6,34 @@ const BUCKET = process.env.SUPABASE_STORAGE_BUCKET ?? "comenzi";
 const MAX_FILES = 20;
 const MAX_FILE_SIZE_MB = 50;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+const MAX_TOTAL_BYTES = MAX_FILES * MAX_FILE_SIZE_BYTES; // 1 GB
+
+// Simple in-memory IP rate limiter
+const ipRequests = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
+const RATE_LIMIT_MAX = 5; // 5 uploads per IP per minute
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = ipRequests.get(ip);
+  if (!entry || now > entry.resetAt) {
+    ipRequests.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+  entry.count++;
+  return entry.count > RATE_LIMIT_MAX;
+}
+
+// Periodically clean up stale entries (every 5 min)
+if (typeof globalThis !== "undefined") {
+  const CLEANUP_INTERVAL = 5 * 60_000;
+  setInterval(() => {
+    const now = Date.now();
+    for (const [ip, entry] of ipRequests) {
+      if (now > entry.resetAt) ipRequests.delete(ip);
+    }
+  }, CLEANUP_INTERVAL).unref?.();
+}
 
 function uniquePath(fileName: string): string {
   const safe = fileName.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 100);
@@ -14,6 +42,30 @@ function uniquePath(fileName: string): string {
 
 export async function POST(request: Request) {
   try {
+    // Rate limit by IP
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
+    if (isRateLimited(ip)) {
+      return NextResponse.json(
+        { error: "Prea multe încărcări. Așteaptă un minut și încearcă din nou." },
+        { status: 429 }
+      );
+    }
+
+    // Content-Length check — fail fast on oversized requests
+    const contentLength = request.headers.get("content-length");
+    if (contentLength) {
+      const size = parseInt(contentLength, 10);
+      if (size > MAX_TOTAL_BYTES) {
+        return NextResponse.json(
+          { error: `Dimensiunea totală depășește limita de ${MAX_FILES * MAX_FILE_SIZE_MB} MB.` },
+          { status: 413 }
+        );
+      }
+    }
+
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || "https://opwtigccuxvfnkjykjdg.supabase.co";
     const serviceRoleKey = process.env.SB_SERVICE_ROLE_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
     if (!supabaseUrl?.trim() || !serviceRoleKey?.trim()) {
