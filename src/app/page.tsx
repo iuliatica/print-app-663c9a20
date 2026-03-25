@@ -33,10 +33,10 @@ import { getPdfPageCount, analyzePdfColors, type PdfColorAnalysis } from "@/lib/
 import printicaLogo from "@/assets/printica-logo.png";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
-const PRICE_BW_ONE_SIDE = 0.25;
+const PRICE_BW_ONE_SIDE = 0.2;
 const PRICE_BW_DUPLEX = 0.35;
-const PRICE_COLOR_ONE_SIDE = 1.5;
-const PRICE_COLOR_DUPLEX = 2.5;
+const PRICE_COLOR_ONE_SIDE = 0.7;
+const PRICE_COLOR_DUPLEX = 1.2;
 const SPIRAL_PRICE = 3;
 const SHIPPING_COST_LEI = 15;
 const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024;
