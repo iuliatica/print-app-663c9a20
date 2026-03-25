@@ -786,8 +786,7 @@ export default function Home() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: amountBani,
-          currency: "ron",
+          order_id: orderId,
           metadata: {
             order_id: orderId,
             total_pages: String(totalPages),
