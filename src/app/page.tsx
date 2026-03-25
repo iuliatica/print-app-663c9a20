@@ -779,15 +779,14 @@ export default function Home() {
       const fileUrlMeta: Record<string, string> = {};
       fileUrls.forEach((url, i) => { fileUrlMeta[`file_url_${i}`] = url; });
       const coverColorSummary = `fata:transparent;spate:${coverBackColor}`;
-      const amountBani = Math.round(totalWithShipping * 100);
+      
       const orderId = orderData.id;
 
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: amountBani,
-          currency: "ron",
+          order_id: orderId,
           metadata: {
             order_id: orderId,
             total_pages: String(totalPages),
