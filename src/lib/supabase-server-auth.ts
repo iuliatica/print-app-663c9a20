@@ -3,16 +3,11 @@ import { headers } from "next/headers";
 import { getServerSupabase } from "@/lib/supabase-server";
 
 function getSupabaseConfig() {
-  const supabaseUrl = (() => {
-    const value = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-    return value && /^https?:\/\//i.test(value)
-      ? value
-      : "https://opwtigccuxvfnkjykjdg.supabase.co";
-  })();
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || "";
   const anonKey =
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() ||
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim() ||
-    "sb_publishable_dUizLOaLXpqNwvCHk2mhOg_TSqoquBF";
+    "";
   return { supabaseUrl, anonKey };
 }
 
@@ -48,6 +43,10 @@ export async function requireAdminEmail(): Promise<
   }
 
   const { supabaseUrl, anonKey } = getSupabaseConfig();
+  if (!supabaseUrl || !anonKey) {
+    return { ok: false, status: 500 };
+  }
+
   const supabase = createClient(supabaseUrl, anonKey, {
     auth: { persistSession: false },
   });

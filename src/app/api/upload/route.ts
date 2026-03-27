@@ -66,7 +66,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || "https://opwtigccuxvfnkjykjdg.supabase.co";
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || "";
     const serviceRoleKey = process.env.SB_SERVICE_ROLE_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
     if (!supabaseUrl?.trim() || !serviceRoleKey?.trim()) {
       const missing: string[] = [];
