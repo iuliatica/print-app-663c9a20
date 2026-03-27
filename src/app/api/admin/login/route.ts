@@ -3,16 +3,11 @@ import { createClient } from "@supabase/supabase-js";
 import { getServerSupabase } from "@/lib/supabase-server";
 
 function getSupabaseConfig() {
-  const supabaseUrl = (() => {
-    const value = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-    return value && /^https?:\/\//i.test(value)
-      ? value
-      : "https://opwtigccuxvfnkjykjdg.supabase.co";
-  })();
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || "";
   const anonKey =
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() ||
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim() ||
-    "sb_publishable_dUizLOaLXpqNwvCHk2mhOg_TSqoquBF";
+    "";
   return { supabaseUrl, anonKey };
 }
 
@@ -44,6 +39,12 @@ export async function POST(request: Request) {
     }
 
     const { supabaseUrl, anonKey } = getSupabaseConfig();
+    if (!supabaseUrl || !anonKey) {
+      return NextResponse.json(
+        { error: "Configurarea Supabase lipsește pe server." },
+        { status: 500 }
+      );
+    }
 
     const supabase = createClient(supabaseUrl, anonKey, {
       auth: { persistSession: false },
@@ -83,7 +84,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Return the token in response body so client can store and send as Authorization header
     return NextResponse.json({
       ok: true,
       redirectTo: "/admin-comenzi",

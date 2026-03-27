@@ -1,16 +1,11 @@
 import { createBrowserClient } from "@supabase/ssr";
 
-const supabaseUrl = (() => {
-  const value = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-  return value && /^https?:\/\//i.test(value)
-    ? value
-    : "https://opwtigccuxvfnkjykjdg.supabase.co";
-})();
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || "";
 
 const supabaseAnonKey =
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() ||
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim() ||
-  "sb_publishable_dUizLOaLXpqNwvCHk2mhOg_TSqoquBF";
+  "";
 
 /**
  * Client Supabase pentru browser (Auth, login, RLS).
@@ -20,7 +15,7 @@ const supabaseAnonKey =
 export function getSupabaseClient() {
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(
-      "Lipsește configurarea Supabase. Adaugă în .env.local: NEXT_PUBLIC_SUPABASE_URL și NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY (publishable key din Supabase → Project Settings → API)."
+      "Lipsește configurarea Supabase. Setează variabilele de mediu: NEXT_PUBLIC_SUPABASE_URL și NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY."
     );
   }
   return createBrowserClient(supabaseUrl, supabaseAnonKey);
