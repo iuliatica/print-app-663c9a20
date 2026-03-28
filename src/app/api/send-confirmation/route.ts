@@ -38,7 +38,7 @@ function buildEmailHtml(data: ConfirmationBody): string {
 
   const spiralLabel =
     data.spiralType === "spirala"
-      ? `Spiralare plastică${data.spiralColor ? `, ${data.spiralColor}` : ""}`
+      ? `Spirală ${data.spiralColor ?? "neagră"}`
       : data.spiralType === "perforare2"
       ? "Perforare cu 2 găuri"
       : data.spiralType === "capsare"
