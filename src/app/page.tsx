@@ -1806,7 +1806,7 @@ export default function Home() {
                 onClick={() => setOrderSuccessDetails(null)}
                 className="flex items-center justify-center gap-2 w-full rounded-xl bg-slate-800 py-3 text-sm font-semibold text-white hover:bg-slate-900 transition-colors"
               >
-                <Home className="h-5 w-5" />
+                ←
                 Înapoi la pagina principală
               </button>
             </div>
