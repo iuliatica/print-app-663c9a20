@@ -219,7 +219,7 @@ function FAQ() {
     { q: "Cum funcționează spiralarea?", a: "Spiralarea leagă documentele într-un volum unic cu spirală de plastic. Poți alege culoarea spiralei (negru sau alb) și culoarea copertei spate. Coperta față este întotdeauna transparentă." },
     { q: "Pot lega mai multe fișiere într-o singură spirală?", a: "Da! Folosește butonul 'Leagă împreună' dintre două fișiere din listă pentru a le combina într-un singur volum spiralat." },
     { q: "Cum se calculează prețul?", a: "Prețul depinde de tipul printării (alb-negru sau color), față-verso, numărul de copii și opțiunea de spiralare. Paginile color din documente sunt detectate automat pentru un preț corect." },
-    { q: "Cât durează livrarea?", a: "Comenzile sunt procesate în 1-2 zile lucrătoare, iar livrarea prin curier durează 1-3 zile lucrătoare. Costul transportului este de 15 lei." },
+    { q: "Cât durează livrarea?", a: "Comenzile sunt procesate și livrate prin curier în 2-4 zile lucrătoare. Costul transportului este de 15 lei." },
     { q: "Ce metode de plată acceptați?", a: "Acceptăm plata online cu cardul (prin Stripe, 100% securizat) sau plata la livrare (ramburs)." },
   ];
   return (
@@ -1595,8 +1595,10 @@ export default function Home() {
                 <ul className="space-y-4">
                   {bindingGroups.map((group, groupIdx) => {
                     const opts = groupOptions[groupIdx] ?? defaultGroupOpts;
-                    const spiralLabel = spiralOptions.find((o) => o.value === opts.spiralType)?.label ?? "Fără spirală";
-                    const spiralColorLabel = opts.spiralType !== "none" ? spiralColorOptions.find((c) => c.value === opts.spiralColor)?.label ?? opts.spiralColor : null;
+                    const spiralLabel = opts.spiralType === "spirala"
+                      ? `Spirală ${(opts.spiralColor ?? "negru").toLowerCase()}`
+                      : spiralOptions.find((o) => o.value === opts.spiralType)?.label ?? "Fără spirală";
+                    const spiralColorLabel: string | null = null;
                     const coverBackLabel = coverBackColors.find((c) => c.value === opts.coverBackColor)?.label ?? opts.coverBackColor;
                     const isSingleDoc = group.filesInGroup.length === 1;
                     return (
@@ -1799,7 +1801,7 @@ export default function Home() {
               </div>
 
               <p className="text-sm text-slate-600 text-center">
-                Livrarea se face în <strong>3 zile lucrătoare</strong>.
+                Livrarea se face în <strong>2-4 zile lucrătoare</strong>.
                 {orderSuccessDetails.paymentMethod === "ramburs" && " Vei primi un email de confirmare."}
               </p>
 

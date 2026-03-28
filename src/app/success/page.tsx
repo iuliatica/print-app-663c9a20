@@ -127,7 +127,7 @@ function SuccessContent() {
           </h1>
           <p className="mt-3 text-slate-700">Plata a fost confirmată cu succes.</p>
           <p className="mt-4 rounded-xl bg-white/80 px-4 py-3 text-sm font-semibold text-slate-800 shadow-sm">
-            Livrarea se face în <strong>3 zile lucrătoare</strong>.
+            Livrarea se face în <strong>2-4 zile lucrătoare</strong>.
           </p>
         </div>
 
