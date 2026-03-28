@@ -1759,37 +1759,57 @@ export default function Home() {
       {/* ═══ Order success (ramburs) ═══ */}
       {orderSuccessDetails && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 px-4 py-6 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl sm:p-8 animate-[fade-in_0.3s_ease-out]">
-            <div className="mb-6 flex flex-col items-center text-center">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-                <Check className="h-8 w-8 text-green-600" />
+          <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden animate-[fade-in_0.3s_ease-out]">
+            {/* Header verde */}
+            <div className="bg-green-50 px-6 py-8 text-center">
+              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
+                <Check className="h-10 w-10 text-green-600" />
               </div>
-              <h2 className="text-xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-slate-900">
                 Comandă plasată cu succes!
               </h2>
-              <p className="mt-2 text-sm text-slate-600">
-                {orderSuccessDetails.paymentMethod === "ramburs"
-                  ? "Vei plăti la livrare."
-                  : "Plata a fost procesată."}
+              {orderSuccessDetails.paymentMethod === "ramburs" && (
+                <div className="mt-4 rounded-xl bg-white/80 px-4 py-3 shadow-sm">
+                  <p className="text-sm font-semibold text-slate-800">
+                    📞 Vei fi contactat telefonic pentru confirmarea comenzii
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Plata se face la livrare (ramburs)
+                  </p>
+                </div>
+              )}
+              {orderSuccessDetails.paymentMethod !== "ramburs" && (
+                <p className="mt-3 text-slate-700">Plata a fost procesată cu succes.</p>
+              )}
+            </div>
+
+            {/* Detalii */}
+            <div className="px-6 py-6 space-y-4">
+              <div className="rounded-xl bg-slate-50 p-4 space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-500">Total pagini</span>
+                  <span className="font-medium text-slate-800">{orderSuccessDetails.totalPages}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-500">Total de plată</span>
+                  <span className="text-lg font-bold text-green-700">{orderSuccessDetails.totalWithShipping.toFixed(2)} lei</span>
+                </div>
+              </div>
+
+              <p className="text-sm text-slate-600 text-center">
+                Livrarea se face în <strong>3 zile lucrătoare</strong>.
+                {orderSuccessDetails.paymentMethod === "ramburs" && " Vei primi un email de confirmare."}
               </p>
+
+              <button
+                type="button"
+                onClick={() => setOrderSuccessDetails(null)}
+                className="flex items-center justify-center gap-2 w-full rounded-xl bg-slate-800 py-3 text-sm font-semibold text-white hover:bg-slate-900 transition-colors"
+              >
+                ←
+                Înapoi la pagina principală
+              </button>
             </div>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-slate-600">Total pagini</span>
-                <span className="font-medium">{orderSuccessDetails.totalPages}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-600">Total</span>
-                <span className="font-bold text-slate-900">{orderSuccessDetails.totalWithShipping.toFixed(2)} lei</span>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => setOrderSuccessDetails(null)}
-              className="mt-6 w-full rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
-            >
-              Comandă nouă
-            </button>
           </div>
         </div>
       )}
