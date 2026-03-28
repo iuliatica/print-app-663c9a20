@@ -132,7 +132,7 @@ function buildEmailHtml(data: ConfirmationBody): string {
             <!-- Info -->
             <div style="background-color:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:16px 20px;margin-bottom:24px;">
               <p style="margin:0;font-size:14px;color:#1e40af;line-height:1.6;">
-                📦 Comanda va fi procesată în <strong>1-2 zile lucrătoare</strong> și livrată prin curier în <strong>1-3 zile lucrătoare</strong>.
+                📦 Comanda va fi procesată și livrată prin curier în <strong>2-4 zile lucrătoare</strong>.
               </p>
             </div>
 
