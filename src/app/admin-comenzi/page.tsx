@@ -186,11 +186,13 @@ function formatConfigSummary(config: ConfigDetails | null): string {
     } else if (config.spiralType === "none" || !config.spiralType) {
       parts.push("Legare: Doar print");
     }
-    if (config.coverFrontColor && config.coverFrontColor !== "transparent") {
-      parts.push(`Copertă față: ${config.coverFrontColor}`);
-    }
-    if (config.coverBackColor && config.coverBackColor !== "transparent") {
-      parts.push(`Copertă spate: ${config.coverBackColor}`);
+    if (config.spiralType && config.spiralType !== "none") {
+      if (config.coverFrontColor && config.coverFrontColor !== "transparent") {
+        parts.push(`Copertă față: ${config.coverFrontColor}`);
+      }
+      if (config.coverBackColor && config.coverBackColor !== "transparent") {
+        parts.push(`Copertă spate: ${config.coverBackColor}`);
+      }
     }
   }
   return parts.length ? parts.join(" · ") : "—";
@@ -231,11 +233,13 @@ function formatConfigSummaryLines(config: ConfigDetails | null): ConfigLine[] {
             : spiral
           : "Doar print";
       line(`Grup ${gi + 1} (îndosariere): Legare: ${label}`);
-      if (opts?.coverFrontColor && opts.coverFrontColor !== "transparent") {
-        sub(`Copertă față: ${opts.coverFrontColor}`);
-      }
-      if (opts?.coverBackColor && opts.coverBackColor !== "transparent") {
-        sub(`Copertă spate: ${opts.coverBackColor}`);
+      if (spiral && spiral !== "none") {
+        if (opts?.coverFrontColor && opts.coverFrontColor !== "transparent") {
+          sub(`Copertă față: ${opts.coverFrontColor}`);
+        }
+        if (opts?.coverBackColor && opts.coverBackColor !== "transparent") {
+          sub(`Copertă spate: ${opts.coverBackColor}`);
+        }
       }
       groupFiles.forEach((f, pos) => {
         const color = f.printMode === "color" ? "Color" : "A-N";
@@ -264,11 +268,13 @@ function formatConfigSummaryLines(config: ConfigDetails | null): ConfigLine[] {
     } else {
       line("Legare: Doar print");
     }
-    if (config.coverFrontColor && config.coverFrontColor !== "transparent") {
-      line(`Copertă față: ${config.coverFrontColor}`);
-    }
-    if (config.coverBackColor && config.coverBackColor !== "transparent") {
-      line(`Copertă spate: ${config.coverBackColor}`);
+    if (spiral && spiral !== "none") {
+      if (config.coverFrontColor && config.coverFrontColor !== "transparent") {
+        line(`Copertă față: ${config.coverFrontColor}`);
+      }
+      if (config.coverBackColor && config.coverBackColor !== "transparent") {
+        line(`Copertă spate: ${config.coverBackColor}`);
+      }
     }
   } else {
     line("Fișiere (ordine printare):");
@@ -293,11 +299,13 @@ function formatConfigSummaryLines(config: ConfigDetails | null): ConfigLine[] {
     } else if (config.spiralType === "none" || !config.spiralType) {
       line("Legare: Doar print");
     }
-    if (config.coverFrontColor && config.coverFrontColor !== "transparent") {
-      line(`Copertă față: ${config.coverFrontColor}`);
-    }
-    if (config.coverBackColor && config.coverBackColor !== "transparent") {
-      line(`Copertă spate: ${config.coverBackColor}`);
+    if (spiral && spiral !== "none") {
+      if (config.coverFrontColor && config.coverFrontColor !== "transparent") {
+        line(`Copertă față: ${config.coverFrontColor}`);
+      }
+      if (config.coverBackColor && config.coverBackColor !== "transparent") {
+        line(`Copertă spate: ${config.coverBackColor}`);
+      }
     }
   }
   return parts.length ? parts : [{ text: "—", indent: 0 }];
