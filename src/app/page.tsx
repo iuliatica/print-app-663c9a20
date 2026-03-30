@@ -216,7 +216,7 @@ function FAQ() {
   const [open, setOpen] = useState<number | null>(null);
   const items = [
     { q: "Ce format de fișier acceptați?", a: "Acceptăm doar fișiere PDF, cu o dimensiune maximă de 50 MB per fișier. Poți încărca până la 20 de fișiere simultan." },
-    { q: "Cum funcționează spiralarea?", a: "Spiralarea leagă documentele într-un volum unic cu spirală de plastic. Poți alege culoarea spiralei (negru sau alb) și culoarea copertei spate. Coperta față este întotdeauna transparentă." },
+    { q: "Cum funcționează spiralarea?", a: "Spiralarea leagă documentele într-un volum unic cu spirală neagră de plastic. Poți alege culoarea copertei spate. Coperta față este întotdeauna transparentă." },
     { q: "Pot lega mai multe fișiere într-o singură spirală?", a: "Da! Folosește butonul 'Leagă împreună' dintre două fișiere din listă pentru a le combina într-un singur volum spiralat." },
     { q: "Cum se calculează prețul?", a: "Prețul depinde de tipul printării (alb-negru sau color), față-verso, numărul de copii și opțiunea de spiralare. Paginile color din documente sunt detectate automat pentru un preț corect." },
     { q: "Cât durează livrarea?", a: "Comenzile sunt procesate și livrate prin curier în 2-4 zile lucrătoare. Costul transportului este de 15 lei." },
