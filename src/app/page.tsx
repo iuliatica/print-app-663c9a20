@@ -45,6 +45,7 @@ const FILE_SIZE_ERROR_MSG = "Fișier prea mare (max 50 MB).";
 const LS_KEY_SHIPPING = "printica_shipping";
 const LS_KEY_PAYMENT = "printica_payment";
 const LS_KEY_GROUP_OPTS = "printica_group_opts";
+const LS_KEY_FILE_OPTS = "printica_file_opts";
 const MIN_NAME_LENGTH = 2;
 const MAX_NAME_LENGTH = 100;
 const MIN_ADDRESS_LENGTH = 10;
@@ -409,17 +410,24 @@ export default function Home() {
   }, []);
 
   const createFileItems = useCallback((fileList: File[]): UploadedFile[] => {
+    let savedFileOpts: Record<string, { printMode?: string; duplex?: boolean; copies?: number }> = {};
+    try {
+      const raw = localStorage.getItem(LS_KEY_FILE_OPTS);
+      if (raw) savedFileOpts = JSON.parse(raw);
+    } catch { /* ignore */ }
+
     return fileList.map((file) => {
       const tooBig = file.size > MAX_FILE_SIZE_BYTES;
+      const saved = savedFileOpts[file.name];
       return {
         id: `${file.name}-${Date.now()}-${Math.random()}`,
         file,
         name: file.name,
         pages: null,
         error: tooBig ? FILE_SIZE_ERROR_MSG : undefined,
-        printMode: "bw" as PrintMode,
-        duplex: false,
-        copies: 1,
+        printMode: (saved?.printMode === "color" ? "color" : "bw") as PrintMode,
+        duplex: saved?.duplex ?? false,
+        copies: saved?.copies ?? 1,
         previewUrl: URL.createObjectURL(file),
         groupWithPrevious: false,
       };
@@ -526,6 +534,17 @@ export default function Home() {
   useEffect(() => {
     try { localStorage.setItem(LS_KEY_GROUP_OPTS, JSON.stringify(groupOptions)); } catch { /* ignore */ }
   }, [groupOptions]);
+
+  useEffect(() => {
+    if (files.length === 0) return;
+    try {
+      const opts: Record<string, { printMode: string; duplex: boolean; copies: number }> = {};
+      files.forEach((f) => {
+        opts[f.name] = { printMode: f.printMode, duplex: f.duplex, copies: f.copies };
+      });
+      localStorage.setItem(LS_KEY_FILE_OPTS, JSON.stringify(opts));
+    } catch { /* ignore */ }
+  }, [files]);
 
   // ─── Optimistic file removal with animation ───────────────────────────────
   const [removingFileId, setRemovingFileId] = useState<string | null>(null);
