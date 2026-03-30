@@ -45,6 +45,7 @@ const FILE_SIZE_ERROR_MSG = "Fișier prea mare (max 50 MB).";
 const LS_KEY_SHIPPING = "printica_shipping";
 const LS_KEY_PAYMENT = "printica_payment";
 const LS_KEY_GROUP_OPTS = "printica_group_opts";
+const LS_KEY_FILE_OPTS = "printica_file_opts";
 const MIN_NAME_LENGTH = 2;
 const MAX_NAME_LENGTH = 100;
 const MIN_ADDRESS_LENGTH = 10;
