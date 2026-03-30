@@ -410,17 +410,24 @@ export default function Home() {
   }, []);
 
   const createFileItems = useCallback((fileList: File[]): UploadedFile[] => {
+    let savedFileOpts: Record<string, { printMode?: string; duplex?: boolean; copies?: number }> = {};
+    try {
+      const raw = localStorage.getItem(LS_KEY_FILE_OPTS);
+      if (raw) savedFileOpts = JSON.parse(raw);
+    } catch { /* ignore */ }
+
     return fileList.map((file) => {
       const tooBig = file.size > MAX_FILE_SIZE_BYTES;
+      const saved = savedFileOpts[file.name];
       return {
         id: `${file.name}-${Date.now()}-${Math.random()}`,
         file,
         name: file.name,
         pages: null,
         error: tooBig ? FILE_SIZE_ERROR_MSG : undefined,
-        printMode: "bw" as PrintMode,
-        duplex: false,
-        copies: 1,
+        printMode: (saved?.printMode === "color" ? "color" : "bw") as PrintMode,
+        duplex: saved?.duplex ?? false,
+        copies: saved?.copies ?? 1,
         previewUrl: URL.createObjectURL(file),
         groupWithPrevious: false,
       };
