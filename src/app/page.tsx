@@ -535,6 +535,17 @@ export default function Home() {
     try { localStorage.setItem(LS_KEY_GROUP_OPTS, JSON.stringify(groupOptions)); } catch { /* ignore */ }
   }, [groupOptions]);
 
+  useEffect(() => {
+    if (files.length === 0) return;
+    try {
+      const opts: Record<string, { printMode: string; duplex: boolean; copies: number }> = {};
+      files.forEach((f) => {
+        opts[f.name] = { printMode: f.printMode, duplex: f.duplex, copies: f.copies };
+      });
+      localStorage.setItem(LS_KEY_FILE_OPTS, JSON.stringify(opts));
+    } catch { /* ignore */ }
+  }, [files]);
+
   // ─── Optimistic file removal with animation ───────────────────────────────
   const [removingFileId, setRemovingFileId] = useState<string | null>(null);
 
