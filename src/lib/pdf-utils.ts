@@ -30,6 +30,8 @@ export interface PdfColorAnalysis {
   bwPages: number;
   /** Index-urile (0-based) ale paginilor color */
   colorPageIndices: number[];
+  /** True dacă PDF-ul conține pagini scanate (imagini mari care acoperă pagina) */
+  hasScannedPages: boolean;
 }
 
 /* ── helpers ─────────────────────────────────────────────── */
