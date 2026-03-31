@@ -1286,6 +1286,15 @@ export default function Home() {
                                     </span>
                                   </div>
                                 )}
+                                {opts.printMode === "color" && file.colorAnalysis?.hasScannedPages && file.colorAnalysis.colorPages > 0 && (
+                                  <div className="mt-2 flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2">
+                                    <Info className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
+                                    <p className="text-xs text-amber-700">
+                                      Documentul conține imagini scanate — {file.colorAnalysis.colorPages} pagini sunt detectate ca fiind color.
+                                      Dacă documentul original este alb-negru, selectează <strong>Alb-negru</strong> pentru un preț mai bun.
+                                    </p>
+                                  </div>
+                                )}
                               </div>
 
                               {/* Duplex */}
