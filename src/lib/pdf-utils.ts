@@ -320,6 +320,50 @@ function imageHasColor(
 }
 
 /**
+ * Detectează dacă o pagină este "scanată" – adică conține o singură imagine
+ * mare care acoperă cea mai mare parte din suprafața paginii.
+ */
+function pageIsScanned(page: PDFPage, context: PDFDocument["context"]): boolean {
+  try {
+    const resources = getResources(page);
+    if (!resources) return false;
+
+    const xobjectEntry = resources.get(PDFName.of("XObject"));
+    if (!xobjectEntry) return false;
+    const xobjectDict = xobjectEntry instanceof PDFRef ? context.lookup(xobjectEntry) : xobjectEntry;
+    if (!(xobjectDict instanceof PDFDict)) return false;
+
+    const entries = xobjectDict.entries();
+    let imageCount = 0;
+    let largeImageFound = false;
+
+    const pageWidth = page.getWidth();
+    const pageHeight = page.getHeight();
+    const pageArea = pageWidth * pageHeight;
+
+    for (const [, value] of entries) {
+      const obj = value instanceof PDFRef ? context.lookup(value) : value;
+      if (!(obj instanceof PDFRawStream)) continue;
+      const subtype = obj.dict.get(PDFName.of("Subtype"))?.toString() ?? "";
+      if (!subtype.includes("Image")) continue;
+
+      imageCount++;
+      const w = parseInt(obj.dict.get(PDFName.of("Width"))?.toString() ?? "0", 10);
+      const h = parseInt(obj.dict.get(PDFName.of("Height"))?.toString() ?? "0", 10);
+      // Consider "large" if image pixel area is >= 50% of page area (at ~72 DPI)
+      if (w * h >= pageArea * 0.5) {
+        largeImageFound = true;
+      }
+    }
+
+    // A scanned page typically has 1 large image and very little else
+    return imageCount >= 1 && largeImageFound;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Analizează fiecare pagină a unui PDF și determină care sunt color vs alb-negru.
  */
 export async function analyzePdfColors(
@@ -329,12 +373,18 @@ export async function analyzePdfColors(
   const pdf = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
   const totalPages = pdf.getPageCount();
   const colorPageIndices: number[] = [];
+  let hasScannedPages = false;
 
   for (let i = 0; i < totalPages; i++) {
     const page = pdf.getPage(i);
     let isColor = false;
 
     try {
+      // Detect scanned pages
+      if (!hasScannedPages && pageIsScanned(page, pdf.context)) {
+        hasScannedPages = true;
+      }
+
       // 1. Scan page content streams for color operators
       const pageResources = getResources(page);
       const refs = getContentRefs(page);
@@ -357,7 +407,6 @@ export async function analyzePdfColors(
         }
       }
     } catch {
-      // Conservative fallback: not color unless we can prove it
       isColor = false;
     }
 
@@ -371,5 +420,6 @@ export async function analyzePdfColors(
     colorPages: colorPageIndices.length,
     bwPages: totalPages - colorPageIndices.length,
     colorPageIndices,
+    hasScannedPages,
   };
 }
