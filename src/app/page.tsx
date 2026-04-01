@@ -1590,7 +1590,7 @@ export default function Home() {
             <button
               type="button"
               onClick={handleOpenCheckout}
-              disabled={isCheckoutLoading}
+              disabled={isCheckoutLoading || totalPrice < MIN_ORDER_LEI}
               className="flex shrink-0 items-center gap-2 bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-blue-600/20 transition-all hover:bg-blue-700 disabled:opacity-50"
             >
               <CreditCard className="h-4 w-4" />
