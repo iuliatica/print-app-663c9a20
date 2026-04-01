@@ -1516,6 +1516,11 @@ export default function Home() {
                         Toate paginile se taxează la tarif color (analiza automată indisponibilă).
                       </p>
                     )}
+                    {totalPrice > 0 && totalPrice < MIN_ORDER_LEI && (
+                      <p className="mt-1 text-xs font-semibold text-red-600">
+                        ⚠ Comanda minimă este de {MIN_ORDER_LEI} lei (fără transport). Mai ai nevoie de {(MIN_ORDER_LEI - totalPrice).toFixed(2)} lei.
+                      </p>
+                    )}
                   </>
                 ) : (
                   <>
