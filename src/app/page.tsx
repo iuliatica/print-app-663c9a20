@@ -41,6 +41,7 @@ const PRICE_COLOR_ONE_SIDE = 0.7;
 const PRICE_COLOR_DUPLEX = 1.2;
 const SPIRAL_PRICE = 3;
 const SHIPPING_COST_LEI = 15;
+const MIN_ORDER_LEI = 30;
 const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024;
 const FILE_SIZE_ERROR_MSG = "Fișier prea mare (max 50 MB).";
 const LS_KEY_SHIPPING = "printica_shipping";
@@ -1515,6 +1516,11 @@ export default function Home() {
                         Toate paginile se taxează la tarif color (analiza automată indisponibilă).
                       </p>
                     )}
+                    {totalPrice > 0 && totalPrice < MIN_ORDER_LEI && (
+                      <p className="mt-1 text-xs font-semibold text-red-600">
+                        ⚠ Comanda minimă este de {MIN_ORDER_LEI} lei (fără transport). Mai ai nevoie de {(MIN_ORDER_LEI - totalPrice).toFixed(2)} lei.
+                      </p>
+                    )}
                   </>
                 ) : (
                   <>
@@ -1528,7 +1534,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={handleOpenCheckout}
-                disabled={files.length === 0 || isCheckoutLoading || totalPages === 0}
+                disabled={files.length === 0 || isCheckoutLoading || totalPages === 0 || totalPrice < MIN_ORDER_LEI}
                 className="flex items-center gap-2 rounded-xl bg-blue-600 px-8 py-4 text-lg font-semibold text-white shadow-md shadow-blue-600/20 transition-all duration-200 hover:bg-blue-700 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
               >
                 <CreditCard className="h-5 w-5" />
@@ -1589,7 +1595,7 @@ export default function Home() {
             <button
               type="button"
               onClick={handleOpenCheckout}
-              disabled={isCheckoutLoading}
+              disabled={isCheckoutLoading || totalPrice < MIN_ORDER_LEI}
               className="flex shrink-0 items-center gap-2 bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-blue-600/20 transition-all hover:bg-blue-700 disabled:opacity-50"
             >
               <CreditCard className="h-4 w-4" />
