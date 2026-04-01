@@ -41,6 +41,7 @@ const PRICE_COLOR_ONE_SIDE = 0.7;
 const PRICE_COLOR_DUPLEX = 1.2;
 const SPIRAL_PRICE = 3;
 const SHIPPING_COST_LEI = 15;
+const MIN_ORDER_LEI = 30;
 const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024;
 const FILE_SIZE_ERROR_MSG = "Fișier prea mare (max 50 MB).";
 const LS_KEY_SHIPPING = "printica_shipping";
