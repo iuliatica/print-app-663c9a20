@@ -1529,7 +1529,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={handleOpenCheckout}
-                disabled={files.length === 0 || isCheckoutLoading || totalPages === 0}
+                disabled={files.length === 0 || isCheckoutLoading || totalPages === 0 || totalPrice < MIN_ORDER_LEI}
                 className="flex items-center gap-2 rounded-xl bg-blue-600 px-8 py-4 text-lg font-semibold text-white shadow-md shadow-blue-600/20 transition-all duration-200 hover:bg-blue-700 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
               >
                 <CreditCard className="h-5 w-5" />
