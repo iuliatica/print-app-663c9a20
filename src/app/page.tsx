@@ -945,8 +945,8 @@ export default function Home() {
             <div>
               <p className="text-sm font-semibold text-blue-900">Plătești color doar pentru paginile colorate</p>
               <p className="mt-0.5 text-xs text-blue-700/80">
-                Analizăm automat fiecare pagină din PDF — paginile alb-negru se taxează la preț de alb-negru, 
-                chiar dacă alegi opțiunea Color. Economisești fără efort.
+                Când selectezi printul <strong>Color</strong>, analizăm automat fiecare pagină din PDF — paginile alb-negru 
+                se taxează la preț de alb-negru, iar restul la preț de color. Economisești fără efort.
               </p>
             </div>
           </div>
