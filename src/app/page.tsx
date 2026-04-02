@@ -30,6 +30,7 @@ import {
   Lock,
   Phone,
   Info,
+  Palette,
 } from "lucide-react";
 import { getPdfPageCount, analyzePdfColors, type PdfColorAnalysis } from "@/lib/pdf-utils";
 import printicaLogo from "@/assets/printica-logo.png";
@@ -932,10 +933,21 @@ export default function Home() {
               <Shield className="h-4 w-4 text-emerald-600" />
               <span className="text-emerald-700">Transport {SHIPPING_COST_LEI} lei</span>
             </div>
-            <div className="hidden sm:block h-4 w-px bg-emerald-300" />
-            <div className="flex items-center gap-2">
-              <Info className="h-4 w-4 text-emerald-600" />
-              <span className="text-emerald-700">Detectare automată pagini color</span>
+          </div>
+        </div>
+
+        {/* ═══ Color Detection Highlight ═══ */}
+        <div className="mt-3 rounded-xl border border-blue-200 bg-gradient-to-r from-blue-50 via-white to-blue-50 px-4 py-3 sm:px-6">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 mt-0.5 rounded-full bg-blue-100 p-2">
+              <Palette className="h-5 w-5 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-blue-900">Plătești color doar pentru paginile colorate</p>
+              <p className="mt-0.5 text-xs text-blue-700/80">
+                Analizăm automat fiecare pagină din PDF — paginile alb-negru se taxează la preț de alb-negru, 
+                chiar dacă alegi opțiunea Color. Economisești fără efort.
+              </p>
             </div>
           </div>
         </div>
