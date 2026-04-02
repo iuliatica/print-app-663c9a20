@@ -932,6 +932,11 @@ export default function Home() {
               <Shield className="h-4 w-4 text-emerald-600" />
               <span className="text-emerald-700">Transport {SHIPPING_COST_LEI} lei</span>
             </div>
+            <div className="hidden sm:block h-4 w-px bg-emerald-300" />
+            <div className="flex items-center gap-2">
+              <Info className="h-4 w-4 text-emerald-600" />
+              <span className="text-emerald-700">Detectare automată pagini color</span>
+            </div>
           </div>
         </div>
 
