@@ -947,6 +947,7 @@ export default function Home() {
               <p className="mt-0.5 text-xs text-blue-700/80">
                 Când selectezi printul <strong>Color</strong>, analizăm automat fiecare pagină din PDF — paginile alb-negru 
                 se taxează la preț de alb-negru, iar restul la preț de color. Economisești fără efort.
+                <span className="block mt-0.5 text-blue-600/70 italic">Nu se aplică documentelor formate din imagini scanate.</span>
               </p>
             </div>
           </div>
