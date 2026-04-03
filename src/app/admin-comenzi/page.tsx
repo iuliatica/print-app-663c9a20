@@ -858,9 +858,17 @@ export default function AdminComenziPage() {
                     const isDropdownOpen = statusDropdownId === order.id;
                     const isDetailsOpen = expandedDetailsId === order.id;
                     const isRambursUnconfirmed = order.payment_method === "ramburs" && order.config_details?.ramburs_confirmed !== true;
-                    const isPaidOrRambursConfirmed = order.payment_method === "stripe" || (order.payment_method === "ramburs" && order.config_details?.ramburs_confirmed === true);
+                    const isStripePaid = order.payment_method === "stripe" && order.status === "paid";
+                    const isStripeUnpaid = order.payment_method === "stripe" && order.status !== "paid";
+                    const isPaidOrRambursConfirmed = isStripePaid || (order.payment_method === "ramburs" && order.config_details?.ramburs_confirmed === true);
                     const logs = order.change_logs ?? [];
-                    const rowBg = isPaidOrRambursConfirmed ? "bg-emerald-200 hover:bg-emerald-300" : isRambursUnconfirmed ? "bg-amber-200 hover:bg-amber-300" : "hover:bg-slate-50/50";
+                    const rowBg = isStripeUnpaid
+                      ? "bg-red-100 hover:bg-red-200"
+                      : isPaidOrRambursConfirmed
+                      ? "bg-emerald-200 hover:bg-emerald-300"
+                      : isRambursUnconfirmed
+                      ? "bg-amber-200 hover:bg-amber-300"
+                      : "hover:bg-slate-50/50";
                     return (
                       <Fragment key={order.id}>
                         <tr className={`border-b border-slate-100 ${rowBg}`}>
