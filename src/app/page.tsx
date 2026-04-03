@@ -1540,7 +1540,7 @@ export default function Home() {
                     <p className="text-sm font-medium text-slate-600">Total comandă</p>
                     <p className="mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">{totalWithShipping.toFixed(2)} lei</p>
                     <p className="mt-1 text-xs text-slate-500">
-                      {totalPrice.toFixed(2)} lei printare + {SHIPPING_COST_LEI} lei transport · {totalPages} pagini
+                      {effectivePrice.toFixed(2)} lei printare + {SHIPPING_COST_LEI} lei transport · {totalPages} pagini
                     </p>
                     {detectedColorPages > 0 && (
                       <p className="mt-0.5 text-xs text-slate-500">
@@ -1549,14 +1549,9 @@ export default function Home() {
                         <span className="font-semibold">{detectedBwPages} pag. alb-negru</span>
                       </p>
                     )}
-                    {userChosenColorPages > 0 && detectedColorPages === 0 && (
-                      <p className="mt-0.5 text-xs text-amber-600">
-                        Toate paginile se taxează la tarif color (analiza automată indisponibilă).
-                      </p>
-                    )}
                     {totalPrice > 0 && totalPrice < MIN_ORDER_LEI && (
-                      <p className="mt-1 text-xs font-semibold text-red-600">
-                        ⚠ Comanda minimă este de {MIN_ORDER_LEI} lei (fără transport). Mai ai nevoie de {(MIN_ORDER_LEI - totalPrice).toFixed(2)} lei.
+                      <p className="mt-1 text-xs font-semibold text-amber-600">
+                        ⚠ Comanda minimă este de {MIN_ORDER_LEI} lei. Prețul a fost ajustat automat la {MIN_ORDER_LEI} lei (+ {SHIPPING_COST_LEI} lei transport).
                       </p>
                     )}
                   </>
