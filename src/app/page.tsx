@@ -1400,7 +1400,7 @@ export default function Home() {
                         {/* 2×2 Grid instead of horizontal scroll */}
                         <div className="grid grid-cols-2 gap-2">
                           {spiralOptions.map(({ value, label, icon, description }) => {
-                            const isCapsareDisabled = value === "capsare" && selectedGroupPages > 240;
+                            const isCapsareDisabled = value === "capsare" && selectedGroupSheets > MAX_CAPSARE_SHEETS;
                             return (
                               <label
                                 key={value}
