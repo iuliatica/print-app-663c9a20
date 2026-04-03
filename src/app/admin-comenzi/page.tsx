@@ -180,7 +180,7 @@ function formatConfigSummary(config: ConfigDetails | null): string {
           : spiral === "perforare2"
           ? "Perforare cu 2 găuri"
           : spiral === "capsare"
-          ? "Capsare (maxim 240 coli)"
+          ? "Capsare (maxim 220 file)"
           : spiral;
       parts.push(`Legare: ${label}`);
     } else if (config.spiralType === "none" || !config.spiralType) {
@@ -229,7 +229,7 @@ function formatConfigSummaryLines(config: ConfigDetails | null): ConfigLine[] {
             : spiral === "perforare2"
             ? "Perforare cu 2 găuri"
             : spiral === "capsare"
-            ? "Capsare (maxim 240 coli)"
+            ? "Capsare (maxim 220 file)"
             : spiral
           : "Doar print";
       line(`Grup ${gi + 1} (îndosariere): Legare: ${label}`);
@@ -262,7 +262,7 @@ function formatConfigSummaryLines(config: ConfigDetails | null): ConfigLine[] {
           : spiral === "perforare2"
           ? "Perforare cu 2 găuri"
           : spiral === "capsare"
-          ? "Capsare (maxim 240 coli)"
+          ? "Capsare (maxim 220 file)"
           : spiral;
       line(`Legare: ${label}`);
     } else {
@@ -293,7 +293,7 @@ function formatConfigSummaryLines(config: ConfigDetails | null): ConfigLine[] {
           : spiral === "perforare2"
           ? "Perforare cu 2 găuri"
           : spiral === "capsare"
-          ? "Capsare (maxim 240 coli)"
+          ? "Capsare (maxim 220 file)"
           : spiral;
       line(`Legare: ${label}`);
     } else if (config.spiralType === "none" || !config.spiralType) {
@@ -341,7 +341,7 @@ function getConfigRowsWithFileIndices(config: ConfigDetails | null): ConfigRow[]
             : spiral === "perforare2"
             ? "Perforare cu 2 găuri"
             : spiral === "capsare"
-            ? "Capsare (maxim 240 coli)"
+            ? "Capsare (maxim 220 file)"
             : spiral
           : "Doar print";
       rows.push({ kind: "text", line: `Grup ${gi + 1} (ordinea fișierelor în îndosariere): — Legare: ${label}` });
@@ -372,7 +372,7 @@ function getConfigRowsWithFileIndices(config: ConfigDetails | null): ConfigRow[]
           : spiral === "perforare2"
           ? "Perforare cu 2 găuri"
           : spiral === "capsare"
-          ? "Capsare (maxim 240 coli)"
+          ? "Capsare (maxim 220 file)"
           : spiral;
       rows.push({ kind: "text", line: `Legare: ${label}${config.spiralColor ? `, culoare ${config.spiralColor}` : ""}` });
     } else {
@@ -400,7 +400,7 @@ function getConfigRowsWithFileIndices(config: ConfigDetails | null): ConfigRow[]
           : spiral === "perforare2"
           ? "Perforare cu 2 găuri"
           : spiral === "capsare"
-          ? "Capsare (maxim 240 coli)"
+          ? "Capsare (maxim 220 file)"
           : spiral;
       rows.push({ kind: "text", line: `Legare: ${label}${config.spiralColor ? `, culoare ${config.spiralColor}` : ""}` });
     } else if (!config.spiralType || config.spiralType === "none") {
