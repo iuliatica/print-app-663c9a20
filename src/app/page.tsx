@@ -190,7 +190,7 @@ function ProgressStepper({ currentStep }: { currentStep: number }) {
                     : "bg-slate-100 text-slate-400"
                 }`}
               >
-                {isDone ? <Check className="h-5 w-5" /> : <Icon className="h-5 w-5" />}
+                {isDone ? <Check className="h-4 w-4" /> : <Icon className="h-4 w-4" />}
               </div>
               <span
                 className={`text-xs font-semibold transition-colors ${
