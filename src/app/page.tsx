@@ -1432,8 +1432,8 @@ export default function Home() {
                                 </span>
                                 <div className="min-w-0">
                                   <span className="block text-sm font-semibold leading-tight">{label}</span>
-                                  <span className="block text-xs text-slate-500 leading-tight mt-0.5">
-                                    {isCapsareDisabled ? `Indisponibil` : description}
+                                   <span className="block text-xs text-slate-500 leading-tight mt-0.5">
+                                    {isCapsareDisabled ? `Indisponibil (${selectedGroupSheets} file)` : description}
                                   </span>
                                 </div>
                               </label>
