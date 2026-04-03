@@ -681,14 +681,11 @@ export default function Home() {
     const capsareError = bindingGroups.some((grp, groupIndex) => {
       const opts = groupOptions[groupIndex] ?? defaultGroupOpts;
       if (opts.spiralType !== "capsare") return false;
-      const groupPages = grp.filesInGroup.reduce(
-        (s, f) => s + (f.pages != null ? f.pages * (f.copies ?? DEFAULT_PRINT_OPTIONS.copies) : 0),
-        0
-      );
-      return groupPages > 240;
+      const groupSheets = getGroupSheets(grp.filesInGroup);
+      return groupSheets > MAX_CAPSARE_SHEETS;
     });
     if (capsareError) {
-      setCheckoutError("Capsarea nu este disponibilă pentru documente cu mai mult de 240 de coli. Alege alt tip de legare.");
+      setCheckoutError(`Capsarea nu este disponibilă pentru documente cu mai mult de ${MAX_CAPSARE_SHEETS} de file. Alege alt tip de legare.`);
       setIsCheckoutLoading(false);
       return;
     }
