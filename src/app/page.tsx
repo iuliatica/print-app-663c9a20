@@ -1043,19 +1043,19 @@ export default function Home() {
                   onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                   onDragLeave={() => setIsDragging(false)}
                   onDrop={onDrop}
-                  className={`mb-4 flex cursor-pointer items-center gap-3 border-2 border-dashed px-5 py-4 transition-all duration-200 ${
+                  className={`mb-4 flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed px-5 py-5 transition-all duration-200 ${
                     isDragging
-                      ? "border-blue-500 bg-blue-50/90"
-                      : "border-blue-300 bg-blue-50/50 hover:border-blue-400 hover:bg-blue-50/80"
+                      ? "border-blue-500 bg-blue-100 shadow-md"
+                      : "border-blue-400 bg-gradient-to-r from-blue-50 to-blue-100/60 hover:border-blue-500 hover:bg-blue-100 hover:shadow-sm"
                   }`}
                 >
                   <input ref={fileInputRef} type="file" accept="application/pdf" multiple onChange={onFileInput} className="hidden" />
-                  <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${isDragging ? "bg-blue-200 text-blue-700" : "bg-blue-100 text-blue-600"}`}>
-                    <Plus className="h-5 w-5" />
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${isDragging ? "bg-blue-300 text-blue-800" : "bg-blue-200 text-blue-700"}`}>
+                    <Plus className="h-6 w-6" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-blue-700">+ Adaugă alte fișiere PDF</p>
-                    <p className="text-xs text-blue-600/70">Trage aici sau click pentru a selecta</p>
+                    <p className="text-sm font-bold text-blue-800">+ Adaugă alte fișiere PDF</p>
+                    <p className="text-xs text-blue-600/80">Trage aici sau click pentru a selecta</p>
                   </div>
                 </label>
 
