@@ -1504,8 +1504,13 @@ export default function Home() {
                     <div className="mt-3 flex flex-wrap items-center gap-3">
                       <span className="inline-flex items-center gap-1.5 bg-blue-100 px-3 py-2 text-base font-bold text-blue-700">
                         <CreditCard className="h-4 w-4 text-blue-500" />
-                        {totalPrice.toFixed(2)} lei printare
+                        {effectivePrice.toFixed(2)} lei printare
                       </span>
+                      {totalPrice < MIN_ORDER_LEI && totalPrice > 0 && (
+                        <span className="inline-flex items-center gap-1.5 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 border border-amber-200 rounded">
+                          Minim {MIN_ORDER_LEI} lei
+                        </span>
+                      )}
                       <span className="inline-flex items-center gap-1.5 bg-amber-100 px-3 py-2 text-base font-bold text-amber-800">
                         +{SHIPPING_COST_LEI} lei transport
                       </span>
