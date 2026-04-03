@@ -963,7 +963,7 @@ export default function AdminComenziPage() {
                         </td>
                       </tr>
                       {isDetailsOpen && (
-                        <tr key={`${order.id}-details`} className={`border-b border-slate-100 ${isRambursUnconfirmed ? "bg-amber-200/90" : isPaidOrRambursConfirmed ? "bg-emerald-200/80" : "bg-slate-50/50"}`}>
+                        <tr key={`${order.id}-details`} className={`border-b border-slate-100 ${isStripeUnpaid ? "bg-red-50" : isRambursUnconfirmed ? "bg-amber-200/90" : isPaidOrRambursConfirmed ? "bg-emerald-200/80" : "bg-slate-50/50"}`}>
                           <td colSpan={7} className="px-4 py-4">
                             <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
                               <h4 className="mb-3 text-sm font-semibold text-slate-800">Detalii comandă și livrare</h4>
