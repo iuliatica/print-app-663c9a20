@@ -228,10 +228,10 @@ function FAQ() {
     { q: "Ce metode de plată acceptați?", a: "Acceptăm plata online cu cardul (prin Stripe, 100% securizat) sau plata la livrare (ramburs)." },
   ];
   return (
-    <section className="mt-12 mx-auto max-w-3xl">
-      <div className="flex items-center gap-2 mb-6">
-        <HelpCircle className="h-5 w-5 text-blue-600" />
-        <h2 className="text-xl font-bold text-slate-800">Întrebări frecvente</h2>
+    <section className="mt-10 mx-auto max-w-3xl">
+      <div className="flex items-center gap-2 mb-4">
+        <HelpCircle className="h-4 w-4 text-blue-600" />
+        <h2 className="text-lg font-bold text-slate-800">Întrebări frecvente</h2>
       </div>
       <div className="space-y-2">
         {items.map((item, i) => (
