@@ -659,6 +659,16 @@ export default function Home() {
     { value: "capsare", label: "Capsare", icon: <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="3" width="16" height="18" rx="1" /><path d="M7 3 L7 7 L11 7" /><line x1="7" y1="3" x2="7" y2="7" strokeWidth="2.5" /><line x1="7" y1="7" x2="11" y2="7" strokeWidth="2.5" /></svg>, description: `Max ${MAX_CAPSARE_SHEETS} file` },
   ];
 
+  // ─── Body scroll lock for modals ─────────────────────────────────────────
+  useEffect(() => {
+    if (checkoutModalOpen || orderSuccessDetails || previewFileId) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [checkoutModalOpen, orderSuccessDetails, previewFileId]);
+
   // ─── Checkout handler ──────────────────────────────────────────────────────
   const handleOpenCheckout = () => {
     setCheckoutError(null);
