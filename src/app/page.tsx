@@ -984,7 +984,7 @@ export default function Home() {
         </div>
 
         {/* Progress Stepper */}
-        <div className="mt-6">
+        <div className="mt-4">
           <ProgressStepper currentStep={currentStep} />
         </div>
 
