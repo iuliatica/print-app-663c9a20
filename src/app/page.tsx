@@ -182,7 +182,7 @@ function ProgressStepper({ currentStep }: { currentStep: number }) {
           <div key={step.label} className="flex items-center">
             <div className="flex flex-col items-center gap-1.5">
               <div
-                className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-300 ${
+                className={`flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 ${
                   isDone
                     ? "bg-green-500 text-white shadow-md shadow-green-500/20"
                     : isActive
