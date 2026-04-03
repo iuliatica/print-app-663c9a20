@@ -43,6 +43,7 @@ const PRICE_COLOR_DUPLEX = 1.2;
 const SPIRAL_PRICE = 3;
 const SHIPPING_COST_LEI = 15;
 const MIN_ORDER_LEI = 30;
+const MAX_CAPSARE_SHEETS = 220;
 const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024;
 const FILE_SIZE_ERROR_MSG = "Fișier prea mare (max 50 MB).";
 const LS_KEY_SHIPPING = "printica_shipping";
@@ -172,7 +173,7 @@ function ProgressStepper({ currentStep }: { currentStep: number }) {
     { label: "Plătește", icon: CreditCard },
   ];
   return (
-    <div className="flex items-center justify-center gap-0 mb-6">
+    <div className="flex items-center justify-center gap-0 mb-4">
       {steps.map((step, i) => {
         const Icon = step.icon;
         const isActive = i === currentStep;
@@ -181,7 +182,7 @@ function ProgressStepper({ currentStep }: { currentStep: number }) {
           <div key={step.label} className="flex items-center">
             <div className="flex flex-col items-center gap-1.5">
               <div
-                className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-300 ${
+                className={`flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 ${
                   isDone
                     ? "bg-green-500 text-white shadow-md shadow-green-500/20"
                     : isActive
@@ -189,7 +190,7 @@ function ProgressStepper({ currentStep }: { currentStep: number }) {
                     : "bg-slate-100 text-slate-400"
                 }`}
               >
-                {isDone ? <Check className="h-5 w-5" /> : <Icon className="h-5 w-5" />}
+                {isDone ? <Check className="h-4 w-4" /> : <Icon className="h-4 w-4" />}
               </div>
               <span
                 className={`text-xs font-semibold transition-colors ${
@@ -227,10 +228,10 @@ function FAQ() {
     { q: "Ce metode de plată acceptați?", a: "Acceptăm plata online cu cardul (prin Stripe, 100% securizat) sau plata la livrare (ramburs)." },
   ];
   return (
-    <section className="mt-12 mx-auto max-w-3xl">
-      <div className="flex items-center gap-2 mb-6">
-        <HelpCircle className="h-5 w-5 text-blue-600" />
-        <h2 className="text-xl font-bold text-slate-800">Întrebări frecvente</h2>
+    <section className="mt-10 mx-auto max-w-3xl">
+      <div className="flex items-center gap-2 mb-4">
+        <HelpCircle className="h-4 w-4 text-blue-600" />
+        <h2 className="text-lg font-bold text-slate-800">Întrebări frecvente</h2>
       </div>
       <div className="space-y-2">
         {items.map((item, i) => (
@@ -605,7 +606,8 @@ export default function Home() {
   }, [bindingGroups, groupOptions]);
 
   const totalPrice = pagePrice + spiralPrice;
-  const totalWithShipping = totalPrice + SHIPPING_COST_LEI;
+  const effectivePrice = Math.max(totalPrice, totalPages > 0 ? MIN_ORDER_LEI : 0);
+  const totalWithShipping = effectivePrice + SHIPPING_COST_LEI;
 
   // ─── Options data ──────────────────────────────────────────────────────────
   const coverBackColors: { value: CoverBackColor; label: string; circleClass: string }[] = [
@@ -621,6 +623,27 @@ export default function Home() {
     { value: "negru", label: "Negru", circleClass: "bg-slate-800" },
   ];
 
+  // Calculate sheets for capsare (duplex = 1 sheet per 2 pages)
+  const getGroupSheets = (filesInGroup: UploadedFile[]) => {
+    return filesInGroup.reduce((s, f) => {
+      if (f.pages == null) return s;
+      const copies = f.copies ?? DEFAULT_PRINT_OPTIONS.copies;
+      const totalPages = f.pages * copies;
+      const sheets = f.duplex ? Math.ceil(totalPages / 2) : totalPages;
+      return s + sheets;
+    }, 0);
+  };
+
+  const selectedGroupSheets =
+    selectedGroupIndex !== null
+      ? getGroupSheets(bindingGroups[selectedGroupIndex].filesInGroup)
+      : files.reduce((s, f) => {
+          if (f.pages == null) return s;
+          const copies = f.copies ?? DEFAULT_PRINT_OPTIONS.copies;
+          const totalPages = f.pages * copies;
+          return s + (f.duplex ? Math.ceil(totalPages / 2) : totalPages);
+        }, 0);
+
   const selectedGroupPages =
     selectedGroupIndex !== null
       ? bindingGroups[selectedGroupIndex].filesInGroup.reduce(
@@ -633,8 +656,18 @@ export default function Home() {
     { value: "none", label: "Doar print", icon: <BookOpen className="h-6 w-6" />, description: "Fără legare" },
     { value: "spirala", label: "Spiralare", icon: <Circle className="h-6 w-6" />, description: "+3 lei" },
     { value: "perforare2", label: "Perforare", icon: <BookMarked className="h-6 w-6" />, description: "2 găuri" },
-    { value: "capsare", label: "Capsare", icon: <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="3" width="16" height="18" rx="1" /><path d="M7 3 L7 7 L11 7" /><line x1="7" y1="3" x2="7" y2="7" strokeWidth="2.5" /><line x1="7" y1="7" x2="11" y2="7" strokeWidth="2.5" /></svg>, description: "Max 240 coli" },
+    { value: "capsare", label: "Capsare", icon: <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="3" width="16" height="18" rx="1" /><path d="M7 3 L7 7 L11 7" /><line x1="7" y1="3" x2="7" y2="7" strokeWidth="2.5" /><line x1="7" y1="7" x2="11" y2="7" strokeWidth="2.5" /></svg>, description: `Max ${MAX_CAPSARE_SHEETS} file` },
   ];
+
+  // ─── Body scroll lock for modals ─────────────────────────────────────────
+  useEffect(() => {
+    if (checkoutModalOpen || orderSuccessDetails || previewFileId) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [checkoutModalOpen, orderSuccessDetails, previewFileId]);
 
   // ─── Checkout handler ──────────────────────────────────────────────────────
   const handleOpenCheckout = () => {
@@ -658,14 +691,11 @@ export default function Home() {
     const capsareError = bindingGroups.some((grp, groupIndex) => {
       const opts = groupOptions[groupIndex] ?? defaultGroupOpts;
       if (opts.spiralType !== "capsare") return false;
-      const groupPages = grp.filesInGroup.reduce(
-        (s, f) => s + (f.pages != null ? f.pages * (f.copies ?? DEFAULT_PRINT_OPTIONS.copies) : 0),
-        0
-      );
-      return groupPages > 240;
+      const groupSheets = getGroupSheets(grp.filesInGroup);
+      return groupSheets > MAX_CAPSARE_SHEETS;
     });
     if (capsareError) {
-      setCheckoutError("Capsarea nu este disponibilă pentru documente cu mai mult de 240 de coli. Alege alt tip de legare.");
+      setCheckoutError(`Capsarea nu este disponibilă pentru documente cu mai mult de ${MAX_CAPSARE_SHEETS} de file. Alege alt tip de legare.`);
       setIsCheckoutLoading(false);
       return;
     }
@@ -922,29 +952,29 @@ export default function Home() {
         </header>
 
         {/* ═══ Delivery Banner ═══ */}
-        <div className="mt-4 rounded-xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50 px-4 py-3 sm:px-6">
-          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
-            <div className="flex items-center gap-2">
-              <Truck className="h-4 w-4 text-emerald-600" />
+        <div className="mt-3 rounded-lg border border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50 px-3 py-2 sm:px-5">
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs">
+            <div className="flex items-center gap-1.5">
+              <Truck className="h-3.5 w-3.5 text-emerald-600" />
               <span className="font-medium text-emerald-800">Livrare în 2-4 zile lucrătoare</span>
             </div>
-            <div className="hidden sm:block h-4 w-px bg-emerald-300" />
-            <div className="flex items-center gap-2">
-              <Shield className="h-4 w-4 text-emerald-600" />
+            <div className="hidden sm:block h-3.5 w-px bg-emerald-300" />
+            <div className="flex items-center gap-1.5">
+              <Shield className="h-3.5 w-3.5 text-emerald-600" />
               <span className="text-emerald-700">Transport {SHIPPING_COST_LEI} lei</span>
             </div>
           </div>
         </div>
 
         {/* ═══ Color Detection Highlight ═══ */}
-        <div className="mt-3 rounded-xl border border-blue-200 bg-gradient-to-r from-blue-50 via-white to-blue-50 px-4 py-3 sm:px-6">
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 mt-0.5 rounded-full bg-blue-100 p-2">
-              <Palette className="h-5 w-5 text-blue-600" />
+        <div className="mt-2 rounded-lg border border-blue-200 bg-gradient-to-r from-blue-50 via-white to-blue-50 px-3 py-2 sm:px-5">
+          <div className="flex items-start gap-2.5">
+            <div className="flex-shrink-0 mt-0.5 rounded-full bg-blue-100 p-1.5">
+              <Palette className="h-4 w-4 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-blue-900">Plătești color doar pentru paginile colorate</p>
-              <p className="mt-0.5 text-xs text-blue-700/80">
+              <p className="text-xs font-semibold text-blue-900">Plătești color doar pentru paginile colorate</p>
+              <p className="mt-0.5 text-[11px] text-blue-700/80">
                 Când selectezi printul <strong>Color</strong>, analizăm automat fiecare pagină din PDF — paginile alb-negru 
                 se taxează la preț de alb-negru, iar restul la preț de color. Economisești fără efort.
                 <span className="block mt-0.5 text-blue-600/70 italic">Nu se aplică documentelor formate din imagini scanate.</span>
@@ -954,7 +984,7 @@ export default function Home() {
         </div>
 
         {/* Progress Stepper */}
-        <div className="mt-6">
+        <div className="mt-4">
           <ProgressStepper currentStep={currentStep} />
         </div>
 
@@ -1023,19 +1053,19 @@ export default function Home() {
                   onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                   onDragLeave={() => setIsDragging(false)}
                   onDrop={onDrop}
-                  className={`mb-4 flex cursor-pointer items-center gap-3 border-2 border-dashed px-5 py-4 transition-all duration-200 ${
+                  className={`mb-4 flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed px-5 py-5 transition-all duration-200 ${
                     isDragging
-                      ? "border-blue-500 bg-blue-50/90"
-                      : "border-blue-300 bg-blue-50/50 hover:border-blue-400 hover:bg-blue-50/80"
+                      ? "border-blue-500 bg-blue-100 shadow-md"
+                      : "border-blue-400 bg-gradient-to-r from-blue-50 to-blue-100/60 hover:border-blue-500 hover:bg-blue-100 hover:shadow-sm"
                   }`}
                 >
                   <input ref={fileInputRef} type="file" accept="application/pdf" multiple onChange={onFileInput} className="hidden" />
-                  <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${isDragging ? "bg-blue-200 text-blue-700" : "bg-blue-100 text-blue-600"}`}>
-                    <Plus className="h-5 w-5" />
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${isDragging ? "bg-blue-300 text-blue-800" : "bg-blue-200 text-blue-700"}`}>
+                    <Plus className="h-6 w-6" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-blue-700">+ Adaugă alte fișiere PDF</p>
-                    <p className="text-xs text-blue-600/70">Trage aici sau click pentru a selecta</p>
+                    <p className="text-sm font-bold text-blue-800">+ Adaugă alte fișiere PDF</p>
+                    <p className="text-xs text-blue-600/80">Trage aici sau click pentru a selecta</p>
                   </div>
                 </label>
 
@@ -1380,7 +1410,7 @@ export default function Home() {
                         {/* 2×2 Grid instead of horizontal scroll */}
                         <div className="grid grid-cols-2 gap-2">
                           {spiralOptions.map(({ value, label, icon, description }) => {
-                            const isCapsareDisabled = value === "capsare" && selectedGroupPages > 240;
+                            const isCapsareDisabled = value === "capsare" && selectedGroupSheets > MAX_CAPSARE_SHEETS;
                             return (
                               <label
                                 key={value}
@@ -1391,7 +1421,7 @@ export default function Home() {
                                     ? "cursor-pointer border-blue-500 bg-blue-50/90 text-blue-700 shadow-sm ring-2 ring-blue-500/20"
                                     : "cursor-pointer border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
                                 }`}
-                                title={isCapsareDisabled ? `Indisponibil (${selectedGroupPages} coli > 240)` : undefined}
+                                title={isCapsareDisabled ? `Indisponibil (${selectedGroupSheets} file > ${MAX_CAPSARE_SHEETS})` : undefined}
                               >
                                 <input
                                   type="radio"
@@ -1412,8 +1442,8 @@ export default function Home() {
                                 </span>
                                 <div className="min-w-0">
                                   <span className="block text-sm font-semibold leading-tight">{label}</span>
-                                  <span className="block text-xs text-slate-500 leading-tight mt-0.5">
-                                    {isCapsareDisabled ? `Indisponibil` : description}
+                                   <span className="block text-xs text-slate-500 leading-tight mt-0.5">
+                                    {isCapsareDisabled ? `Indisponibil (${selectedGroupSheets} file)` : description}
                                   </span>
                                 </div>
                               </label>
@@ -1484,8 +1514,13 @@ export default function Home() {
                     <div className="mt-3 flex flex-wrap items-center gap-3">
                       <span className="inline-flex items-center gap-1.5 bg-blue-100 px-3 py-2 text-base font-bold text-blue-700">
                         <CreditCard className="h-4 w-4 text-blue-500" />
-                        {totalPrice.toFixed(2)} lei printare
+                        {effectivePrice.toFixed(2)} lei printare
                       </span>
+                      {totalPrice < MIN_ORDER_LEI && totalPrice > 0 && (
+                        <span className="inline-flex items-center gap-1.5 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 border border-amber-200 rounded">
+                          Minim {MIN_ORDER_LEI} lei
+                        </span>
+                      )}
                       <span className="inline-flex items-center gap-1.5 bg-amber-100 px-3 py-2 text-base font-bold text-amber-800">
                         +{SHIPPING_COST_LEI} lei transport
                       </span>
@@ -1520,7 +1555,7 @@ export default function Home() {
                     <p className="text-sm font-medium text-slate-600">Total comandă</p>
                     <p className="mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">{totalWithShipping.toFixed(2)} lei</p>
                     <p className="mt-1 text-xs text-slate-500">
-                      {totalPrice.toFixed(2)} lei printare + {SHIPPING_COST_LEI} lei transport · {totalPages} pagini
+                      {effectivePrice.toFixed(2)} lei printare + {SHIPPING_COST_LEI} lei transport · {totalPages} pagini
                     </p>
                     {detectedColorPages > 0 && (
                       <p className="mt-0.5 text-xs text-slate-500">
@@ -1529,14 +1564,9 @@ export default function Home() {
                         <span className="font-semibold">{detectedBwPages} pag. alb-negru</span>
                       </p>
                     )}
-                    {userChosenColorPages > 0 && detectedColorPages === 0 && (
-                      <p className="mt-0.5 text-xs text-amber-600">
-                        Toate paginile se taxează la tarif color (analiza automată indisponibilă).
-                      </p>
-                    )}
                     {totalPrice > 0 && totalPrice < MIN_ORDER_LEI && (
-                      <p className="mt-1 text-xs font-semibold text-red-600">
-                        ⚠ Comanda minimă este de {MIN_ORDER_LEI} lei (fără transport). Mai ai nevoie de {(MIN_ORDER_LEI - totalPrice).toFixed(2)} lei.
+                      <p className="mt-1 text-xs font-semibold text-amber-600">
+                        ⚠ Comanda minimă este de {MIN_ORDER_LEI} lei. Prețul a fost ajustat automat la {MIN_ORDER_LEI} lei (+ {SHIPPING_COST_LEI} lei transport).
                       </p>
                     )}
                   </>
@@ -1552,7 +1582,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={handleOpenCheckout}
-                disabled={files.length === 0 || isCheckoutLoading || totalPages === 0 || totalPrice < MIN_ORDER_LEI}
+                disabled={files.length === 0 || isCheckoutLoading || totalPages === 0}
                 className="flex items-center gap-2 rounded-xl bg-blue-600 px-8 py-4 text-lg font-semibold text-white shadow-md shadow-blue-600/20 transition-all duration-200 hover:bg-blue-700 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
               >
                 <CreditCard className="h-5 w-5" />
@@ -1613,7 +1643,7 @@ export default function Home() {
             <button
               type="button"
               onClick={handleOpenCheckout}
-              disabled={isCheckoutLoading || totalPrice < MIN_ORDER_LEI}
+              disabled={isCheckoutLoading}
               className="flex shrink-0 items-center gap-2 bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-blue-600/20 transition-all hover:bg-blue-700 disabled:opacity-50"
             >
               <CreditCard className="h-4 w-4" />
@@ -1625,8 +1655,8 @@ export default function Home() {
 
 
       {checkoutModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 px-4 py-6 backdrop-blur-sm">
-          <div className="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-slate-200/50 sm:p-8 animate-[fade-in_0.3s_ease-out]">
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 px-4 py-6 backdrop-blur-sm overflow-hidden">
+          <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-slate-200/50 sm:p-8 animate-[fade-in_0.3s_ease-out]">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-bold text-slate-900">Finalizare comandă</h2>
               <button
@@ -1704,6 +1734,12 @@ export default function Home() {
                     <span>Subtotal printare</span>
                     <span>{totalPrice.toFixed(2)} lei</span>
                   </div>
+                  {totalPrice < MIN_ORDER_LEI && totalPrice > 0 && (
+                    <div className="flex justify-between text-amber-600">
+                      <span>Ajustare comandă minimă</span>
+                      <span>+{(MIN_ORDER_LEI - totalPrice).toFixed(2)} lei</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-slate-600">
                     <span>Transport</span>
                     <span>{SHIPPING_COST_LEI.toFixed(2)} lei</span>

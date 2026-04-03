@@ -180,7 +180,7 @@ function formatConfigSummary(config: ConfigDetails | null): string {
           : spiral === "perforare2"
           ? "Perforare cu 2 găuri"
           : spiral === "capsare"
-          ? "Capsare (maxim 240 coli)"
+          ? "Capsare (maxim 220 file)"
           : spiral;
       parts.push(`Legare: ${label}`);
     } else if (config.spiralType === "none" || !config.spiralType) {
@@ -229,7 +229,7 @@ function formatConfigSummaryLines(config: ConfigDetails | null): ConfigLine[] {
             : spiral === "perforare2"
             ? "Perforare cu 2 găuri"
             : spiral === "capsare"
-            ? "Capsare (maxim 240 coli)"
+            ? "Capsare (maxim 220 file)"
             : spiral
           : "Doar print";
       line(`Grup ${gi + 1} (îndosariere): Legare: ${label}`);
@@ -262,7 +262,7 @@ function formatConfigSummaryLines(config: ConfigDetails | null): ConfigLine[] {
           : spiral === "perforare2"
           ? "Perforare cu 2 găuri"
           : spiral === "capsare"
-          ? "Capsare (maxim 240 coli)"
+          ? "Capsare (maxim 220 file)"
           : spiral;
       line(`Legare: ${label}`);
     } else {
@@ -293,7 +293,7 @@ function formatConfigSummaryLines(config: ConfigDetails | null): ConfigLine[] {
           : spiral === "perforare2"
           ? "Perforare cu 2 găuri"
           : spiral === "capsare"
-          ? "Capsare (maxim 240 coli)"
+          ? "Capsare (maxim 220 file)"
           : spiral;
       line(`Legare: ${label}`);
     } else if (config.spiralType === "none" || !config.spiralType) {
@@ -341,7 +341,7 @@ function getConfigRowsWithFileIndices(config: ConfigDetails | null): ConfigRow[]
             : spiral === "perforare2"
             ? "Perforare cu 2 găuri"
             : spiral === "capsare"
-            ? "Capsare (maxim 240 coli)"
+            ? "Capsare (maxim 220 file)"
             : spiral
           : "Doar print";
       rows.push({ kind: "text", line: `Grup ${gi + 1} (ordinea fișierelor în îndosariere): — Legare: ${label}` });
@@ -372,7 +372,7 @@ function getConfigRowsWithFileIndices(config: ConfigDetails | null): ConfigRow[]
           : spiral === "perforare2"
           ? "Perforare cu 2 găuri"
           : spiral === "capsare"
-          ? "Capsare (maxim 240 coli)"
+          ? "Capsare (maxim 220 file)"
           : spiral;
       rows.push({ kind: "text", line: `Legare: ${label}${config.spiralColor ? `, culoare ${config.spiralColor}` : ""}` });
     } else {
@@ -400,7 +400,7 @@ function getConfigRowsWithFileIndices(config: ConfigDetails | null): ConfigRow[]
           : spiral === "perforare2"
           ? "Perforare cu 2 găuri"
           : spiral === "capsare"
-          ? "Capsare (maxim 240 coli)"
+          ? "Capsare (maxim 220 file)"
           : spiral;
       rows.push({ kind: "text", line: `Legare: ${label}${config.spiralColor ? `, culoare ${config.spiralColor}` : ""}` });
     } else if (!config.spiralType || config.spiralType === "none") {
@@ -858,9 +858,17 @@ export default function AdminComenziPage() {
                     const isDropdownOpen = statusDropdownId === order.id;
                     const isDetailsOpen = expandedDetailsId === order.id;
                     const isRambursUnconfirmed = order.payment_method === "ramburs" && order.config_details?.ramburs_confirmed !== true;
-                    const isPaidOrRambursConfirmed = order.payment_method === "stripe" || (order.payment_method === "ramburs" && order.config_details?.ramburs_confirmed === true);
+                    const isStripePaid = order.payment_method === "stripe" && order.status === "paid";
+                    const isStripeUnpaid = order.payment_method === "stripe" && order.status !== "paid";
+                    const isPaidOrRambursConfirmed = isStripePaid || (order.payment_method === "ramburs" && order.config_details?.ramburs_confirmed === true);
                     const logs = order.change_logs ?? [];
-                    const rowBg = isPaidOrRambursConfirmed ? "bg-emerald-200 hover:bg-emerald-300" : isRambursUnconfirmed ? "bg-amber-200 hover:bg-amber-300" : "hover:bg-slate-50/50";
+                    const rowBg = isStripeUnpaid
+                      ? "bg-red-100 hover:bg-red-200"
+                      : isPaidOrRambursConfirmed
+                      ? "bg-emerald-200 hover:bg-emerald-300"
+                      : isRambursUnconfirmed
+                      ? "bg-amber-200 hover:bg-amber-300"
+                      : "hover:bg-slate-50/50";
                     return (
                       <Fragment key={order.id}>
                         <tr className={`border-b border-slate-100 ${rowBg}`}>
@@ -891,7 +899,9 @@ export default function AdminComenziPage() {
                         </td>
                         <td className="px-4 py-3 text-slate-700">
                           {order.payment_method === "stripe"
-                            ? "Online (card)"
+                            ? order.status === "paid"
+                              ? "Online (card) ✓"
+                              : <span className="font-semibold text-red-700">Online — NEPLĂTIT</span>
                             : order.payment_method === "ramburs"
                               ? "Ramburs"
                               : order.payment_method}
@@ -953,7 +963,7 @@ export default function AdminComenziPage() {
                         </td>
                       </tr>
                       {isDetailsOpen && (
-                        <tr key={`${order.id}-details`} className={`border-b border-slate-100 ${isRambursUnconfirmed ? "bg-amber-200/90" : isPaidOrRambursConfirmed ? "bg-emerald-200/80" : "bg-slate-50/50"}`}>
+                        <tr key={`${order.id}-details`} className={`border-b border-slate-100 ${isStripeUnpaid ? "bg-red-50" : isRambursUnconfirmed ? "bg-amber-200/90" : isPaidOrRambursConfirmed ? "bg-emerald-200/80" : "bg-slate-50/50"}`}>
                           <td colSpan={7} className="px-4 py-4">
                             <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
                               <h4 className="mb-3 text-sm font-semibold text-slate-800">Detalii comandă și livrare</h4>
