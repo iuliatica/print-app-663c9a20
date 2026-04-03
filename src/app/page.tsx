@@ -606,7 +606,8 @@ export default function Home() {
   }, [bindingGroups, groupOptions]);
 
   const totalPrice = pagePrice + spiralPrice;
-  const totalWithShipping = totalPrice + SHIPPING_COST_LEI;
+  const effectivePrice = Math.max(totalPrice, totalPages > 0 ? MIN_ORDER_LEI : 0);
+  const totalWithShipping = effectivePrice + SHIPPING_COST_LEI;
 
   // ─── Options data ──────────────────────────────────────────────────────────
   const coverBackColors: { value: CoverBackColor; label: string; circleClass: string }[] = [
