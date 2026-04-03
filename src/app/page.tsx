@@ -1724,6 +1724,12 @@ export default function Home() {
                     <span>Subtotal printare</span>
                     <span>{totalPrice.toFixed(2)} lei</span>
                   </div>
+                  {totalPrice < MIN_ORDER_LEI && totalPrice > 0 && (
+                    <div className="flex justify-between text-amber-600">
+                      <span>Ajustare comandă minimă</span>
+                      <span>+{(MIN_ORDER_LEI - totalPrice).toFixed(2)} lei</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-slate-600">
                     <span>Transport</span>
                     <span>{SHIPPING_COST_LEI.toFixed(2)} lei</span>
