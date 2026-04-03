@@ -899,7 +899,9 @@ export default function AdminComenziPage() {
                         </td>
                         <td className="px-4 py-3 text-slate-700">
                           {order.payment_method === "stripe"
-                            ? "Online (card)"
+                            ? order.status === "paid"
+                              ? "Online (card) ✓"
+                              : <span className="font-semibold text-red-700">Online — NEPLĂTIT</span>
                             : order.payment_method === "ramburs"
                               ? "Ramburs"
                               : order.payment_method}
