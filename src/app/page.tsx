@@ -1411,7 +1411,7 @@ export default function Home() {
                                     ? "cursor-pointer border-blue-500 bg-blue-50/90 text-blue-700 shadow-sm ring-2 ring-blue-500/20"
                                     : "cursor-pointer border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
                                 }`}
-                                title={isCapsareDisabled ? `Indisponibil (${selectedGroupPages} coli > 240)` : undefined}
+                                title={isCapsareDisabled ? `Indisponibil (${selectedGroupSheets} file > ${MAX_CAPSARE_SHEETS})` : undefined}
                               >
                                 <input
                                   type="radio"
