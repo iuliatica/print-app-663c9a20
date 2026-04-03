@@ -173,7 +173,7 @@ function ProgressStepper({ currentStep }: { currentStep: number }) {
     { label: "Plătește", icon: CreditCard },
   ];
   return (
-    <div className="flex items-center justify-center gap-0 mb-6">
+    <div className="flex items-center justify-center gap-0 mb-4">
       {steps.map((step, i) => {
         const Icon = step.icon;
         const isActive = i === currentStep;
