@@ -967,14 +967,14 @@ export default function Home() {
         </div>
 
         {/* ═══ Color Detection Highlight ═══ */}
-        <div className="mt-3 rounded-xl border border-blue-200 bg-gradient-to-r from-blue-50 via-white to-blue-50 px-4 py-3 sm:px-6">
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 mt-0.5 rounded-full bg-blue-100 p-2">
-              <Palette className="h-5 w-5 text-blue-600" />
+        <div className="mt-2 rounded-lg border border-blue-200 bg-gradient-to-r from-blue-50 via-white to-blue-50 px-3 py-2 sm:px-5">
+          <div className="flex items-start gap-2.5">
+            <div className="flex-shrink-0 mt-0.5 rounded-full bg-blue-100 p-1.5">
+              <Palette className="h-4 w-4 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-blue-900">Plătești color doar pentru paginile colorate</p>
-              <p className="mt-0.5 text-xs text-blue-700/80">
+              <p className="text-xs font-semibold text-blue-900">Plătești color doar pentru paginile colorate</p>
+              <p className="mt-0.5 text-[11px] text-blue-700/80">
                 Când selectezi printul <strong>Color</strong>, analizăm automat fiecare pagină din PDF — paginile alb-negru 
                 se taxează la preț de alb-negru, iar restul la preț de color. Economisești fără efort.
                 <span className="block mt-0.5 text-blue-600/70 italic">Nu se aplică documentelor formate din imagini scanate.</span>
