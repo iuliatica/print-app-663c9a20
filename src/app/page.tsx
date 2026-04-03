@@ -1640,8 +1640,8 @@ export default function Home() {
 
 
       {checkoutModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 px-4 py-6 backdrop-blur-sm">
-          <div className="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-slate-200/50 sm:p-8 animate-[fade-in_0.3s_ease-out]">
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 px-4 py-6 backdrop-blur-sm overflow-hidden">
+          <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-slate-200/50 sm:p-8 animate-[fade-in_0.3s_ease-out]">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-bold text-slate-900">Finalizare comandă</h2>
               <button
