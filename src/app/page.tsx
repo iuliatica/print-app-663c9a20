@@ -623,6 +623,27 @@ export default function Home() {
     { value: "negru", label: "Negru", circleClass: "bg-slate-800" },
   ];
 
+  // Calculate sheets for capsare (duplex = 1 sheet per 2 pages)
+  const getGroupSheets = (filesInGroup: UploadedFile[]) => {
+    return filesInGroup.reduce((s, f) => {
+      if (f.pages == null) return s;
+      const copies = f.copies ?? DEFAULT_PRINT_OPTIONS.copies;
+      const totalPages = f.pages * copies;
+      const sheets = f.duplex ? Math.ceil(totalPages / 2) : totalPages;
+      return s + sheets;
+    }, 0);
+  };
+
+  const selectedGroupSheets =
+    selectedGroupIndex !== null
+      ? getGroupSheets(bindingGroups[selectedGroupIndex].filesInGroup)
+      : files.reduce((s, f) => {
+          if (f.pages == null) return s;
+          const copies = f.copies ?? DEFAULT_PRINT_OPTIONS.copies;
+          const totalPages = f.pages * copies;
+          return s + (f.duplex ? Math.ceil(totalPages / 2) : totalPages);
+        }, 0);
+
   const selectedGroupPages =
     selectedGroupIndex !== null
       ? bindingGroups[selectedGroupIndex].filesInGroup.reduce(
