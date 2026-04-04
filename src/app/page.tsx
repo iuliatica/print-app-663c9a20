@@ -1736,7 +1736,7 @@ export default function Home() {
                   </div>
                   {totalPrice < MIN_ORDER_LEI && totalPrice > 0 && (
                     <div className="flex justify-between text-amber-600">
-                      <span>Ajustare comandă minimă</span>
+                      <span>Ajustare comandă minimă (cost real: {totalPrice.toFixed(2)} lei)</span>
                       <span>+{(MIN_ORDER_LEI - totalPrice).toFixed(2)} lei</span>
                     </div>
                   )}
