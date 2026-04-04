@@ -1413,6 +1413,7 @@ export default function Home() {
                     )}
 
                     {/* ─── Spiral / Binding options ─── */}
+                    {selectedFileId && files.some((f) => f.id === selectedFileId) && (
                     <div className="mt-5 space-y-5 border-t border-slate-200 pt-5">
                       <div>
                         <p className="mb-3 text-sm font-semibold text-slate-700">
