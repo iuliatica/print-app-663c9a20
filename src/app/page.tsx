@@ -445,13 +445,21 @@ export default function Home() {
       const dropped = Array.from(e.dataTransfer.files).filter((f) => f.type === "application/pdf");
       if (dropped.length === 0) return;
       const newItems = createFileItems(dropped);
+      const tooBigFiles = newItems.filter((f) => f.error);
+      const validNewFiles = newItems.filter((f) => !f.error);
+      if (tooBigFiles.length > 0) {
+        addToast(`${tooBigFiles.length} fișier${tooBigFiles.length > 1 ? "e depășesc" : " depășește"} limita de 50 MB și nu ${tooBigFiles.length > 1 ? "au" : "a"} fost adăugat${tooBigFiles.length > 1 ? "e" : ""}.`, "error");
+      }
+      if (validNewFiles.length === 0 && tooBigFiles.length > 0) return;
       setFiles((prev) => {
-        const next = [...prev, ...newItems];
-        if (prev.length === 0 && newItems.length > 0) setSelectedFileId(newItems[0].id);
+        const next = [...prev, ...validNewFiles];
+        if (prev.length === 0 && validNewFiles.length > 0) setSelectedFileId(validNewFiles[0].id);
         return next;
       });
-      addToast(`${dropped.length} fișier${dropped.length > 1 ? "e" : ""} adăugat${dropped.length > 1 ? "e" : ""}`, "success");
-      loadPageCounts([...files, ...newItems]);
+      if (validNewFiles.length > 0) {
+        addToast(`${validNewFiles.length} fișier${validNewFiles.length > 1 ? "e" : ""} adăugat${validNewFiles.length > 1 ? "e" : ""}`, "success");
+      }
+      loadPageCounts([...files, ...validNewFiles]);
     },
     [files, loadPageCounts, createFileItems, addToast]
   );
@@ -461,13 +469,21 @@ export default function Home() {
       const selected = e.target.files;
       if (!selected?.length) return;
       const newItems = createFileItems(Array.from(selected));
+      const tooBigFiles = newItems.filter((f) => f.error);
+      const validNewFiles = newItems.filter((f) => !f.error);
+      if (tooBigFiles.length > 0) {
+        addToast(`${tooBigFiles.length} fișier${tooBigFiles.length > 1 ? "e depășesc" : " depășește"} limita de 50 MB și nu ${tooBigFiles.length > 1 ? "au" : "a"} fost adăugat${tooBigFiles.length > 1 ? "e" : ""}.`, "error");
+      }
+      if (validNewFiles.length === 0 && tooBigFiles.length > 0) return;
       setFiles((prev) => {
-        const next = [...prev, ...newItems];
-        if (prev.length === 0 && newItems.length > 0) setSelectedFileId(newItems[0].id);
+        const next = [...prev, ...validNewFiles];
+        if (prev.length === 0 && validNewFiles.length > 0) setSelectedFileId(validNewFiles[0].id);
         return next;
       });
-      addToast(`${selected.length} fișier${selected.length > 1 ? "e" : ""} adăugat${selected.length > 1 ? "e" : ""}`, "success");
-      loadPageCounts([...files, ...newItems]);
+      if (validNewFiles.length > 0) {
+        addToast(`${validNewFiles.length} fișier${validNewFiles.length > 1 ? "e" : ""} adăugat${validNewFiles.length > 1 ? "e" : ""}`, "success");
+      }
+      loadPageCounts([...files, ...validNewFiles]);
       e.target.value = "";
     },
     [files, loadPageCounts, createFileItems, addToast]
@@ -1397,6 +1413,7 @@ export default function Home() {
                     )}
 
                     {/* ─── Spiral / Binding options ─── */}
+                    {selectedFileId && files.some((f) => f.id === selectedFileId) && (
                     <div className="mt-5 space-y-5 border-t border-slate-200 pt-5">
                       <div>
                         <p className="mb-3 text-sm font-semibold text-slate-700">
@@ -1488,6 +1505,7 @@ export default function Home() {
                         </div>
                       )}
                     </div>
+                    )}
                   </div>
                 </section>
 
