@@ -777,8 +777,8 @@ export default function Home() {
           config_details,
         }),
       });
-      const orderData = await orderRes.json();
-      if (!orderRes.ok) throw new Error("Nu am putut salva comanda. Verifică conexiunea la internet și încearcă din nou.");
+      const orderData = await orderRes.json().catch(() => ({}));
+      if (!orderRes.ok) throw new Error(orderData.error || "Nu am putut salva comanda. Verifică conexiunea la internet și încearcă din nou.");
 
       // Send confirmation email (fire-and-forget)
       fetch("/api/send-confirmation", {
