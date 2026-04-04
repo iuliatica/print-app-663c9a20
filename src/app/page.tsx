@@ -720,8 +720,8 @@ export default function Home() {
           const formData = new FormData();
           fileList.forEach((file) => formData.append("files", file));
           const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
-          const uploadData = await uploadRes.json();
-          if (!uploadRes.ok) throw new Error("Nu am putut încărca fișierele. Te rugăm încearcă din nou.");
+          const uploadData = await uploadRes.json().catch(() => ({}));
+          if (!uploadRes.ok) throw new Error(uploadData.error || "Nu am putut încărca fișierele. Te rugăm încearcă din nou.");
           fileUrls = uploadData.urls ?? [];
           setUploadProgress(100);
         } finally {
