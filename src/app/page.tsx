@@ -720,8 +720,8 @@ export default function Home() {
           const formData = new FormData();
           fileList.forEach((file) => formData.append("files", file));
           const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
-          const uploadData = await uploadRes.json();
-          if (!uploadRes.ok) throw new Error("Nu am putut încărca fișierele. Te rugăm încearcă din nou.");
+          const uploadData = await uploadRes.json().catch(() => ({}));
+          if (!uploadRes.ok) throw new Error(uploadData.error || "Nu am putut încărca fișierele. Te rugăm încearcă din nou.");
           fileUrls = uploadData.urls ?? [];
           setUploadProgress(100);
         } finally {
@@ -777,8 +777,8 @@ export default function Home() {
           config_details,
         }),
       });
-      const orderData = await orderRes.json();
-      if (!orderRes.ok) throw new Error("Nu am putut salva comanda. Verifică conexiunea la internet și încearcă din nou.");
+      const orderData = await orderRes.json().catch(() => ({}));
+      if (!orderRes.ok) throw new Error(orderData.error || "Nu am putut salva comanda. Verifică conexiunea la internet și încearcă din nou.");
 
       // Send confirmation email (fire-and-forget)
       fetch("/api/send-confirmation", {
@@ -860,8 +860,8 @@ export default function Home() {
           },
         }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error("Nu am putut iniția plata. Încearcă din nou.");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Nu am putut iniția plata. Încearcă din nou.");
 
       // Legăm sesiunea Stripe de comandă
       if (data.id && orderId) {
@@ -1518,7 +1518,7 @@ export default function Home() {
                       </span>
                       {totalPrice < MIN_ORDER_LEI && totalPrice > 0 && (
                         <span className="inline-flex items-center gap-1.5 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 border border-amber-200 rounded">
-                          Minim {MIN_ORDER_LEI} lei
+                          Minim {MIN_ORDER_LEI} lei (cost real: {totalPrice.toFixed(2)} lei)
                         </span>
                       )}
                       <span className="inline-flex items-center gap-1.5 bg-amber-100 px-3 py-2 text-base font-bold text-amber-800">
@@ -1566,7 +1566,7 @@ export default function Home() {
                     )}
                     {totalPrice > 0 && totalPrice < MIN_ORDER_LEI && (
                       <p className="mt-1 text-xs font-semibold text-amber-600">
-                        ⚠ Comanda minimă este de {MIN_ORDER_LEI} lei. Prețul a fost ajustat automat la {MIN_ORDER_LEI} lei (+ {SHIPPING_COST_LEI} lei transport).
+                        ⚠ Costul real: {totalPrice.toFixed(2)} lei. Comanda minimă este de {MIN_ORDER_LEI} lei, prețul a fost ajustat automat (+ {SHIPPING_COST_LEI} lei transport).
                       </p>
                     )}
                   </>
@@ -1736,7 +1736,7 @@ export default function Home() {
                   </div>
                   {totalPrice < MIN_ORDER_LEI && totalPrice > 0 && (
                     <div className="flex justify-between text-amber-600">
-                      <span>Ajustare comandă minimă</span>
+                      <span>Ajustare comandă minimă (cost real: {totalPrice.toFixed(2)} lei)</span>
                       <span>+{(MIN_ORDER_LEI - totalPrice).toFixed(2)} lei</span>
                     </div>
                   )}
