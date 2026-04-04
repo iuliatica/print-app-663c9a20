@@ -860,8 +860,8 @@ export default function Home() {
           },
         }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error("Nu am putut iniția plata. Încearcă din nou.");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Nu am putut iniția plata. Încearcă din nou.");
 
       // Legăm sesiunea Stripe de comandă
       if (data.id && orderId) {
