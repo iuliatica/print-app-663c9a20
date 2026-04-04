@@ -1518,7 +1518,7 @@ export default function Home() {
                       </span>
                       {totalPrice < MIN_ORDER_LEI && totalPrice > 0 && (
                         <span className="inline-flex items-center gap-1.5 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 border border-amber-200 rounded">
-                          Minim {MIN_ORDER_LEI} lei
+                          Minim {MIN_ORDER_LEI} lei (cost real: {totalPrice.toFixed(2)} lei)
                         </span>
                       )}
                       <span className="inline-flex items-center gap-1.5 bg-amber-100 px-3 py-2 text-base font-bold text-amber-800">
