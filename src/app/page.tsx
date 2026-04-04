@@ -1566,7 +1566,7 @@ export default function Home() {
                     )}
                     {totalPrice > 0 && totalPrice < MIN_ORDER_LEI && (
                       <p className="mt-1 text-xs font-semibold text-amber-600">
-                        ⚠ Comanda minimă este de {MIN_ORDER_LEI} lei. Prețul a fost ajustat automat la {MIN_ORDER_LEI} lei (+ {SHIPPING_COST_LEI} lei transport).
+                        ⚠ Costul real: {totalPrice.toFixed(2)} lei. Comanda minimă este de {MIN_ORDER_LEI} lei, prețul a fost ajustat automat (+ {SHIPPING_COST_LEI} lei transport).
                       </p>
                     )}
                   </>
