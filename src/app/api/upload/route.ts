@@ -136,14 +136,15 @@ export async function POST(request: Request) {
     if (message.includes("nu este un PDF") || message.includes("nu pare a fi")) {
       return NextResponse.json({ error: message }, { status: 400 });
     }
+    if (message.includes("supabaseUrl") || message.includes("SUPABASE")) {
+      return NextResponse.json(
+        { error: "Serverul nu este configurat pentru upload. Verifică variabilele de mediu." },
+        { status: 503 }
+      );
+    }
     console.error("Upload API error:", err);
     return NextResponse.json(
-      {
-        error:
-          process.env.NODE_ENV === "development"
-            ? message
-            : "Eroare la încărcarea fișierelor. Încearcă din nou.",
-      },
+      { error: "Eroare la încărcarea fișierelor. Încearcă din nou." },
       { status: 500 }
     );
   }
