@@ -921,7 +921,7 @@ export default function Home() {
               Rapid · Sigur · Stripe
             </div>
             <div className="flex items-center justify-center lg:justify-start gap-2">
-              <img src={printicaLogo.src} alt="Printica" className="h-8 w-8 object-contain" />
+              <img src={printicaLogo.src} alt="Printica" className="h-14 w-14 object-contain drop-shadow-md" />
               <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
                 Printica
               </h1>
