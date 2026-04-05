@@ -66,23 +66,6 @@ export async function POST(request: Request) {
       }
     }
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || "";
-    const serviceRoleKey = process.env.SB_SERVICE_ROLE_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (!supabaseUrl?.trim() || !serviceRoleKey?.trim()) {
-      const missing: string[] = [];
-      if (!supabaseUrl?.trim()) missing.push("NEXT_PUBLIC_SUPABASE_URL");
-      if (!serviceRoleKey?.trim()) missing.push("SUPABASE_SERVICE_ROLE_KEY");
-      console.error("Upload: variabile lipsă:", missing.join(", "));
-      return NextResponse.json(
-        {
-          error: "Serverul nu este configurat pentru upload (lipsesc variabile de mediu).",
-          missing: missing,
-          hint: "Adaugă în .env.local: NEXT_PUBLIC_SUPABASE_URL și SUPABASE_SERVICE_ROLE_KEY (din Supabase → Settings → API).",
-        },
-        { status: 503 }
-      );
-    }
-
     const formData = await request.formData();
     const files = formData.getAll("files");
     const fileList = Array.isArray(files) ? files : [files].filter(Boolean);
