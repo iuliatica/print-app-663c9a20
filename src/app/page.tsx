@@ -448,7 +448,8 @@ export default function Home() {
       const tooBigFiles = newItems.filter((f) => f.error);
       const validNewFiles = newItems.filter((f) => !f.error);
       if (tooBigFiles.length > 0) {
-        addToast(`${tooBigFiles.length} fișier${tooBigFiles.length > 1 ? "e depășesc" : " depășește"} limita de 50 MB și nu ${tooBigFiles.length > 1 ? "au" : "a"} fost adăugat${tooBigFiles.length > 1 ? "e" : ""}.`, "error");
+        const names = tooBigFiles.map((f) => `„${f.name}"`).join(", ");
+        addToast(`⚠️ ${tooBigFiles.length === 1 ? "Fișierul" : "Fișierele"} ${names} ${tooBigFiles.length === 1 ? "depășește" : "depășesc"} limita de 50 MB și ${tooBigFiles.length === 1 ? "a fost eliminat" : "au fost eliminate"} din selecție. Redu dimensiunea și încearcă din nou.`, "error");
       }
       if (validNewFiles.length === 0 && tooBigFiles.length > 0) return;
       setFiles((prev) => {
@@ -472,7 +473,8 @@ export default function Home() {
       const tooBigFiles = newItems.filter((f) => f.error);
       const validNewFiles = newItems.filter((f) => !f.error);
       if (tooBigFiles.length > 0) {
-        addToast(`${tooBigFiles.length} fișier${tooBigFiles.length > 1 ? "e depășesc" : " depășește"} limita de 50 MB și nu ${tooBigFiles.length > 1 ? "au" : "a"} fost adăugat${tooBigFiles.length > 1 ? "e" : ""}.`, "error");
+        const names = tooBigFiles.map((f) => `„${f.name}"`).join(", ");
+        addToast(`⚠️ ${tooBigFiles.length === 1 ? "Fișierul" : "Fișierele"} ${names} ${tooBigFiles.length === 1 ? "depășește" : "depășesc"} limita de 50 MB și ${tooBigFiles.length === 1 ? "a fost eliminat" : "au fost eliminate"} din selecție. Redu dimensiunea și încearcă din nou.`, "error");
       }
       if (validNewFiles.length === 0 && tooBigFiles.length > 0) return;
       setFiles((prev) => {
@@ -1536,7 +1538,7 @@ export default function Home() {
                       </span>
                       {totalPrice < MIN_ORDER_LEI && totalPrice > 0 && (
                         <span className="inline-flex items-center gap-1.5 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 border border-amber-200 rounded">
-                          Minim {MIN_ORDER_LEI} lei (cost real: {totalPrice.toFixed(2)} lei)
+                          Minim {MIN_ORDER_LEI} lei (valoare printare: {totalPrice.toFixed(2)} lei)
                         </span>
                       )}
                       <span className="inline-flex items-center gap-1.5 bg-amber-100 px-3 py-2 text-base font-bold text-amber-800">
@@ -1754,7 +1756,7 @@ export default function Home() {
                   </div>
                   {totalPrice < MIN_ORDER_LEI && totalPrice > 0 && (
                     <div className="flex justify-between text-amber-600">
-                      <span>Ajustare comandă minimă (cost real: {totalPrice.toFixed(2)} lei)</span>
+                      <span>Ajustare comandă minimă (valoare printare: {totalPrice.toFixed(2)} lei)</span>
                       <span>+{(MIN_ORDER_LEI - totalPrice).toFixed(2)} lei</span>
                     </div>
                   )}
