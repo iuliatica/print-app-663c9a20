@@ -29,9 +29,9 @@ export default function ContactPage() {
         {/* Phone */}
         <a
           href="tel:0778124553"
-          className="group flex items-start gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:border-blue-200 hover:shadow-md"
+          className="group flex items-start gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:border-teal-200 hover:shadow-md"
         >
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition-colors group-hover:bg-blue-100">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-600 transition-colors group-hover:bg-teal-100">
             <Phone className="h-6 w-6" />
           </div>
           <div>
@@ -43,16 +43,15 @@ export default function ContactPage() {
 
         {/* Email */}
         <a
-          href="mailto:printicaalba@gmail.com"
-          className="group flex items-start gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:border-blue-200 hover:shadow-md"
+          href="mailto:contact@printica.ro"
+          className="group flex items-start gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:border-teal-200 hover:shadow-md"
         >
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition-colors group-hover:bg-blue-100">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-600 transition-colors group-hover:bg-teal-100">
             <Mail className="h-6 w-6" />
           </div>
           <div>
             <p className="text-sm font-medium text-slate-500">Email</p>
-            <p className="mt-1 text-lg font-semibold text-slate-900">printicaalba@gmail.com</p>
-            <p className="mt-1 text-xs text-slate-500">Răspundem în maxim 24h</p>
+            <p className="mt-1 text-lg font-semibold text-slate-900">contact@printica.ro</p>
           </div>
         </a>
       </div>
