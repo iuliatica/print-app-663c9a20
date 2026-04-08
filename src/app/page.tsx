@@ -186,7 +186,7 @@ function ProgressStepper({ currentStep }: { currentStep: number }) {
                   isDone
                     ? "bg-green-500 text-white shadow-md shadow-green-500/20"
                     : isActive
-                    ? "bg-blue-600 text-white shadow-lg shadow-blue-600/30 scale-110"
+                    ? "bg-teal-600 text-white shadow-lg shadow-teal-600/30 scale-110"
                     : "bg-slate-100 text-slate-400"
                 }`}
               >
@@ -194,7 +194,7 @@ function ProgressStepper({ currentStep }: { currentStep: number }) {
               </div>
               <span
                 className={`text-xs font-semibold transition-colors ${
-                  isDone ? "text-green-600" : isActive ? "text-blue-700" : "text-slate-400"
+                  isDone ? "text-green-600" : isActive ? "text-teal-700" : "text-slate-400"
                 }`}
               >
                 {step.label}
@@ -1043,7 +1043,7 @@ export default function Home() {
                     <path d="M38 44V33M38 33L33 38M38 33L43 38" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </div>
-                <div className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-white shadow-md">
+                <div className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-teal-600 text-white shadow-md">
                   <Plus className="h-4 w-4" />
                 </div>
               </div>
@@ -1052,7 +1052,7 @@ export default function Home() {
               </p>
               <p className="mt-1 text-center text-slate-500 text-sm">
                 sau{" "}
-                <span className="font-semibold text-blue-600 underline decoration-blue-600/30 underline-offset-2">
+                <span className="font-semibold text-teal-600 underline decoration-teal-600/30 underline-offset-2">
                   click pentru a selecta
                 </span>
               </p>
@@ -1302,7 +1302,7 @@ export default function Home() {
                 <section className="rounded-2xl border-2 border-blue-200/90 bg-gradient-to-b from-blue-50/60 to-white shadow-lg ring-1 ring-slate-200/80">
                   <div className="border-b border-blue-200/80 bg-blue-100/70 px-5 py-3.5">
                     <div className="flex items-center gap-3">
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-teal-600 text-white shadow-sm">
                         <Settings2 className="h-4 w-4" />
                       </span>
                       <div>

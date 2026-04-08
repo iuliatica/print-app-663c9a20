@@ -63,7 +63,7 @@ function buildEmailHtml(data: ConfirmationBody): string {
       <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
         <!-- Header -->
         <tr>
-          <td style="background:linear-gradient(135deg,#2563eb,#1d4ed8);padding:32px 40px;text-align:center;">
+          <td style="background:linear-gradient(135deg,#06b6d4,#0ea5a0,#10b981);padding:32px 40px;text-align:center;">
             <h1 style="margin:0;font-size:28px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">Printica</h1>
             <p style="margin:8px 0 0;font-size:14px;color:#bfdbfe;">Servicii de printare profesionale</p>
           </td>
@@ -124,20 +124,20 @@ function buildEmailHtml(data: ConfirmationBody): string {
                 </tr>
                 <tr>
                   <td style="padding:6px 0;font-size:18px;font-weight:800;color:#1e293b;">Total</td>
-                  <td style="padding:6px 0;font-size:18px;font-weight:800;color:#2563eb;text-align:right;">${data.totalPrice.toFixed(2)} lei</td>
+                  <td style="padding:6px 0;font-size:18px;font-weight:800;color:#0ea5a0;text-align:right;">${data.totalPrice.toFixed(2)} lei</td>
                 </tr>
               </table>
             </div>
 
             <!-- Info -->
-            <div style="background-color:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:16px 20px;margin-bottom:24px;">
-              <p style="margin:0;font-size:14px;color:#1e40af;line-height:1.6;">
+            <div style="background-color:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:16px 20px;margin-bottom:24px;">
+              <p style="margin:0;font-size:14px;color:#065f46;line-height:1.6;">
                 📦 Comanda va fi procesată și livrată prin curier în <strong>2-4 zile lucrătoare</strong>.
               </p>
             </div>
 
             <p style="margin:0;font-size:14px;color:#475569;line-height:1.6;">
-              Dacă ai întrebări, nu ezita să ne contactezi la pagina de <a href="https://printica.ro/contact" style="color:#2563eb;text-decoration:underline;">contact</a>.
+              Dacă ai întrebări, nu ezita să ne contactezi la <a href="mailto:contact@printica.ro" style="color:#0ea5a0;text-decoration:underline;">contact@printica.ro</a>.
             </p>
           </td>
         </tr>
