@@ -449,8 +449,7 @@ export default function Home() {
       const tooBigFiles = newItems.filter((f) => f.error);
       const validNewFiles = newItems.filter((f) => !f.error);
       if (tooBigFiles.length > 0) {
-        const names = tooBigFiles.map((f) => `„${f.name}"`).join(", ");
-        addToast(`⚠️ ${tooBigFiles.length === 1 ? "Fișierul" : "Fișierele"} ${names} ${tooBigFiles.length === 1 ? "depășește" : "depășesc"} limita de 50 MB și ${tooBigFiles.length === 1 ? "a fost eliminat" : "au fost eliminate"} din selecție. Redu dimensiunea și încearcă din nou.`, "error");
+        setRejectedFiles(tooBigFiles.map((f) => f.name));
       }
       if (validNewFiles.length === 0 && tooBigFiles.length > 0) return;
       setFiles((prev) => {
@@ -474,8 +473,7 @@ export default function Home() {
       const tooBigFiles = newItems.filter((f) => f.error);
       const validNewFiles = newItems.filter((f) => !f.error);
       if (tooBigFiles.length > 0) {
-        const names = tooBigFiles.map((f) => `„${f.name}"`).join(", ");
-        addToast(`⚠️ ${tooBigFiles.length === 1 ? "Fișierul" : "Fișierele"} ${names} ${tooBigFiles.length === 1 ? "depășește" : "depășesc"} limita de 50 MB și ${tooBigFiles.length === 1 ? "a fost eliminat" : "au fost eliminate"} din selecție. Redu dimensiunea și încearcă din nou.`, "error");
+        setRejectedFiles(tooBigFiles.map((f) => f.name));
       }
       if (validNewFiles.length === 0 && tooBigFiles.length > 0) return;
       setFiles((prev) => {
@@ -1090,7 +1088,31 @@ export default function Home() {
                   </div>
                 </label>
 
-                <h2 className="mb-3 flex shrink-0 items-center gap-2 text-base font-semibold text-slate-800">
+                {/* Rejected files warning banner */}
+                {rejectedFiles.length > 0 && (
+                  <div className="mb-4 rounded-xl border border-amber-300 bg-amber-50 p-4">
+                    <div className="flex items-start gap-3">
+                      <Info className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-amber-800">
+                          {rejectedFiles.length === 1 ? "Un fișier nu a putut fi încărcat" : `${rejectedFiles.length} fișiere nu au putut fi încărcate`}
+                        </p>
+                        <p className="mt-1 text-xs text-amber-700">
+                          {rejectedFiles.map((n) => `„${n}"`).join(", ")} {rejectedFiles.length === 1 ? "depășește" : "depășesc"} limita de 50 MB per fișier.
+                          Poți reduce dimensiunea comprimând PDF-ul sau eliminând paginile inutile, apoi reîncarcă.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => setRejectedFiles([])}
+                          className="mt-2 rounded-lg bg-amber-200 px-3 py-1.5 text-xs font-semibold text-amber-900 hover:bg-amber-300 transition-colors"
+                        >
+                          Am înțeles
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                   <FileText className="h-5 w-5 text-blue-600" />
                   Fișiere încărcate
                   <span className="ml-2 rounded-full bg-slate-200/80 px-2.5 py-0.5 text-xs font-medium text-slate-600">
@@ -1848,10 +1870,17 @@ export default function Home() {
                 <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{checkoutError}</div>
               )}
 
+              {isLoadingPages && !isUploading && !isCheckoutLoading && (
+                <div className="flex items-center gap-2 rounded-xl bg-blue-50 border border-blue-200 px-4 py-3 text-sm text-blue-700">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Documentele se procesează, te rugăm așteaptă…</span>
+                </div>
+              )}
+
               <button
                 type="button"
                 onClick={handleSubmitCheckout}
-                disabled={isCheckoutLoading || isUploading}
+                disabled={isCheckoutLoading || isUploading || isLoadingPages}
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-4 text-lg font-semibold text-white shadow-md shadow-blue-600/20 hover:bg-blue-700 disabled:opacity-50 transition-all duration-200"
               >
                 {(isCheckoutLoading || isUploading) ? (
