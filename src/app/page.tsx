@@ -318,6 +318,7 @@ export default function Home() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [rejectedFiles, setRejectedFiles] = useState<string[]>([]);
   const [previewFileId, setPreviewFileId] = useState<string | null>(null);
   const [previewFromCheckout, setPreviewFromCheckout] = useState(false);
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
