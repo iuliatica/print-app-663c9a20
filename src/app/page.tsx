@@ -738,8 +738,10 @@ export default function Home() {
           const formData = new FormData();
           fileList.forEach((file) => formData.append("files", file));
           const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
-          const uploadData = await uploadRes.json().catch(() => ({}));
-          if (!uploadRes.ok) throw new Error(uploadData.error || "Nu am putut încărca fișierele. Te rugăm încearcă din nou.");
+          let uploadData: Record<string, unknown> = {};
+          const resText = await uploadRes.text();
+          try { uploadData = JSON.parse(resText); } catch { uploadData = { error: resText?.slice(0, 200) || "Răspuns invalid de la server." }; }
+          if (!uploadRes.ok) throw new Error((uploadData.error as string) || `Eroare la încărcare (${uploadRes.status}). Te rugăm încearcă din nou.`);
           fileUrls = uploadData.urls ?? [];
           setUploadProgress(100);
         } finally {
