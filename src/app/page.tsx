@@ -796,8 +796,10 @@ export default function Home() {
           config_details,
         }),
       });
-      const orderData = await orderRes.json().catch(() => ({}));
-      if (!orderRes.ok) throw new Error(orderData.error || "Nu am putut salva comanda. Verifică conexiunea la internet și încearcă din nou.");
+      const orderText = await orderRes.text();
+      let orderData: Record<string, unknown> = {};
+      try { orderData = JSON.parse(orderText); } catch { orderData = { error: orderText?.slice(0, 200) || "Răspuns invalid de la server." }; }
+      if (!orderRes.ok) throw new Error((orderData.error as string) || "Nu am putut salva comanda. Verifică conexiunea la internet și încearcă din nou.");
 
       // Send confirmation email (fire-and-forget)
       fetch("/api/send-confirmation", {
@@ -879,8 +881,10 @@ export default function Home() {
           },
         }),
       });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "Nu am putut iniția plata. Încearcă din nou.");
+      const checkoutText = await res.text();
+      let data: Record<string, unknown> = {};
+      try { data = JSON.parse(checkoutText); } catch { data = { error: checkoutText?.slice(0, 200) || "Răspuns invalid de la server." }; }
+      if (!res.ok) throw new Error((data.error as string) || "Nu am putut iniția plata. Încearcă din nou.");
 
       // Legăm sesiunea Stripe de comandă
       if (data.id && orderId) {
