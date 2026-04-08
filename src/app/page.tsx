@@ -1113,6 +1113,7 @@ export default function Home() {
                   </div>
                 )}
 
+                <h2 className="mb-3 flex shrink-0 items-center gap-2 text-base font-semibold text-slate-800">
                   <FileText className="h-5 w-5 text-blue-600" />
                   Fișiere încărcate
                   <span className="ml-2 rounded-full bg-slate-200/80 px-2.5 py-0.5 text-xs font-medium text-slate-600">
