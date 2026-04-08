@@ -318,6 +318,7 @@ export default function Home() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [rejectedFiles, setRejectedFiles] = useState<string[]>([]);
   const [previewFileId, setPreviewFileId] = useState<string | null>(null);
   const [previewFromCheckout, setPreviewFromCheckout] = useState(false);
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
@@ -448,8 +449,7 @@ export default function Home() {
       const tooBigFiles = newItems.filter((f) => f.error);
       const validNewFiles = newItems.filter((f) => !f.error);
       if (tooBigFiles.length > 0) {
-        const names = tooBigFiles.map((f) => `„${f.name}"`).join(", ");
-        addToast(`⚠️ ${tooBigFiles.length === 1 ? "Fișierul" : "Fișierele"} ${names} ${tooBigFiles.length === 1 ? "depășește" : "depășesc"} limita de 50 MB și ${tooBigFiles.length === 1 ? "a fost eliminat" : "au fost eliminate"} din selecție. Redu dimensiunea și încearcă din nou.`, "error");
+        setRejectedFiles(tooBigFiles.map((f) => f.name));
       }
       if (validNewFiles.length === 0 && tooBigFiles.length > 0) return;
       setFiles((prev) => {
@@ -473,8 +473,7 @@ export default function Home() {
       const tooBigFiles = newItems.filter((f) => f.error);
       const validNewFiles = newItems.filter((f) => !f.error);
       if (tooBigFiles.length > 0) {
-        const names = tooBigFiles.map((f) => `„${f.name}"`).join(", ");
-        addToast(`⚠️ ${tooBigFiles.length === 1 ? "Fișierul" : "Fișierele"} ${names} ${tooBigFiles.length === 1 ? "depășește" : "depășesc"} limita de 50 MB și ${tooBigFiles.length === 1 ? "a fost eliminat" : "au fost eliminate"} din selecție. Redu dimensiunea și încearcă din nou.`, "error");
+        setRejectedFiles(tooBigFiles.map((f) => f.name));
       }
       if (validNewFiles.length === 0 && tooBigFiles.length > 0) return;
       setFiles((prev) => {
@@ -738,9 +737,11 @@ export default function Home() {
           const formData = new FormData();
           fileList.forEach((file) => formData.append("files", file));
           const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
-          const uploadData = await uploadRes.json().catch(() => ({}));
-          if (!uploadRes.ok) throw new Error(uploadData.error || "Nu am putut încărca fișierele. Te rugăm încearcă din nou.");
-          fileUrls = uploadData.urls ?? [];
+          let uploadData: Record<string, unknown> = {};
+          const resText = await uploadRes.text();
+          try { uploadData = JSON.parse(resText); } catch { uploadData = { error: resText?.slice(0, 200) || "Răspuns invalid de la server." }; }
+          if (!uploadRes.ok) throw new Error((uploadData.error as string) || `Eroare la încărcare (${uploadRes.status}). Te rugăm încearcă din nou.`);
+          fileUrls = (uploadData.urls as string[]) ?? [];
           setUploadProgress(100);
         } finally {
           clearInterval(progressInterval);
@@ -795,8 +796,10 @@ export default function Home() {
           config_details,
         }),
       });
-      const orderData = await orderRes.json().catch(() => ({}));
-      if (!orderRes.ok) throw new Error(orderData.error || "Nu am putut salva comanda. Verifică conexiunea la internet și încearcă din nou.");
+      const orderText = await orderRes.text();
+      let orderData: Record<string, unknown> = {};
+      try { orderData = JSON.parse(orderText); } catch { orderData = { error: orderText?.slice(0, 200) || "Răspuns invalid de la server." }; }
+      if (!orderRes.ok) throw new Error((orderData.error as string) || "Nu am putut salva comanda. Verifică conexiunea la internet și încearcă din nou.");
 
       // Send confirmation email (fire-and-forget)
       fetch("/api/send-confirmation", {
@@ -878,8 +881,10 @@ export default function Home() {
           },
         }),
       });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "Nu am putut iniția plata. Încearcă din nou.");
+      const checkoutText = await res.text();
+      let data: Record<string, unknown> = {};
+      try { data = JSON.parse(checkoutText); } catch { data = { error: checkoutText?.slice(0, 200) || "Răspuns invalid de la server." }; }
+      if (!res.ok) throw new Error((data.error as string) || "Nu am putut iniția plata. Încearcă din nou.");
 
       // Legăm sesiunea Stripe de comandă
       if (data.id && orderId) {
@@ -891,7 +896,7 @@ export default function Home() {
       }
 
       if (data.url) {
-        window.location.href = data.url;
+        window.location.href = data.url as string;
       } else {
         throw new Error("Nu s-a putut deschide pagina de plată. Încearcă din nou.");
       }
@@ -1086,6 +1091,31 @@ export default function Home() {
                     <p className="text-xs text-blue-600/80">Trage aici sau click pentru a selecta</p>
                   </div>
                 </label>
+
+                {/* Rejected files warning banner */}
+                {rejectedFiles.length > 0 && (
+                  <div className="mb-4 rounded-xl border border-amber-300 bg-amber-50 p-4">
+                    <div className="flex items-start gap-3">
+                      <Info className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-amber-800">
+                          {rejectedFiles.length === 1 ? "Un fișier nu a putut fi încărcat" : `${rejectedFiles.length} fișiere nu au putut fi încărcate`}
+                        </p>
+                        <p className="mt-1 text-xs text-amber-700">
+                          {rejectedFiles.map((n) => `„${n}"`).join(", ")} {rejectedFiles.length === 1 ? "depășește" : "depășesc"} limita de 50 MB per fișier.
+                          Poți reduce dimensiunea comprimând PDF-ul sau eliminând paginile inutile, apoi reîncarcă.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => setRejectedFiles([])}
+                          className="mt-2 rounded-lg bg-amber-200 px-3 py-1.5 text-xs font-semibold text-amber-900 hover:bg-amber-300 transition-colors"
+                        >
+                          Am înțeles
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <h2 className="mb-3 flex shrink-0 items-center gap-2 text-base font-semibold text-slate-800">
                   <FileText className="h-5 w-5 text-blue-600" />
@@ -1845,10 +1875,17 @@ export default function Home() {
                 <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{checkoutError}</div>
               )}
 
+              {isLoadingPages && !isUploading && !isCheckoutLoading && (
+                <div className="flex items-center gap-2 rounded-xl bg-blue-50 border border-blue-200 px-4 py-3 text-sm text-blue-700">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Documentele se procesează, te rugăm așteaptă…</span>
+                </div>
+              )}
+
               <button
                 type="button"
                 onClick={handleSubmitCheckout}
-                disabled={isCheckoutLoading || isUploading}
+                disabled={isCheckoutLoading || isUploading || isLoadingPages}
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-4 text-lg font-semibold text-white shadow-md shadow-blue-600/20 hover:bg-blue-700 disabled:opacity-50 transition-all duration-200"
               >
                 {(isCheckoutLoading || isUploading) ? (
