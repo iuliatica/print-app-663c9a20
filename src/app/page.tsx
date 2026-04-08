@@ -896,7 +896,7 @@ export default function Home() {
       }
 
       if (data.url) {
-        window.location.href = data.url;
+        window.location.href = data.url as string;
       } else {
         throw new Error("Nu s-a putut deschide pagina de plată. Încearcă din nou.");
       }
