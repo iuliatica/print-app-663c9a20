@@ -923,20 +923,20 @@ export default function Home() {
         {/* Header */}
         <header className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
            <div className="min-w-0 flex-1 text-center lg:text-left">
-            <div className="mb-1.5 inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
+            <div className="mb-1.5 inline-flex items-center gap-1.5 rounded-full bg-teal-50 px-3 py-1 text-xs font-medium text-teal-700">
               <Printer className="h-3.5 w-3.5" />
               Rapid · Sigur · Stripe
             </div>
-            <div className="flex items-center justify-center lg:justify-start gap-2">
-              <img src={printicaLogo.src} alt="Printica" className="h-14 w-14 object-contain drop-shadow-md" />
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+            <div className="flex items-center justify-center lg:justify-start gap-3">
+              <img src={printicaLogo.src} alt="Printica" className="h-16 w-16 object-contain drop-shadow-lg" />
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl bg-gradient-to-r from-cyan-600 via-teal-500 to-emerald-500 bg-clip-text text-transparent">
                 Printica
               </h1>
             </div>
             <p className="mt-1 text-sm text-slate-600 sm:text-base">
               Încarcă PDF-urile, configurează opțiunile și plătește în siguranță.
             </p>
-            <a href="/contact" className="mt-1 inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 transition-colors font-medium">
+            <a href="/contact" className="mt-1 inline-flex items-center gap-1 text-xs text-teal-600 hover:text-teal-800 transition-colors font-medium">
               <Phone className="h-3 w-3" />
               Contact
             </a>
@@ -947,7 +947,7 @@ export default function Home() {
                 <p className="text-[10px] font-bold uppercase tracking-wide text-slate-600 sm:text-xs">Prețuri</p>
               </div>
               <div className="shrink-0">
-                <div className="grid grid-cols-3 gap-1 p-1.5 text-[11px] sm:gap-1.5 sm:p-2 sm:text-xs">
+                <div className="grid grid-cols-3 gap-1 p-1.5 text-xs sm:gap-1.5 sm:p-2 sm:text-xs">
                   <div className="rounded-md border border-slate-100 bg-slate-50/50 px-1.5 py-1">
                     <p className="text-slate-600 leading-tight truncate">Alb-negru 1 față</p>
                     <p className="mt-0.5 font-semibold text-slate-800 tabular-nums">{PRICE_BW_ONE_SIDE} lei</p>
@@ -958,11 +958,11 @@ export default function Home() {
                   </div>
                   <div className="rounded-md border border-slate-100 bg-slate-50/50 px-1.5 py-1">
                     <p className="text-slate-600 leading-tight truncate">Color 1 față</p>
-                    <p className="mt-0.5 font-semibold text-blue-600 tabular-nums">{PRICE_COLOR_ONE_SIDE} lei</p>
+                    <p className="mt-0.5 font-semibold text-teal-600 tabular-nums">{PRICE_COLOR_ONE_SIDE} lei</p>
                   </div>
                   <div className="rounded-md border border-slate-100 bg-slate-50/50 px-1.5 py-1">
                     <p className="text-slate-600 leading-tight truncate">Color față-verso</p>
-                    <p className="mt-0.5 font-semibold text-blue-600 tabular-nums">{PRICE_COLOR_DUPLEX} lei</p>
+                    <p className="mt-0.5 font-semibold text-teal-600 tabular-nums">{PRICE_COLOR_DUPLEX} lei</p>
                   </div>
                   <div className="rounded-md border border-slate-100 bg-slate-50/50 px-1.5 py-1">
                     <p className="text-slate-600 leading-tight truncate">Spiralare</p>
@@ -1633,7 +1633,7 @@ export default function Home() {
                 type="button"
                 onClick={handleOpenCheckout}
                 disabled={files.length === 0 || isCheckoutLoading || totalPages === 0}
-                className="flex items-center gap-2 rounded-xl bg-blue-600 px-8 py-4 text-lg font-semibold text-white shadow-md shadow-blue-600/20 transition-all duration-200 hover:bg-blue-700 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-teal-600 px-8 py-4 text-lg font-semibold text-white shadow-md shadow-teal-600/20 transition-all duration-200 hover:from-cyan-700 hover:to-teal-700 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
               >
                 <CreditCard className="h-5 w-5" />
                 Finalizează comanda
@@ -1646,8 +1646,8 @@ export default function Home() {
         <div className="mt-12 mx-auto max-w-3xl">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div className="flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-white p-4 text-center shadow-sm">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50">
-                <Lock className="h-5 w-5 text-blue-600" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-50">
+                <Lock className="h-5 w-5 text-teal-600" />
               </div>
               <span className="text-xs font-semibold text-slate-700">Plată securizată</span>
               <span className="text-[10px] text-slate-500">100% criptat via Stripe</span>
@@ -1664,7 +1664,7 @@ export default function Home() {
                 <Star className="h-5 w-5 text-amber-500" />
               </div>
               <span className="text-xs font-semibold text-slate-700">Calitate premium</span>
-              <span className="text-[10px] text-slate-500">Imprimantă profesională</span>
+              <span className="text-[10px] text-slate-500">Echipamente profesionale</span>
             </div>
             <div className="flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-white p-4 text-center shadow-sm">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-50">
@@ -1694,7 +1694,7 @@ export default function Home() {
               type="button"
               onClick={handleOpenCheckout}
               disabled={isCheckoutLoading}
-              className="flex shrink-0 items-center gap-2 bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-blue-600/20 transition-all hover:bg-blue-700 disabled:opacity-50"
+              className="flex shrink-0 items-center gap-2 bg-gradient-to-r from-cyan-600 to-teal-600 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-teal-600/20 transition-all hover:from-cyan-700 hover:to-teal-700 disabled:opacity-50"
             >
               <CreditCard className="h-4 w-4" />
               Finalizează
