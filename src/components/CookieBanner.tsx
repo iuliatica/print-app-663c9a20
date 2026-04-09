@@ -46,14 +46,14 @@ export function CookieBanner() {
               Află mai multe în{" "}
               <Link
                 href="/legal/politica-cookies"
-                className="font-medium text-blue-600 underline underline-offset-2 hover:text-blue-800"
+                className="font-medium text-cyan-600 underline underline-offset-2 hover:text-cyan-800"
               >
                 Politica de cookies
               </Link>{" "}
               și{" "}
               <Link
                 href="/legal/politica-confidentialitate"
-                className="font-medium text-blue-600 underline underline-offset-2 hover:text-blue-800"
+                className="font-medium text-cyan-600 underline underline-offset-2 hover:text-cyan-800"
               >
                 Politica de confidențialitate
               </Link>.
