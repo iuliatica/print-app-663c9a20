@@ -33,7 +33,15 @@ import {
   Palette,
 } from "lucide-react";
 import { getPdfPageCount, analyzePdfColors, type PdfColorAnalysis } from "@/lib/pdf-utils";
-import printicaLogo from "@/assets/printica-logo.png";
+// Inline SVG logo component
+function PrinticaLogo({ className = "" }: { className?: string }) {
+  return (
+    <svg className={className} width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 10C10 7.79086 11.7909 6 14 6H24C28.4183 6 32 9.58172 32 14C32 18.4183 28.4183 22 24 22H14V34" stroke="var(--primary)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M14 22H20C22.2091 22 24 20.2091 24 18V14" stroke="var(--primary)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const PRICE_BW_ONE_SIDE = 0.2;
@@ -146,23 +154,25 @@ function calculateFilePrice(f: UploadedFile): number {
   const mode = f.printMode ?? DEFAULT_PRINT_OPTIONS.printMode;
   const duplex = f.duplex ?? DEFAULT_PRINT_OPTIONS.duplex;
   const copies = f.copies ?? DEFAULT_PRINT_OPTIONS.copies;
+  // For single-page documents, duplex is identical to simplex (1 page = 1 sheet regardless)
+  const effectiveDuplex = duplex && f.pages > 1;
 
   if (mode === "bw") {
     const sides = f.pages * copies;
-    return duplex ? Math.ceil(sides / 2) * PRICE_BW_DUPLEX : sides * PRICE_BW_ONE_SIDE;
+    return effectiveDuplex ? Math.ceil(sides / 2) * PRICE_BW_DUPLEX : sides * PRICE_BW_ONE_SIDE;
   }
 
   if (f.colorAnalysis) {
     const colorSides = f.colorAnalysis.colorPages * copies;
     const bwSides = f.colorAnalysis.bwPages * copies;
-    if (duplex) {
+    if (effectiveDuplex) {
       return Math.ceil(colorSides / 2) * PRICE_COLOR_DUPLEX + Math.ceil(bwSides / 2) * PRICE_BW_DUPLEX;
     }
     return colorSides * PRICE_COLOR_ONE_SIDE + bwSides * PRICE_BW_ONE_SIDE;
   }
 
   const sides = f.pages * copies;
-  return duplex ? Math.ceil(sides / 2) * PRICE_COLOR_DUPLEX : sides * PRICE_COLOR_ONE_SIDE;
+  return effectiveDuplex ? Math.ceil(sides / 2) * PRICE_COLOR_DUPLEX : sides * PRICE_COLOR_ONE_SIDE;
 }
 
 // ─── Progress Stepper Component ──────────────────────────────────────────────
@@ -928,8 +938,8 @@ export default function Home() {
               Rapid · Sigur · Stripe
             </div>
             <div className="flex items-center justify-center lg:justify-start gap-3">
-              <img src={printicaLogo.src} alt="Printica" className="h-16 w-16 object-contain drop-shadow-lg" />
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl bg-gradient-to-r from-cyan-600 via-teal-500 to-emerald-500 bg-clip-text text-transparent">
+              <PrinticaLogo className="h-10 w-10" />
+              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl" style={{ color: 'var(--primary)' }}>
                 Printica
               </h1>
             </div>
