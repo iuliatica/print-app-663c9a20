@@ -37,8 +37,14 @@ import { getPdfPageCount, analyzePdfColors, type PdfColorAnalysis } from "@/lib/
 function PrinticaLogo({ className = "" }: { className?: string }) {
   return (
     <svg className={className} width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M10 10C10 7.79086 11.7909 6 14 6H24C28.4183 6 32 9.58172 32 14C32 18.4183 28.4183 22 24 22H14V34" stroke="var(--primary)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M14 22H20C22.2091 22 24 20.2091 24 18V14" stroke="var(--primary)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+      <defs>
+        <linearGradient id="pGradient" x1="10" y1="10" x2="32" y2="34" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#00D1FF"/>
+          <stop offset="100%" stopColor="#00FFD1"/>
+        </linearGradient>
+      </defs>
+      <path d="M10 10C10 7.79086 11.7909 6 14 6H24C28.4183 6 32 9.58172 32 14C32 18.4183 28.4183 22 24 22H14V34" stroke="url(#pGradient)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M14 22H20C22.2091 22 24 20.2091 24 18V14" stroke="url(#pGradient)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   );
 }
@@ -240,7 +246,7 @@ function FAQ() {
   return (
     <section className="mt-10 mx-auto max-w-3xl">
       <div className="flex items-center gap-2 mb-4">
-        <HelpCircle className="h-4 w-4 text-blue-600" />
+        <HelpCircle className="h-4 w-4 text-cyan-600" />
         <h2 className="text-lg font-bold text-slate-800">Întrebări frecvente</h2>
       </div>
       <div className="space-y-2">
@@ -276,17 +282,17 @@ function FAQ() {
 function UploadProgressBar({ isUploading, progress }: { isUploading: boolean; progress: number }) {
   if (!isUploading) return null;
   return (
-    <div className="rounded-xl border border-blue-200 bg-blue-50/80 p-4 space-y-2">
+    <div className="rounded-xl border border-cyan-200 bg-cyan-50/80 p-4 space-y-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
-          <span className="text-sm font-medium text-blue-800">Se încarcă fișierele...</span>
+          <Loader2 className="h-4 w-4 animate-spin text-cyan-600" />
+          <span className="text-sm font-medium text-cyan-800">Se încarcă fișierele...</span>
         </div>
-        <span className="text-sm font-bold text-blue-700 tabular-nums">{progress}%</span>
+        <span className="text-sm font-bold text-cyan-700 tabular-nums">{progress}%</span>
       </div>
-      <div className="h-2 rounded-full bg-blue-200/60 overflow-hidden">
+      <div className="h-2 rounded-full bg-cyan-200/60 overflow-hidden">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-300 ease-out"
+          className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-cyan-500 transition-all duration-300 ease-out"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -304,7 +310,7 @@ function Toast({ message, type, onClose }: { message: string; type: "success" | 
   const colors = {
     success: "bg-green-50 border-green-300 text-green-800",
     error: "bg-red-50 border-red-300 text-red-800",
-    info: "bg-blue-50 border-blue-300 text-blue-800",
+    info: "bg-cyan-50 border-cyan-300 text-cyan-800",
   };
 
   return (
@@ -939,7 +945,7 @@ export default function Home() {
             </div>
             <div className="flex items-center justify-center lg:justify-start gap-3">
               <PrinticaLogo className="h-10 w-10" />
-              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl" style={{ color: 'var(--primary)' }}>
+              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl" style={{ fontFamily: "'Montserrat', sans-serif", background: 'linear-gradient(135deg, #00D1FF, #00FFD1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 Printica
               </h1>
             </div>
@@ -1000,17 +1006,17 @@ export default function Home() {
         </div>
 
         {/* ═══ Color Detection Highlight ═══ */}
-        <div className="mt-2 rounded-lg border border-blue-200 bg-gradient-to-r from-blue-50 via-white to-blue-50 px-3 py-2 sm:px-5">
+        <div className="mt-2 rounded-lg border border-cyan-200 bg-gradient-to-r from-cyan-50 via-white to-cyan-50 px-3 py-2 sm:px-5">
           <div className="flex items-start gap-2.5">
-            <div className="flex-shrink-0 mt-0.5 rounded-full bg-blue-100 p-1.5">
-              <Palette className="h-4 w-4 text-blue-600" />
+            <div className="flex-shrink-0 mt-0.5 rounded-full bg-cyan-100 p-1.5">
+              <Palette className="h-4 w-4 text-cyan-600" />
             </div>
             <div>
-              <p className="text-xs font-semibold text-blue-900">Plătești color doar pentru paginile colorate</p>
-              <p className="mt-0.5 text-[11px] text-blue-700/80">
+              <p className="text-xs font-semibold text-cyan-900">Plătești color doar pentru paginile colorate</p>
+              <p className="mt-0.5 text-[11px] text-cyan-700/80">
                 Când selectezi printul <strong>Color</strong>, analizăm automat fiecare pagină din PDF — paginile alb-negru 
                 se taxează la preț de alb-negru, iar restul la preț de color. Economisești fără efort.
-                <span className="block mt-0.5 text-blue-600/70 italic">Nu se aplică documentelor formate din imagini scanate.</span>
+                <span className="block mt-0.5 text-cyan-600/70 italic">Nu se aplică documentelor formate din imagini scanate.</span>
               </p>
             </div>
           </div>
@@ -1030,14 +1036,14 @@ export default function Home() {
               onDrop={onDrop}
               className={`drop-zone flex min-h-[280px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed transition-all duration-300 ${
                 isDragging
-                  ? "border-blue-500 bg-blue-50/90 shadow-inner scale-[1.01]"
-                  : "border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/50 hover:shadow-[var(--shadow)]"
+                  ? "border-cyan-500 bg-cyan-50/90 shadow-inner scale-[1.01]"
+                  : "border-slate-200 bg-white hover:border-cyan-300 hover:bg-cyan-50/50 hover:shadow-[var(--shadow)]"
               }`}
             >
               <input type="file" accept="application/pdf" multiple onChange={onFileInput} className="hidden" />
               {/* Custom illustration */}
               <div className="relative mb-4">
-                <div className={`drop-zone-icon flex h-24 w-24 items-center justify-center rounded-2xl ${isDragging ? "bg-blue-100" : "bg-gradient-to-br from-blue-50 to-slate-100"} transition-colors`}>
+                <div className={`drop-zone-icon flex h-24 w-24 items-center justify-center rounded-2xl ${isDragging ? "bg-cyan-100" : "bg-gradient-to-br from-cyan-50 to-slate-100"} transition-colors`}>
                   <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
                     {/* Paper stack */}
                     <rect x="14" y="12" width="28" height="36" rx="3" fill="#e2e8f0" stroke="#94a3b8" strokeWidth="1.5"/>
@@ -1088,17 +1094,17 @@ export default function Home() {
                   onDrop={onDrop}
                   className={`mb-4 flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed px-5 py-5 transition-all duration-200 ${
                     isDragging
-                      ? "border-blue-500 bg-blue-100 shadow-md"
-                      : "border-blue-400 bg-gradient-to-r from-blue-50 to-blue-100/60 hover:border-blue-500 hover:bg-blue-100 hover:shadow-sm"
+                      ? "border-cyan-500 bg-cyan-100 shadow-md"
+                      : "border-cyan-400 bg-gradient-to-r from-cyan-50 to-cyan-100/60 hover:border-cyan-500 hover:bg-cyan-100 hover:shadow-sm"
                   }`}
                 >
                   <input ref={fileInputRef} type="file" accept="application/pdf" multiple onChange={onFileInput} className="hidden" />
-                  <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${isDragging ? "bg-blue-300 text-blue-800" : "bg-blue-200 text-blue-700"}`}>
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${isDragging ? "bg-cyan-300 text-cyan-800" : "bg-cyan-200 text-cyan-700"}`}>
                     <Plus className="h-6 w-6" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-blue-800">+ Adaugă alte fișiere PDF</p>
-                    <p className="text-xs text-blue-600/80">Trage aici sau click pentru a selecta</p>
+                    <p className="text-sm font-bold text-cyan-800">+ Adaugă alte fișiere PDF</p>
+                    <p className="text-xs text-cyan-600/80">Trage aici sau click pentru a selecta</p>
                   </div>
                 </label>
 
@@ -1128,7 +1134,7 @@ export default function Home() {
                 )}
 
                 <h2 className="mb-3 flex shrink-0 items-center gap-2 text-base font-semibold text-slate-800">
-                  <FileText className="h-5 w-5 text-blue-600" />
+                  <FileText className="h-5 w-5 text-cyan-600" />
                   Fișiere încărcate
                   <span className="ml-2 rounded-full bg-slate-200/80 px-2.5 py-0.5 text-xs font-medium text-slate-600">
                     {files.length}
@@ -1136,11 +1142,11 @@ export default function Home() {
                 </h2>
 
                 {files.length >= 2 && (
-                  <div className="mb-3 flex items-start gap-2.5 rounded-xl border border-blue-200 bg-blue-50/80 px-4 py-3">
-                    <Link2 className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
-                    <div className="text-xs text-blue-800">
+                  <div className="mb-3 flex items-start gap-2.5 rounded-xl border border-cyan-200 bg-cyan-50/80 px-4 py-3">
+                    <Link2 className="mt-0.5 h-4 w-4 shrink-0 text-cyan-600" />
+                    <div className="text-xs text-cyan-800">
                       <p className="font-semibold">Vrei să legi mai multe fișiere într-o singură spirală?</p>
-                      <p className="mt-0.5 text-blue-700">
+                      <p className="mt-0.5 text-cyan-700">
                         Apasă butonul <span className="inline-flex items-center gap-0.5 font-semibold"><Link2 className="inline h-3 w-3" /> Leagă împreună</span> dintre două fișiere.
                       </p>
                     </div>
@@ -1161,9 +1167,9 @@ export default function Home() {
                       return (
                         <li key={item.id} className="list-none">
                           {isFirstInGroup && (
-                            <div className="mt-2 flex items-center gap-2 rounded-t-xl border-2 border-b-0 border-blue-300 bg-gradient-to-r from-blue-100 to-blue-50 px-4 py-2.5">
-                              <BookMarked className="h-4 w-4 text-blue-600 shrink-0" />
-                              <span className="text-sm font-bold text-blue-800">
+                            <div className="mt-2 flex items-center gap-2 rounded-t-xl border-2 border-b-0 border-cyan-300 bg-gradient-to-r from-cyan-100 to-cyan-50 px-4 py-2.5">
+                              <BookMarked className="h-4 w-4 text-cyan-600 shrink-0" />
+                              <span className="text-sm font-bold text-cyan-800">
                                 Volum spiralat · {groupInfo!.filesInGroup.length} fișiere legate
                               </span>
                             </div>
@@ -1179,11 +1185,11 @@ export default function Home() {
                               removingFileId === item.id ? "opacity-0 scale-95 -translate-x-4" : ""
                             } ${
                               selectedFileId === item.id
-                                ? "ring-2 ring-blue-500 ring-offset-1 bg-white shadow-[var(--shadow)]"
+                                ? "ring-2 ring-cyan-500 ring-offset-1 bg-white shadow-[var(--shadow)]"
                                 : "bg-white shadow-[var(--shadow)] ring-1 ring-slate-200/80 hover:ring-slate-300 hover:shadow-[var(--shadow-md)]"
                             } ${
                               isInGroup
-                                ? `border-x-2 border-blue-300 ${!isFirstInGroup ? "border-t border-t-blue-200/60" : "border-t-0"} ${isLastInGroup ? "border-b-2 rounded-b-xl" : "border-b-0"} ring-0 shadow-none`
+                                ? `border-x-2 border-cyan-300 ${!isFirstInGroup ? "border-t border-t-cyan-200/60" : "border-t-0"} ${isLastInGroup ? "border-b-2 rounded-b-xl" : "border-b-0"} ring-0 shadow-none`
                                 : "rounded-xl"
                             }`}
                             style={{ animationDelay: `${globalIndex * 60}ms` }}
@@ -1213,8 +1219,8 @@ export default function Home() {
                               {item.pages != null && (item.printMode ?? "bw") === "color" && item.colorAnalysis && (
                                 <p className="mt-0.5 text-xs text-slate-500">
                                   <span className="inline-flex items-center gap-1">
-                                    <span className="inline-block h-2 w-2 rounded-full bg-blue-500" />
-                                    <span className="font-semibold text-blue-600">{item.colorAnalysis.colorPages}</span> color
+                                    <span className="inline-block h-2 w-2 rounded-full bg-cyan-500" />
+                                    <span className="font-semibold text-cyan-600">{item.colorAnalysis.colorPages}</span> color
                                   </span>
                                   <span className="mx-1 text-slate-300">·</span>
                                   <span className="inline-flex items-center gap-1">
@@ -1228,7 +1234,7 @@ export default function Home() {
                               )}
                               {/* Price per file */}
                               {item.pages != null && (
-                                <p className="mt-0.5 text-xs font-semibold text-blue-600 tabular-nums">
+                                <p className="mt-0.5 text-xs font-semibold text-cyan-600 tabular-nums">
                                   {filePrice.toFixed(2)} lei
                                 </p>
                               )}
@@ -1276,7 +1282,7 @@ export default function Home() {
 
                           {nextItem && (
                             <div className="relative flex items-center justify-center py-1.5">
-                              <div className={`absolute inset-x-8 top-1/2 h-px ${isLinkedToNext ? "bg-blue-300" : "bg-slate-200"}`} />
+                              <div className={`absolute inset-x-8 top-1/2 h-px ${isLinkedToNext ? "bg-cyan-300" : "bg-slate-200"}`} />
                               <button
                                 type="button"
                                 onClick={(e) => {
@@ -1285,8 +1291,8 @@ export default function Home() {
                                 }}
                                 className={`relative z-10 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-200 ${
                                   isLinkedToNext
-                                    ? "bg-blue-600 text-white shadow-md hover:bg-blue-700 ring-2 ring-blue-200"
-                                    : "bg-white text-slate-600 shadow-sm ring-1 ring-slate-200 hover:ring-blue-300 hover:text-blue-700 hover:bg-blue-50"
+                                    ? "bg-cyan-600 text-white shadow-md hover:bg-cyan-700 ring-2 ring-cyan-200"
+                                    : "bg-white text-slate-600 shadow-sm ring-1 ring-slate-200 hover:ring-cyan-300 hover:text-cyan-700 hover:bg-cyan-50"
                                 }`}
                                 title={isLinkedToNext ? "Separă" : "Leagă împreună"}
                               >
@@ -1309,8 +1315,8 @@ export default function Home() {
 
               {/* ─── Right: Config panel ─── */}
               <div className="lg:sticky lg:top-6 lg:self-start space-y-5">
-                <section className="rounded-2xl border-2 border-blue-200/90 bg-gradient-to-b from-blue-50/60 to-white shadow-lg ring-1 ring-slate-200/80">
-                  <div className="border-b border-blue-200/80 bg-blue-100/70 px-5 py-3.5">
+                <section className="rounded-2xl border-2 border-cyan-200/90 bg-gradient-to-b from-cyan-50/60 to-white shadow-lg ring-1 ring-slate-200/80">
+                  <div className="border-b border-cyan-200/80 bg-cyan-100/70 px-5 py-3.5">
                     <div className="flex items-center gap-3">
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cyan-500 text-white shadow-sm">
                         <Settings2 className="h-4 w-4" />
@@ -1334,7 +1340,7 @@ export default function Home() {
                         return (
                           <div key={file.id}>
                             <div className="mb-5 flex items-start gap-3">
-                              <span className="flex h-10 w-10 shrink-0 items-center justify-center bg-blue-100 text-blue-600">
+                              <span className="flex h-10 w-10 shrink-0 items-center justify-center bg-cyan-100 text-cyan-600">
                                 <Printer className="h-5 w-5" />
                               </span>
                               <div className="min-w-0 flex-1">
@@ -1346,8 +1352,8 @@ export default function Home() {
                                       <FileText className="h-4 w-4 text-slate-500" />
                                       {file.pages} pagini
                                     </span>
-                                    <span className="inline-flex items-center gap-1.5 bg-blue-100 px-3 py-1.5 text-sm font-bold text-blue-700">
-                                      <CreditCard className="h-4 w-4 text-blue-500" />
+                                    <span className="inline-flex items-center gap-1.5 bg-cyan-100 px-3 py-1.5 text-sm font-bold text-cyan-700">
+                                      <CreditCard className="h-4 w-4 text-cyan-500" />
                                       {calculateFilePrice(file).toFixed(2)} lei
                                     </span>
                                   </div>
@@ -1376,7 +1382,7 @@ export default function Home() {
                                     onClick={() => setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, printMode: "color" } : f))}
                                     className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200 ${
                                       opts.printMode === "color"
-                                        ? "bg-blue-600 text-white shadow-sm"
+                                        ? "bg-cyan-600 text-white shadow-sm"
                                         : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                                     }`}
                                   >
@@ -1384,8 +1390,8 @@ export default function Home() {
                                   </button>
                                 </div>
                                 {opts.printMode === "color" && file.colorAnalysis && (
-                                  <div className="mt-2 flex items-center gap-2 rounded-lg bg-blue-50 border border-blue-200 px-3 py-2">
-                                    <span className="text-xs font-bold text-blue-700">
+                                  <div className="mt-2 flex items-center gap-2 rounded-lg bg-cyan-50 border border-cyan-200 px-3 py-2">
+                                    <span className="text-xs font-bold text-cyan-700">
                                       {file.colorAnalysis.colorPages} pag. color
                                     </span>
                                     <span className="text-xs text-slate-400">·</span>
@@ -1411,7 +1417,7 @@ export default function Home() {
                                   type="checkbox"
                                   checked={opts.duplex}
                                   onChange={(e) => setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, duplex: e.target.checked } : f))}
-                                  className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                                  className="h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-2 focus:ring-cyan-500"
                                 />
                                 <span className="text-sm font-medium text-slate-700">Față-verso (Duplex)</span>
                               </label>
@@ -1437,7 +1443,7 @@ export default function Home() {
                                       return prev.map((f) => idsInGroup.has(f.id) ? { ...f, copies: next } : f);
                                     });
                                   }}
-                                  className="w-20 rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                                  className="w-20 rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
                                 />
                               </label>
                             </div>
@@ -1477,7 +1483,7 @@ export default function Home() {
                                   isCapsareDisabled
                                     ? "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400 opacity-60"
                                     : spiralType === value
-                                    ? "cursor-pointer border-blue-500 bg-blue-50/90 text-blue-700 shadow-sm ring-2 ring-blue-500/20"
+                                    ? "cursor-pointer border-cyan-500 bg-cyan-50/90 text-cyan-700 shadow-sm ring-2 ring-cyan-500/20"
                                     : "cursor-pointer border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
                                 }`}
                                 title={isCapsareDisabled ? `Indisponibil (${selectedGroupSheets} file > ${MAX_CAPSARE_SHEETS})` : undefined}
@@ -1495,7 +1501,7 @@ export default function Home() {
                                   className="sr-only"
                                 />
                                 <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
-                                  isCapsareDisabled ? "text-slate-400 bg-slate-50" : spiralType === value ? "text-blue-600 bg-blue-100" : "text-slate-500 bg-slate-50"
+                                  isCapsareDisabled ? "text-slate-400 bg-slate-50" : spiralType === value ? "text-cyan-600 bg-cyan-100" : "text-slate-500 bg-slate-50"
                                 }`}>
                                   {icon}
                                 </span>
@@ -1513,14 +1519,14 @@ export default function Home() {
 
                       {/* Spiral color + cover options */}
                       {spiralType === "spirala" && (
-                        <div className="space-y-4 rounded-xl border border-blue-200/80 bg-blue-50/40 p-4">
+                        <div className="space-y-4 rounded-xl border border-cyan-200/80 bg-cyan-50/40 p-4">
                           <div>
                             <p className="mb-2 text-sm font-medium text-slate-700">Culoare spirală</p>
                             <div className="flex items-center gap-4">
                               {spiralColorOptions.map(({ value, label, circleClass }) => (
                                 <label key={value} className="flex cursor-pointer flex-col items-center gap-1.5" title={label}>
                                   <input type="radio" name="spiralColor" value={value} checked={spiralColor === value} onChange={() => updateSelectedGroupOptions({ spiralColor: value })} className="sr-only" />
-                                  <span className={`flex h-10 w-10 shrink-0 rounded-full transition-all duration-200 hover:scale-110 ${spiralColor === value ? "ring-4 ring-blue-500 ring-offset-2" : "ring-2 ring-transparent ring-offset-2 hover:ring-slate-300"} ${circleClass}`} />
+                                  <span className={`flex h-10 w-10 shrink-0 rounded-full transition-all duration-200 hover:scale-110 ${spiralColor === value ? "ring-4 ring-cyan-500 ring-offset-2" : "ring-2 ring-transparent ring-offset-2 hover:ring-slate-300"} ${circleClass}`} />
                                   <span className="text-xs font-medium text-slate-600">{label}</span>
                                 </label>
                               ))}
@@ -1538,7 +1544,7 @@ export default function Home() {
                               {coverBackColors.map(({ value, label, circleClass }) => (
                                 <label key={value} className="flex cursor-pointer flex-col items-center gap-1.5" title={label}>
                                   <input type="radio" name="coverBackColor" value={value} checked={coverBackColor === value} onChange={() => updateSelectedGroupOptions({ coverBackColor: value })} className="sr-only" />
-                                  <span className={`flex h-10 w-10 shrink-0 rounded-full transition-all duration-200 hover:scale-110 ${coverBackColor === value ? "ring-4 ring-blue-500 ring-offset-2" : "ring-2 ring-transparent ring-offset-2 hover:ring-slate-300"} ${circleClass}`} />
+                                  <span className={`flex h-10 w-10 shrink-0 rounded-full transition-all duration-200 hover:scale-110 ${coverBackColor === value ? "ring-4 ring-cyan-500 ring-offset-2" : "ring-2 ring-transparent ring-offset-2 hover:ring-slate-300"} ${circleClass}`} />
                                   <span className="text-xs font-medium text-slate-600">{label}</span>
                                 </label>
                               ))}
@@ -1552,7 +1558,7 @@ export default function Home() {
                 </section>
 
                 {/* Summary */}
-                <section className="bg-gradient-to-br from-blue-50/80 to-slate-50/80 p-4 ring-1 ring-slate-200/60 sm:p-5">
+                <section className="bg-gradient-to-br from-cyan-50/80 to-slate-50/80 p-4 ring-1 ring-slate-200/60 sm:p-5">
                   <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Rezumat</p>
                   <div className="mt-2 flex flex-wrap items-center gap-3">
                     <span className="inline-flex items-center gap-1.5 bg-slate-100 px-3 py-2 text-base font-bold text-slate-800">
@@ -1561,7 +1567,7 @@ export default function Home() {
                     </span>
                     {detectedColorPages > 0 && (
                       <>
-                        <span className="inline-flex items-center gap-1.5 bg-blue-100 px-3 py-2 text-sm font-bold text-blue-700">
+                        <span className="inline-flex items-center gap-1.5 bg-cyan-100 px-3 py-2 text-sm font-bold text-cyan-700">
                           {detectedColorPages} color
                         </span>
                         <span className="inline-flex items-center gap-1.5 bg-slate-200 px-3 py-2 text-sm font-bold text-slate-700">
@@ -1572,8 +1578,8 @@ export default function Home() {
                   </div>
                   {totalPages > 0 && (
                     <div className="mt-3 flex flex-wrap items-center gap-3">
-                      <span className="inline-flex items-center gap-1.5 bg-blue-100 px-3 py-2 text-base font-bold text-blue-700">
-                        <CreditCard className="h-4 w-4 text-blue-500" />
+                      <span className="inline-flex items-center gap-1.5 bg-cyan-100 px-3 py-2 text-base font-bold text-cyan-700">
+                        <CreditCard className="h-4 w-4 text-cyan-500" />
                         {effectivePrice.toFixed(2)} lei printare
                       </span>
                       {totalPrice < MIN_ORDER_LEI && totalPrice > 0 && (
@@ -1619,7 +1625,7 @@ export default function Home() {
                     </p>
                     {detectedColorPages > 0 && (
                       <p className="mt-0.5 text-xs text-slate-500">
-                        Detectat: <span className="font-semibold text-blue-600">{detectedColorPages} pag. color</span>
+                        Detectat: <span className="font-semibold text-cyan-600">{detectedColorPages} pag. color</span>
                         {" · "}
                         <span className="font-semibold">{detectedBwPages} pag. alb-negru</span>
                       </p>
@@ -1762,14 +1768,14 @@ export default function Home() {
                                   <button
                                     type="button"
                                     onClick={() => { setCheckoutModalOpen(false); setPreviewFileId(f.id); setPreviewFromCheckout(true); }}
-                                    className="shrink-0 inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                                    className="shrink-0 inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600 hover:bg-cyan-50 hover:text-cyan-700 transition-colors"
                                     title="Preview document"
                                   >
                                     <FileText className="h-3 w-3" />
                                     Preview
                                   </button>
                                 </div>
-                                <span className="text-xs font-semibold text-blue-600 tabular-nums shrink-0">{calculateFilePrice(f).toFixed(2)} lei</span>
+                                <span className="text-xs font-semibold text-cyan-600 tabular-nums shrink-0">{calculateFilePrice(f).toFixed(2)} lei</span>
                               </div>
                               {f.pages != null && <p className="mt-0.5 text-slate-500">{f.pages} pagini</p>}
                               <p className="mt-1 text-slate-600">
@@ -1833,8 +1839,8 @@ export default function Home() {
                           if (shippingErrors[key]) setShippingErrors((prev) => ({ ...prev, [key]: undefined }));
                         }}
                         placeholder={placeholder}
-                        className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 ${
-                          shippingErrors[key] ? "border-red-400 focus:border-red-500 bg-red-50/50" : "border-slate-300 focus:border-blue-500"
+                        className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 ${
+                          shippingErrors[key] ? "border-red-400 focus:border-red-500 bg-red-50/50" : "border-slate-300 focus:border-cyan-500"
                         }`}
                       />
                       {shippingErrors[key] && <p className="mt-1 text-xs text-red-600">{shippingErrors[key]}</p>}
@@ -1851,8 +1857,8 @@ export default function Home() {
                       }}
                       placeholder="Strada, nr., localitate, județ, cod poștal"
                       rows={3}
-                      className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 ${
-                        shippingErrors.address ? "border-red-400 focus:border-red-500 bg-red-50/50" : "border-slate-300 focus:border-blue-500"
+                      className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 ${
+                        shippingErrors.address ? "border-red-400 focus:border-red-500 bg-red-50/50" : "border-slate-300 focus:border-cyan-500"
                       }`}
                     />
                     {shippingErrors.address && <p className="mt-1 text-xs text-red-600">{shippingErrors.address}</p>}
@@ -1865,14 +1871,14 @@ export default function Home() {
                 <p className="mb-3 text-sm font-medium text-slate-700">Modalitate plată</p>
                 <div className="space-y-2">
                   <label className="flex cursor-pointer items-center gap-3 rounded-xl border-2 p-4 transition-colors hover:bg-slate-50">
-                    <input type="radio" name="paymentMethod" checked={paymentMethod === "stripe"} onChange={() => setPaymentMethod("stripe")} className="h-4 w-4 text-blue-600" />
+                    <input type="radio" name="paymentMethod" checked={paymentMethod === "stripe"} onChange={() => setPaymentMethod("stripe")} className="h-4 w-4 text-cyan-600" />
                     <div>
                       <span className="font-medium text-slate-800">Plată online (card)</span>
                       <p className="text-xs text-slate-500">Securizată prin Stripe · {totalWithShipping.toFixed(2)} lei</p>
                     </div>
                   </label>
                   <label className="flex cursor-pointer items-center gap-3 rounded-xl border-2 p-4 transition-colors hover:bg-slate-50">
-                    <input type="radio" name="paymentMethod" checked={paymentMethod === "ramburs"} onChange={() => setPaymentMethod("ramburs")} className="h-4 w-4 text-blue-600" />
+                    <input type="radio" name="paymentMethod" checked={paymentMethod === "ramburs"} onChange={() => setPaymentMethod("ramburs")} className="h-4 w-4 text-cyan-600" />
                     <div>
                       <span className="font-medium text-slate-800">Plată la livrare (ramburs)</span>
                       <p className="text-xs text-slate-500">Achit la curier · {totalWithShipping.toFixed(2)} lei</p>
@@ -1886,7 +1892,7 @@ export default function Home() {
               )}
 
               {isLoadingPages && !isUploading && !isCheckoutLoading && (
-                <div className="flex items-center gap-2 rounded-xl bg-blue-50 border border-blue-200 px-4 py-3 text-sm text-blue-700">
+                <div className="flex items-center gap-2 rounded-xl bg-cyan-50 border border-cyan-200 px-4 py-3 text-sm text-cyan-700">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   <span>Documentele se procesează, te rugăm așteaptă…</span>
                 </div>
@@ -1896,7 +1902,7 @@ export default function Home() {
                 type="button"
                 onClick={handleSubmitCheckout}
                 disabled={isCheckoutLoading || isUploading || isLoadingPages}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-4 text-lg font-semibold text-white shadow-md shadow-blue-600/20 hover:bg-blue-700 disabled:opacity-50 transition-all duration-200"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-600 py-4 text-lg font-semibold text-white shadow-md shadow-cyan-600/20 hover:bg-cyan-700 disabled:opacity-50 transition-all duration-200"
               >
                 {(isCheckoutLoading || isUploading) ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
@@ -1996,7 +2002,7 @@ export default function Home() {
                     <button
                       type="button"
                       onClick={() => { setPreviewFileId(null); setPreviewFromCheckout(false); setCheckoutModalOpen(true); }}
-                      className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700 transition-colors"
+                      className="flex items-center gap-1.5 rounded-lg bg-cyan-600 px-3 py-2 text-xs font-semibold text-white hover:bg-cyan-700 transition-colors"
                     >
                       <ChevronRight className="h-3.5 w-3.5 rotate-180" />
                       Înapoi la comandă
@@ -2022,10 +2028,10 @@ export default function Home() {
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="text-[11px] uppercase tracking-wide text-slate-500">Tip:</span>
                         <button type="button" onClick={() => setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, printMode: "bw" } : f))} className={`rounded-full px-3 py-1 text-xs font-medium ${file.printMode === "bw" ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Alb-negru</button>
-                        <button type="button" onClick={() => setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, printMode: "color" } : f))} className={`rounded-full px-3 py-1 text-xs font-medium ${file.printMode === "color" ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Color</button>
+                        <button type="button" onClick={() => setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, printMode: "color" } : f))} className={`rounded-full px-3 py-1 text-xs font-medium ${file.printMode === "color" ? "bg-cyan-600 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Color</button>
                       </div>
                       <label className="flex items-center gap-2">
-                        <input type="checkbox" checked={file.duplex} onChange={(e) => setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, duplex: e.target.checked } : f))} className="h-3.5 w-3.5 rounded border-slate-300 text-blue-600" />
+                        <input type="checkbox" checked={file.duplex} onChange={(e) => setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, duplex: e.target.checked } : f))} className="h-3.5 w-3.5 rounded border-slate-300 text-cyan-600" />
                         <span>Față-verso</span>
                       </label>
                       <label className="flex items-center gap-2">
