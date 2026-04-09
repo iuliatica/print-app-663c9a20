@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -7,9 +7,10 @@
   --card: #ffffff;
   --card-border: #e2e8f0;
   --primary: #00D1FF;
+  --primary-end: #00FFD1;
   --primary-hover: #00b8e6;
   --primary-light: #e6faff;
-  --primary-gradient: linear-gradient(135deg, #00D1FF, #00b8e6, #0099cc);
+  --primary-gradient: linear-gradient(135deg, #00D1FF, #00FFD1);
   --muted: #64748b;
   --muted-light: #f1f5f9;
   --success: #059669;
