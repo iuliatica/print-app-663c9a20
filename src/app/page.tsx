@@ -1185,11 +1185,11 @@ export default function Home() {
                               removingFileId === item.id ? "opacity-0 scale-95 -translate-x-4" : ""
                             } ${
                               selectedFileId === item.id
-                                ? "ring-2 ring-blue-500 ring-offset-1 bg-white shadow-[var(--shadow)]"
+                                ? "ring-2 ring-cyan-500 ring-offset-1 bg-white shadow-[var(--shadow)]"
                                 : "bg-white shadow-[var(--shadow)] ring-1 ring-slate-200/80 hover:ring-slate-300 hover:shadow-[var(--shadow-md)]"
                             } ${
                               isInGroup
-                                ? `border-x-2 border-cyan-300 ${!isFirstInGroup ? "border-t border-t-blue-200/60" : "border-t-0"} ${isLastInGroup ? "border-b-2 rounded-b-xl" : "border-b-0"} ring-0 shadow-none`
+                                ? `border-x-2 border-cyan-300 ${!isFirstInGroup ? "border-t border-t-cyan-200/60" : "border-t-0"} ${isLastInGroup ? "border-b-2 rounded-b-xl" : "border-b-0"} ring-0 shadow-none`
                                 : "rounded-xl"
                             }`}
                             style={{ animationDelay: `${globalIndex * 60}ms` }}
@@ -1291,8 +1291,8 @@ export default function Home() {
                                 }}
                                 className={`relative z-10 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-200 ${
                                   isLinkedToNext
-                                    ? "bg-blue-600 text-white shadow-md hover:bg-blue-700 ring-2 ring-blue-200"
-                                    : "bg-white text-slate-600 shadow-sm ring-1 ring-slate-200 hover:ring-blue-300 hover:text-cyan-700 hover:bg-cyan-50"
+                                    ? "bg-cyan-600 text-white shadow-md hover:bg-cyan-700 ring-2 ring-cyan-200"
+                                    : "bg-white text-slate-600 shadow-sm ring-1 ring-slate-200 hover:ring-cyan-300 hover:text-cyan-700 hover:bg-cyan-50"
                                 }`}
                                 title={isLinkedToNext ? "Separă" : "Leagă împreună"}
                               >
@@ -1353,7 +1353,7 @@ export default function Home() {
                                       {file.pages} pagini
                                     </span>
                                     <span className="inline-flex items-center gap-1.5 bg-cyan-100 px-3 py-1.5 text-sm font-bold text-cyan-700">
-                                      <CreditCard className="h-4 w-4 text-blue-500" />
+                                      <CreditCard className="h-4 w-4 text-cyan-500" />
                                       {calculateFilePrice(file).toFixed(2)} lei
                                     </span>
                                   </div>
@@ -1382,7 +1382,7 @@ export default function Home() {
                                     onClick={() => setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, printMode: "color" } : f))}
                                     className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200 ${
                                       opts.printMode === "color"
-                                        ? "bg-blue-600 text-white shadow-sm"
+                                        ? "bg-cyan-600 text-white shadow-sm"
                                         : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                                     }`}
                                   >
@@ -1417,7 +1417,7 @@ export default function Home() {
                                   type="checkbox"
                                   checked={opts.duplex}
                                   onChange={(e) => setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, duplex: e.target.checked } : f))}
-                                  className="h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-2 focus:ring-blue-500"
+                                  className="h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-2 focus:ring-cyan-500"
                                 />
                                 <span className="text-sm font-medium text-slate-700">Față-verso (Duplex)</span>
                               </label>
@@ -1443,7 +1443,7 @@ export default function Home() {
                                       return prev.map((f) => idsInGroup.has(f.id) ? { ...f, copies: next } : f);
                                     });
                                   }}
-                                  className="w-20 rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-cyan-500 focus:ring-2 focus:ring-blue-500/20"
+                                  className="w-20 rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
                                 />
                               </label>
                             </div>
@@ -1483,7 +1483,7 @@ export default function Home() {
                                   isCapsareDisabled
                                     ? "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400 opacity-60"
                                     : spiralType === value
-                                    ? "cursor-pointer border-cyan-500 bg-cyan-50/90 text-cyan-700 shadow-sm ring-2 ring-blue-500/20"
+                                    ? "cursor-pointer border-cyan-500 bg-cyan-50/90 text-cyan-700 shadow-sm ring-2 ring-cyan-500/20"
                                     : "cursor-pointer border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
                                 }`}
                                 title={isCapsareDisabled ? `Indisponibil (${selectedGroupSheets} file > ${MAX_CAPSARE_SHEETS})` : undefined}
@@ -1526,7 +1526,7 @@ export default function Home() {
                               {spiralColorOptions.map(({ value, label, circleClass }) => (
                                 <label key={value} className="flex cursor-pointer flex-col items-center gap-1.5" title={label}>
                                   <input type="radio" name="spiralColor" value={value} checked={spiralColor === value} onChange={() => updateSelectedGroupOptions({ spiralColor: value })} className="sr-only" />
-                                  <span className={`flex h-10 w-10 shrink-0 rounded-full transition-all duration-200 hover:scale-110 ${spiralColor === value ? "ring-4 ring-blue-500 ring-offset-2" : "ring-2 ring-transparent ring-offset-2 hover:ring-slate-300"} ${circleClass}`} />
+                                  <span className={`flex h-10 w-10 shrink-0 rounded-full transition-all duration-200 hover:scale-110 ${spiralColor === value ? "ring-4 ring-cyan-500 ring-offset-2" : "ring-2 ring-transparent ring-offset-2 hover:ring-slate-300"} ${circleClass}`} />
                                   <span className="text-xs font-medium text-slate-600">{label}</span>
                                 </label>
                               ))}
@@ -1544,7 +1544,7 @@ export default function Home() {
                               {coverBackColors.map(({ value, label, circleClass }) => (
                                 <label key={value} className="flex cursor-pointer flex-col items-center gap-1.5" title={label}>
                                   <input type="radio" name="coverBackColor" value={value} checked={coverBackColor === value} onChange={() => updateSelectedGroupOptions({ coverBackColor: value })} className="sr-only" />
-                                  <span className={`flex h-10 w-10 shrink-0 rounded-full transition-all duration-200 hover:scale-110 ${coverBackColor === value ? "ring-4 ring-blue-500 ring-offset-2" : "ring-2 ring-transparent ring-offset-2 hover:ring-slate-300"} ${circleClass}`} />
+                                  <span className={`flex h-10 w-10 shrink-0 rounded-full transition-all duration-200 hover:scale-110 ${coverBackColor === value ? "ring-4 ring-cyan-500 ring-offset-2" : "ring-2 ring-transparent ring-offset-2 hover:ring-slate-300"} ${circleClass}`} />
                                   <span className="text-xs font-medium text-slate-600">{label}</span>
                                 </label>
                               ))}
@@ -1579,7 +1579,7 @@ export default function Home() {
                   {totalPages > 0 && (
                     <div className="mt-3 flex flex-wrap items-center gap-3">
                       <span className="inline-flex items-center gap-1.5 bg-cyan-100 px-3 py-2 text-base font-bold text-cyan-700">
-                        <CreditCard className="h-4 w-4 text-blue-500" />
+                        <CreditCard className="h-4 w-4 text-cyan-500" />
                         {effectivePrice.toFixed(2)} lei printare
                       </span>
                       {totalPrice < MIN_ORDER_LEI && totalPrice > 0 && (
@@ -1839,7 +1839,7 @@ export default function Home() {
                           if (shippingErrors[key]) setShippingErrors((prev) => ({ ...prev, [key]: undefined }));
                         }}
                         placeholder={placeholder}
-                        className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 ${
+                        className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 ${
                           shippingErrors[key] ? "border-red-400 focus:border-red-500 bg-red-50/50" : "border-slate-300 focus:border-cyan-500"
                         }`}
                       />
@@ -1857,7 +1857,7 @@ export default function Home() {
                       }}
                       placeholder="Strada, nr., localitate, județ, cod poștal"
                       rows={3}
-                      className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 ${
+                      className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 ${
                         shippingErrors.address ? "border-red-400 focus:border-red-500 bg-red-50/50" : "border-slate-300 focus:border-cyan-500"
                       }`}
                     />
@@ -1902,7 +1902,7 @@ export default function Home() {
                 type="button"
                 onClick={handleSubmitCheckout}
                 disabled={isCheckoutLoading || isUploading || isLoadingPages}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-4 text-lg font-semibold text-white shadow-md shadow-blue-600/20 hover:bg-blue-700 disabled:opacity-50 transition-all duration-200"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-600 py-4 text-lg font-semibold text-white shadow-md shadow-cyan-600/20 hover:bg-cyan-700 disabled:opacity-50 transition-all duration-200"
               >
                 {(isCheckoutLoading || isUploading) ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
@@ -2002,7 +2002,7 @@ export default function Home() {
                     <button
                       type="button"
                       onClick={() => { setPreviewFileId(null); setPreviewFromCheckout(false); setCheckoutModalOpen(true); }}
-                      className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700 transition-colors"
+                      className="flex items-center gap-1.5 rounded-lg bg-cyan-600 px-3 py-2 text-xs font-semibold text-white hover:bg-cyan-700 transition-colors"
                     >
                       <ChevronRight className="h-3.5 w-3.5 rotate-180" />
                       Înapoi la comandă
@@ -2028,7 +2028,7 @@ export default function Home() {
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="text-[11px] uppercase tracking-wide text-slate-500">Tip:</span>
                         <button type="button" onClick={() => setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, printMode: "bw" } : f))} className={`rounded-full px-3 py-1 text-xs font-medium ${file.printMode === "bw" ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Alb-negru</button>
-                        <button type="button" onClick={() => setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, printMode: "color" } : f))} className={`rounded-full px-3 py-1 text-xs font-medium ${file.printMode === "color" ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Color</button>
+                        <button type="button" onClick={() => setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, printMode: "color" } : f))} className={`rounded-full px-3 py-1 text-xs font-medium ${file.printMode === "color" ? "bg-cyan-600 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Color</button>
                       </div>
                       <label className="flex items-center gap-2">
                         <input type="checkbox" checked={file.duplex} onChange={(e) => setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, duplex: e.target.checked } : f))} className="h-3.5 w-3.5 rounded border-slate-300 text-cyan-600" />
