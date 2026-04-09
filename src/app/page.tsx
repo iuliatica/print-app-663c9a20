@@ -196,7 +196,7 @@ function ProgressStepper({ currentStep }: { currentStep: number }) {
                   isDone
                     ? "bg-green-500 text-white shadow-md shadow-green-500/20"
                     : isActive
-                    ? "bg-teal-600 text-white shadow-lg shadow-teal-600/30 scale-110"
+                    ? "bg-cyan-500 text-white shadow-lg shadow-cyan-500/30 scale-110"
                     : "bg-slate-100 text-slate-400"
                 }`}
               >
@@ -204,7 +204,7 @@ function ProgressStepper({ currentStep }: { currentStep: number }) {
               </div>
               <span
                 className={`text-xs font-semibold transition-colors ${
-                  isDone ? "text-green-600" : isActive ? "text-teal-700" : "text-slate-400"
+                  isDone ? "text-green-600" : isActive ? "text-cyan-700" : "text-slate-400"
                 }`}
               >
                 {step.label}
@@ -933,7 +933,7 @@ export default function Home() {
         {/* Header */}
         <header className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
            <div className="min-w-0 flex-1 text-center lg:text-left">
-            <div className="mb-1.5 inline-flex items-center gap-1.5 rounded-full bg-teal-50 px-3 py-1 text-xs font-medium text-teal-700">
+            <div className="mb-1.5 inline-flex items-center gap-1.5 rounded-full bg-cyan-50 px-3 py-1 text-xs font-medium text-cyan-700">
               <Printer className="h-3.5 w-3.5" />
               Rapid · Sigur · Stripe
             </div>
@@ -946,7 +946,7 @@ export default function Home() {
             <p className="mt-1 text-sm text-slate-600 sm:text-base">
               Încarcă PDF-urile, configurează opțiunile și plătește în siguranță.
             </p>
-            <a href="/contact" className="mt-1 inline-flex items-center gap-1 text-xs text-teal-600 hover:text-teal-800 transition-colors font-medium">
+            <a href="/contact" className="mt-1 inline-flex items-center gap-1 text-xs text-cyan-600 hover:text-cyan-800 transition-colors font-medium">
               <Phone className="h-3 w-3" />
               Contact
             </a>
@@ -968,11 +968,11 @@ export default function Home() {
                   </div>
                   <div className="rounded-md border border-slate-100 bg-slate-50/50 px-1.5 py-1">
                     <p className="text-slate-600 leading-tight truncate">Color 1 față</p>
-                    <p className="mt-0.5 font-semibold text-teal-600 tabular-nums">{PRICE_COLOR_ONE_SIDE} lei</p>
+                    <p className="mt-0.5 font-semibold text-cyan-600 tabular-nums">{PRICE_COLOR_ONE_SIDE} lei</p>
                   </div>
                   <div className="rounded-md border border-slate-100 bg-slate-50/50 px-1.5 py-1">
                     <p className="text-slate-600 leading-tight truncate">Color față-verso</p>
-                    <p className="mt-0.5 font-semibold text-teal-600 tabular-nums">{PRICE_COLOR_DUPLEX} lei</p>
+                    <p className="mt-0.5 font-semibold text-cyan-600 tabular-nums">{PRICE_COLOR_DUPLEX} lei</p>
                   </div>
                   <div className="rounded-md border border-slate-100 bg-slate-50/50 px-1.5 py-1">
                     <p className="text-slate-600 leading-tight truncate">Spiralare</p>
@@ -985,7 +985,7 @@ export default function Home() {
         </header>
 
         {/* ═══ Delivery Banner ═══ */}
-        <div className="mt-3 rounded-lg border border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50 px-3 py-2 sm:px-5">
+        <div className="mt-3 rounded-lg border border-cyan-200 bg-gradient-to-r from-cyan-50 to-cyan-50 px-3 py-2 sm:px-5">
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs">
             <div className="flex items-center gap-1.5">
               <Truck className="h-3.5 w-3.5 text-emerald-600" />
@@ -1053,7 +1053,7 @@ export default function Home() {
                     <path d="M38 44V33M38 33L33 38M38 33L43 38" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </div>
-                <div className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-teal-600 text-white shadow-md">
+                <div className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-cyan-500 text-white shadow-md">
                   <Plus className="h-4 w-4" />
                 </div>
               </div>
@@ -1062,7 +1062,7 @@ export default function Home() {
               </p>
               <p className="mt-1 text-center text-slate-500 text-sm">
                 sau{" "}
-                <span className="font-semibold text-teal-600 underline decoration-teal-600/30 underline-offset-2">
+                <span className="font-semibold text-cyan-600 underline decoration-cyan-500/30 underline-offset-2">
                   click pentru a selecta
                 </span>
               </p>
@@ -1312,7 +1312,7 @@ export default function Home() {
                 <section className="rounded-2xl border-2 border-blue-200/90 bg-gradient-to-b from-blue-50/60 to-white shadow-lg ring-1 ring-slate-200/80">
                   <div className="border-b border-blue-200/80 bg-blue-100/70 px-5 py-3.5">
                     <div className="flex items-center gap-3">
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-teal-600 text-white shadow-sm">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cyan-500 text-white shadow-sm">
                         <Settings2 className="h-4 w-4" />
                       </span>
                       <div>
@@ -1643,7 +1643,7 @@ export default function Home() {
                 type="button"
                 onClick={handleOpenCheckout}
                 disabled={files.length === 0 || isCheckoutLoading || totalPages === 0}
-                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-teal-600 px-8 py-4 text-lg font-semibold text-white shadow-md shadow-teal-600/20 transition-all duration-200 hover:from-cyan-700 hover:to-teal-700 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-cyan-500 px-8 py-4 text-lg font-semibold text-white shadow-md shadow-cyan-500/20 transition-all duration-200 hover:from-cyan-700 hover:to-cyan-600 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
               >
                 <CreditCard className="h-5 w-5" />
                 Finalizează comanda
@@ -1656,8 +1656,8 @@ export default function Home() {
         <div className="mt-12 mx-auto max-w-3xl">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div className="flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-white p-4 text-center shadow-sm">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-50">
-                <Lock className="h-5 w-5 text-teal-600" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-50">
+                <Lock className="h-5 w-5 text-cyan-600" />
               </div>
               <span className="text-xs font-semibold text-slate-700">Plată securizată</span>
               <span className="text-[10px] text-slate-500">100% criptat via Stripe</span>
@@ -1704,7 +1704,7 @@ export default function Home() {
               type="button"
               onClick={handleOpenCheckout}
               disabled={isCheckoutLoading}
-              className="flex shrink-0 items-center gap-2 bg-gradient-to-r from-cyan-600 to-teal-600 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-teal-600/20 transition-all hover:from-cyan-700 hover:to-teal-700 disabled:opacity-50"
+              className="flex shrink-0 items-center gap-2 bg-gradient-to-r from-cyan-600 to-cyan-500 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-cyan-500/20 transition-all hover:from-cyan-700 hover:to-cyan-600 disabled:opacity-50"
             >
               <CreditCard className="h-4 w-4" />
               Finalizează
