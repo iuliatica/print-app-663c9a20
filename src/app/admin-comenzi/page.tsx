@@ -728,7 +728,7 @@ export default function AdminComenziPage() {
   if (accessDenied) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-100 p-4">
-        <Loader2 className="h-10 w-10 animate-spin text-blue-600" aria-hidden />
+        <Loader2 className="h-10 w-10 animate-spin text-cyan-600" aria-hidden />
       </div>
     );
   }
@@ -787,7 +787,7 @@ export default function AdminComenziPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Caută după email sau telefon..."
-              className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-800 placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-800 placeholder-slate-400 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
             />
           </label>
         </div>
@@ -1163,7 +1163,7 @@ export default function AdminComenziPage() {
                                                 type="button"
                                                 onClick={() => handleDownloadPdf(fileUrls[row.fileIndex])}
                                                 disabled={downloadingUrl === fileUrls[row.fileIndex]}
-                                                className="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-70"
+                                                className="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-cyan-600 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-cyan-700 disabled:opacity-70"
                                                 title={fileNames[row.fileIndex] ?? `PDF ${row.fileIndex + 1}`}
                                               >
                                                 {downloadingUrl === fileUrls[row.fileIndex] ? (

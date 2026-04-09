@@ -77,7 +77,7 @@ function SuccessContent() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-4 rounded-2xl bg-white p-10 shadow-lg border border-slate-200/80">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+          <Loader2 className="h-12 w-12 animate-spin text-cyan-600" />
           <p className="text-slate-600 font-medium">Se verifică plata…</p>
         </div>
       </div>
@@ -189,7 +189,7 @@ function SuccessContent() {
 
           {/* Legare */}
           {order?.config_details?.spiralType && order.config_details.spiralType !== "none" && (
-            <div className="rounded-lg bg-blue-50 px-4 py-2.5 text-sm text-blue-800">
+            <div className="rounded-lg bg-cyan-50 px-4 py-2.5 text-sm text-cyan-800">
               🔗 Legare: <strong className="capitalize">{order.config_details.spiralType}</strong>
               {order.config_details.spiralColor ? ` (${order.config_details.spiralColor})` : ""}
             </div>
@@ -217,7 +217,7 @@ export default function SuccessPage() {
     <Suspense
       fallback={
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 to-white">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+          <Loader2 className="h-12 w-12 animate-spin text-cyan-600" />
         </div>
       }
     >
