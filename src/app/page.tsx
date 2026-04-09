@@ -945,7 +945,7 @@ export default function Home() {
             </div>
             <div className="flex items-center justify-center lg:justify-start gap-3">
               <PrinticaLogo className="h-10 w-10" />
-              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl" style={{ color: 'var(--primary)' }}>
+              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl" style={{ fontFamily: "'Montserrat', sans-serif", background: 'linear-gradient(135deg, #00D1FF, #00FFD1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 Printica
               </h1>
             </div>
