@@ -1055,7 +1055,8 @@ export default function Home() {
                     <line x1="14" y1="26" x2="26" y2="26" stroke="#cbd5e1" strokeWidth="1.5" strokeLinecap="round"/>
                     <line x1="14" y1="31" x2="24" y2="31" stroke="#e2e8f0" strokeWidth="1.5" strokeLinecap="round"/>
                     {/* Upload arrow */}
-                    <circle cx="38" cy="38" r="12" fill="#2563eb" opacity="0.9"/>
+                    <circle cx="38" cy="38" r="12" fill="url(#uploadGrad)" opacity="0.9"/>
+                    <defs><linearGradient id="uploadGrad" x1="26" y1="26" x2="50" y2="50"><stop offset="0%" stopColor="#00D1FF"/><stop offset="100%" stopColor="#00FFD1"/></linearGradient></defs>
                     <path d="M38 44V33M38 33L33 38M38 33L43 38" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </div>
