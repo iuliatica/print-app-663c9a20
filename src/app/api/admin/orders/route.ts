@@ -40,10 +40,27 @@ export async function GET() {
 
   try {
     const supabase = getServerSupabase();
-    const { data, error } = await supabase
+    // Try with stripe_session_id first, fall back without it
+    let data, error;
+    const fullSelect = "id, created_at, phone, customer_email, customer_name, shipping_address, total_price, payment_method, status, file_url, config_details, awb_url, factura_url, files_deleted_at, stripe_session_id";
+    const fallbackSelect = "id, created_at, phone, customer_email, customer_name, shipping_address, total_price, payment_method, status, file_url, config_details, awb_url, factura_url, files_deleted_at";
+
+    const result = await supabase
       .from("orders")
-      .select("id, created_at, phone, customer_email, customer_name, shipping_address, total_price, payment_method, status, file_url, config_details, awb_url, factura_url, files_deleted_at, stripe_session_id")
+      .select(fullSelect)
       .order("created_at", { ascending: false });
+
+    if (result.error && result.error.message?.includes("stripe_session_id")) {
+      const fallback = await supabase
+        .from("orders")
+        .select(fallbackSelect)
+        .order("created_at", { ascending: false });
+      data = fallback.data;
+      error = fallback.error;
+    } else {
+      data = result.data;
+      error = result.error;
+    }
 
     if (error) {
       console.error("Admin orders fetch error:", error);
