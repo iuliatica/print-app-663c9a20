@@ -902,7 +902,38 @@ export default function AdminComenziPage() {
                           {order.payment_method === "stripe"
                             ? order.status === "paid"
                               ? "Online (card) ✓"
-                              : <span className="font-semibold text-red-700">Online — NEPLĂTIT</span>
+                              : <span className="flex items-center gap-2">
+                                  <span className="font-semibold text-red-700">Online — NEPLĂTIT</span>
+                                  <button
+                                    type="button"
+                                    className="text-xs px-2 py-0.5 rounded bg-cyan-600 text-white hover:bg-cyan-700 transition-colors"
+                                    onClick={async (e) => {
+                                      e.stopPropagation();
+                                      const btn = e.currentTarget;
+                                      btn.disabled = true;
+                                      btn.textContent = "Verificare...";
+                                      try {
+                                        const res = await fetch("/api/admin/verify-stripe", {
+                                          method: "POST",
+                                          headers: { "Content-Type": "application/json" },
+                                          body: JSON.stringify({ order_id: order.id }),
+                                        });
+                                        const data = await res.json();
+                                        if (data.status === "paid" || data.already_paid) {
+                                          setOrders((prev) => prev.map((o) => o.id === order.id ? { ...o, status: "paid" } : o));
+                                          btn.textContent = "✓ Plătit!";
+                                        } else {
+                                          btn.textContent = data.error || `Status: ${data.stripe_status}`;
+                                        }
+                                      } catch {
+                                        btn.textContent = "Eroare";
+                                      }
+                                      setTimeout(() => { btn.disabled = false; btn.textContent = "Verifică plata"; }, 3000);
+                                    }}
+                                  >
+                                    Verifică plata
+                                  </button>
+                                </span>
                             : order.payment_method === "ramburs"
                               ? "Ramburs"
                               : order.payment_method}
