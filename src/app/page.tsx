@@ -274,12 +274,12 @@ function UploadProgressBar({ isUploading, progress }: { isUploading: boolean; pr
           <Loader2 className="h-4 w-4 animate-spin text-cyan-600" />
           <span className="text-sm font-medium text-cyan-800">Se încarcă fișierele...</span>
         </div>
-        <span className="text-sm font-bold text-cyan-700 tabular-nums">{progress}%</span>
+        <span className="text-sm font-bold text-cyan-700 tabular-nums">{Math.round(progress)}%</span>
       </div>
       <div className="h-2 rounded-full bg-cyan-200/60 overflow-hidden">
         <div
           className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-cyan-500 transition-all duration-300 ease-out"
-          style={{ width: `${progress}%` }}
+          style={{ width: `${Math.round(progress)}%` }}
         />
       </div>
     </div>
