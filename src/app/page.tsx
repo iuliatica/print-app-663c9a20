@@ -1636,7 +1636,7 @@ export default function Home() {
                 type="button"
                 onClick={handleOpenCheckout}
                 disabled={files.length === 0 || isCheckoutLoading || totalPages === 0}
-                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-cyan-500 px-8 py-4 text-lg font-semibold text-white shadow-md shadow-cyan-500/20 transition-all duration-200 hover:from-cyan-700 hover:to-cyan-600 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+                className="flex items-center gap-2 rounded-xl px-8 py-4 text-lg font-semibold text-white shadow-md shadow-[#00D1FF]/20 transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none" style={{ background: '#00D1FF' }}
               >
                 <CreditCard className="h-5 w-5" />
                 Finalizează comanda
