@@ -33,7 +33,6 @@ import {
   Palette,
 } from "lucide-react";
 import { getPdfPageCount, analyzePdfColors, type PdfColorAnalysis } from "@/lib/pdf-utils";
-import BrandLogo from "@/components/BrandLogo";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const PRICE_BW_ONE_SIDE = 0.2;
@@ -930,7 +929,6 @@ export default function Home() {
               Rapid · Sigur · Stripe
             </div>
             <div className="flex items-center justify-center lg:justify-start gap-3">
-              <BrandLogo />
               <h1 className="text-2xl font-bold tracking-tight sm:text-3xl" style={{ fontFamily: "'Montserrat', sans-serif", background: 'linear-gradient(135deg, #00D1FF, #00FFD1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 Printica
               </h1>
