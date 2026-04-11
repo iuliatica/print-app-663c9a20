@@ -225,7 +225,7 @@ function FAQ() {
     { q: "Ce format de fișier acceptați?", a: "Acceptăm doar fișiere PDF, cu o dimensiune maximă de 50 MB per fișier. Poți încărca până la 20 de fișiere simultan." },
     { q: "Cum funcționează spiralarea?", a: "Spiralarea leagă documentele într-un volum unic cu spirală neagră de plastic. Poți alege culoarea copertei spate. Coperta față este întotdeauna transparentă." },
     { q: "Pot lega mai multe fișiere într-o singură spirală?", a: "Da! Folosește butonul 'Leagă împreună' dintre două fișiere din listă pentru a le combina într-un singur volum spiralat." },
-    { q: "Cum se calculează prețul?", a: "Prețul depinde de tipul printării (alb-negru sau color), față-verso, numărul de copii și opțiunea de spiralare. Când alegi opțiunea Color, sistemul analizează automat fiecare pagină din PDF și identifică paginile color și cele alb-negru — plătești preț de color doar pentru paginile efectiv colorate, restul fiind taxate la preț de alb-negru." },
+    { q: "Cum se calculează prețul?", a: "Prețul depinde de tipul printării (alb-negru sau color), față-verso, numărul de copii și opțiunea de spiralare. Când alegi opțiunea Color, sistemul analizează automat fiecare pagină din PDF și identifică paginile color și cele alb-negru — plătești preț de color doar pentru paginile efectiv colorate, restul fiind taxate la preț de alb-negru. Atenție: această analiză automată nu se aplică documentelor scanate (formate din imagini), care vor fi taxate integral la preț de color." },
     { q: "Cât durează livrarea?", a: "Comenzile sunt procesate și livrate prin curier în 2-4 zile lucrătoare. Costul transportului este de 15 lei." },
     { q: "Ce metode de plată acceptați?", a: "Acceptăm plata online cu cardul (prin Stripe, 100% securizat) sau plata la livrare (ramburs)." },
   ];
@@ -1221,7 +1221,7 @@ export default function Home() {
                               )}
                               {/* Price per file */}
                               {item.pages != null && (
-                                <p className="mt-0.5 text-xs font-semibold text-cyan-600 tabular-nums">
+                                <p className="mt-0.5 text-xs font-semibold text-slate-900 tabular-nums">
                                   {filePrice.toFixed(2)} lei
                                 </p>
                               )}
@@ -1339,8 +1339,8 @@ export default function Home() {
                                       <FileText className="h-4 w-4 text-slate-500" />
                                       {file.pages} pagini
                                     </span>
-                                    <span className="inline-flex items-center gap-1.5 bg-cyan-100 px-3 py-1.5 text-sm font-bold text-cyan-700">
-                                      <CreditCard className="h-4 w-4 text-cyan-500" />
+                                    <span className="inline-flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 text-sm font-bold text-slate-800">
+                                      <CreditCard className="h-4 w-4 text-slate-500" />
                                       {calculateFilePrice(file).toFixed(2)} lei
                                     </span>
                                   </div>
@@ -1565,8 +1565,8 @@ export default function Home() {
                   </div>
                   {totalPages > 0 && (
                     <div className="mt-3 flex flex-wrap items-center gap-3">
-                      <span className="inline-flex items-center gap-1.5 bg-cyan-100 px-3 py-2 text-base font-bold text-cyan-700">
-                        <CreditCard className="h-4 w-4 text-cyan-500" />
+                      <span className="inline-flex items-center gap-1.5 bg-slate-100 px-3 py-2 text-base font-bold text-slate-800">
+                        <CreditCard className="h-4 w-4 text-slate-500" />
                         {effectivePrice.toFixed(2)} lei printare
                       </span>
                       {totalPrice < MIN_ORDER_LEI && totalPrice > 0 && (
