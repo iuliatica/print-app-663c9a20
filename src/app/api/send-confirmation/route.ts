@@ -10,40 +10,95 @@ type FileInfo = {
   copies: number;
 };
 
+type GroupInfo = {
+  files: FileInfo[];
+  spiralType?: string;
+  spiralColor?: string;
+  coverBackColor?: string;
+};
+
 type ConfirmationBody = {
   to: string;
   customerName?: string;
   totalPrice: number;
   paymentMethod: string;
-  files: FileInfo[];
+  groups: GroupInfo[];
+  shippingAddress?: string;
+  // Legacy flat fields (backwards compat)
+  files?: FileInfo[];
   spiralType?: string;
   spiralColor?: string;
   coverBackColor?: string;
-  shippingAddress?: string;
 };
 
-function buildEmailHtml(data: ConfirmationBody): string {
-  const filesHtml = data.files
-    .map(
-      (f) =>
-        `<tr>
-          <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#334155;">${f.name}</td>
-          <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#334155;text-align:center;">${f.pages ?? "—"}</td>
-          <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#334155;text-align:center;">${f.printMode === "color" ? "Color" : "Alb-negru"}</td>
-          <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#334155;text-align:center;">${f.duplex ? "Da" : "Nu"}</td>
-          <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#334155;text-align:center;">${f.copies}</td>
-        </tr>`
-    )
-    .join("");
+function getSpiralLabel(spiralType?: string, spiralColor?: string): string {
+  if (spiralType === "spirala") return `Spirală ${spiralColor ?? "neagră"}`;
+  if (spiralType === "perforare2") return "Perforare cu 2 găuri";
+  if (spiralType === "capsare") return "Capsare";
+  return "Fără legare";
+}
 
-  const spiralLabel =
-    data.spiralType === "spirala"
-      ? `Spirală ${data.spiralColor ?? "neagră"}`
-      : data.spiralType === "perforare2"
-      ? "Perforare cu 2 găuri"
-      : data.spiralType === "capsare"
-      ? "Capsare"
-      : "Fără legare";
+function buildEmailHtml(data: ConfirmationBody): string {
+  // Normalize to groups format (backwards compat with old flat format)
+  const groups: GroupInfo[] = data.groups && data.groups.length > 0
+    ? data.groups
+    : [{
+        files: data.files ?? [],
+        spiralType: data.spiralType,
+        spiralColor: data.spiralColor,
+        coverBackColor: data.coverBackColor,
+      }];
+
+  const groupsHtml = groups.map((group, gIdx) => {
+    const filesHtml = group.files
+      .map(
+        (f) =>
+          `<tr>
+            <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#334155;">${f.name}</td>
+            <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#334155;text-align:center;">${f.pages ?? "—"}</td>
+            <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#334155;text-align:center;">${f.printMode === "color" ? "Color" : "Alb-negru"}</td>
+            <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#334155;text-align:center;">${f.duplex ? "Da" : "Nu"}</td>
+            <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#334155;text-align:center;">${f.copies}</td>
+          </tr>`
+      )
+      .join("");
+
+    const spiralLabel = getSpiralLabel(group.spiralType, group.spiralColor);
+    const groupTitle = groups.length > 1 ? `<h3 style="margin:0 0 8px;font-size:15px;font-weight:700;color:#1e293b;">Grup ${gIdx + 1}</h3>` : "";
+
+    const coverRow = group.coverBackColor && group.spiralType === "spirala"
+      ? `<tr>
+          <td style="padding:4px 0;font-size:13px;color:#64748b;">Copertă spate</td>
+          <td style="padding:4px 0;font-size:13px;color:#1e293b;font-weight:600;text-align:right;">${group.coverBackColor}</td>
+        </tr>`
+      : "";
+
+    return `
+      <div style="margin-bottom:20px;">
+        ${groupTitle}
+        <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:8px;">
+          <thead>
+            <tr style="background-color:#f8fafc;">
+              <th style="padding:10px 12px;text-align:left;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid #e2e8f0;">Fișier</th>
+              <th style="padding:10px 12px;text-align:center;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid #e2e8f0;">Pagini</th>
+              <th style="padding:10px 12px;text-align:center;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid #e2e8f0;">Tip</th>
+              <th style="padding:10px 12px;text-align:center;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid #e2e8f0;">Față-verso</th>
+              <th style="padding:10px 12px;text-align:center;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid #e2e8f0;">Copii</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${filesHtml}
+          </tbody>
+        </table>
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:4px;">
+          <tr>
+            <td style="padding:4px 0;font-size:13px;color:#64748b;">Legare</td>
+            <td style="padding:4px 0;font-size:13px;color:#1e293b;font-weight:600;text-align:right;">${spiralLabel}</td>
+          </tr>
+          ${coverRow}
+        </table>
+      </div>`;
+  }).join("");
 
   const greeting = data.customerName
     ? `Salut, ${data.customerName}!`
@@ -83,34 +138,13 @@ function buildEmailHtml(data: ConfirmationBody): string {
               <p style="margin:8px 0 0;font-size:16px;font-weight:700;color:#065f46;">Comanda confirmată</p>
             </div>
 
-            <!-- Files table -->
+            <!-- Files grouped with binding -->
             <h3 style="margin:0 0 12px;font-size:16px;font-weight:700;color:#1e293b;">Documente comandate</h3>
-            <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:24px;">
-              <thead>
-                <tr style="background-color:#f8fafc;">
-                  <th style="padding:10px 12px;text-align:left;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid #e2e8f0;">Fișier</th>
-                  <th style="padding:10px 12px;text-align:center;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid #e2e8f0;">Pagini</th>
-                  <th style="padding:10px 12px;text-align:center;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid #e2e8f0;">Tip</th>
-                  <th style="padding:10px 12px;text-align:center;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid #e2e8f0;">Față-verso</th>
-                  <th style="padding:10px 12px;text-align:center;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid #e2e8f0;">Copii</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${filesHtml}
-              </tbody>
-            </table>
+            ${groupsHtml}
 
             <!-- Order details -->
             <div style="background-color:#f8fafc;border-radius:12px;padding:20px;margin-bottom:24px;">
               <table width="100%" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td style="padding:6px 0;font-size:14px;color:#64748b;">Legare</td>
-                  <td style="padding:6px 0;font-size:14px;color:#1e293b;font-weight:600;text-align:right;">${spiralLabel}</td>
-                </tr>
-                ${data.coverBackColor && data.spiralType === "spirala" ? `<tr>
-                  <td style="padding:6px 0;font-size:14px;color:#64748b;">Copertă spate</td>
-                  <td style="padding:6px 0;font-size:14px;color:#1e293b;font-weight:600;text-align:right;">${data.coverBackColor}</td>
-                </tr>` : ""}
                 <tr>
                   <td style="padding:6px 0;font-size:14px;color:#64748b;">Metodă plată</td>
                   <td style="padding:6px 0;font-size:14px;color:#1e293b;font-weight:600;text-align:right;">${paymentLabel}</td>
