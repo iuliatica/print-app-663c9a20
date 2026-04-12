@@ -1221,7 +1221,7 @@ export default function Home() {
                               )}
                               {/* Price per file */}
                               {item.pages != null && (
-                                <p className="mt-0.5 text-xs font-semibold text-slate-900 tabular-nums">
+                                <p className="mt-0.5 text-xs font-semibold text-cyan-600 tabular-nums">
                                   {filePrice.toFixed(2)} lei
                                 </p>
                               )}
@@ -1690,7 +1690,7 @@ export default function Home() {
         <div className="fixed bottom-0 inset-x-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur-sm px-4 py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] lg:hidden">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-lg font-bold text-slate-900 tabular-nums">{totalWithShipping.toFixed(2)} lei</p>
+              <p className="text-lg font-bold text-cyan-600 tabular-nums">{totalWithShipping.toFixed(2)} lei</p>
               <p className="text-xs text-slate-500 truncate">{totalPages} pag. · incl. {SHIPPING_COST_LEI} lei transport</p>
             </div>
             <button
