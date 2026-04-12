@@ -252,7 +252,7 @@ function FAQ() {
             </button>
             <div
               className={`overflow-hidden transition-all duration-200 ${
-                open === i ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
+                open === i ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
               }`}
             >
               <p className="px-5 pb-4 text-sm text-slate-600 leading-relaxed">{item.a}</p>
