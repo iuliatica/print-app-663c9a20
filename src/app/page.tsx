@@ -960,11 +960,11 @@ export default function Home() {
                   </div>
                   <div className="rounded-md border border-slate-100 bg-slate-50/50 px-1.5 py-1">
                     <p className="text-slate-600 leading-tight truncate">Color 1 față</p>
-                    <p className="mt-0.5 font-semibold text-cyan-600 tabular-nums">{PRICE_COLOR_ONE_SIDE} lei</p>
+                    <p className="mt-0.5 font-semibold text-black tabular-nums">{PRICE_COLOR_ONE_SIDE} lei</p>
                   </div>
                   <div className="rounded-md border border-slate-100 bg-slate-50/50 px-1.5 py-1">
                     <p className="text-slate-600 leading-tight truncate">Color față-verso</p>
-                    <p className="mt-0.5 font-semibold text-cyan-600 tabular-nums">{PRICE_COLOR_DUPLEX} lei</p>
+                    <p className="mt-0.5 font-semibold text-black tabular-nums">{PRICE_COLOR_DUPLEX} lei</p>
                   </div>
                   <div className="rounded-md border border-slate-100 bg-slate-50/50 px-1.5 py-1">
                     <p className="text-slate-600 leading-tight truncate">Spiralare</p>
