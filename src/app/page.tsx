@@ -812,16 +812,21 @@ export default function Home() {
           customerName: name.trim(),
           totalPrice: totalWithShipping,
           paymentMethod,
-          files: validFiles.map((f) => ({
-            name: f.name,
-            pages: f.pages,
-            printMode: f.printMode ?? "bw",
-            duplex: f.duplex ?? false,
-            copies: f.copies ?? 1,
-          })),
-          spiralType: validBindingOptions[0]?.spiralType ?? "none",
-          spiralColor: validBindingOptions[0]?.spiralColor,
-          coverBackColor: validBindingOptions[0]?.coverBackColor,
+          groups: validBindingGroups.map((grp, groupIndex) => {
+            const opts = validBindingOptions[groupIndex] ?? defaultGroupOpts;
+            return {
+              files: grp.filesInGroup.map((f) => ({
+                name: f.name,
+                pages: f.pages,
+                printMode: f.printMode ?? "bw",
+                duplex: f.duplex ?? false,
+                copies: f.copies ?? 1,
+              })),
+              spiralType: opts.spiralType,
+              spiralColor: opts.spiralColor,
+              coverBackColor: opts.coverBackColor,
+            };
+          }),
           shippingAddress: address.trim(),
         }),
       }).catch(() => {});
