@@ -934,11 +934,11 @@ export default function Home() {
               <Printer className="h-3.5 w-3.5" />
               Rapid · Sigur · Stripe
             </div>
-            <div className="flex items-center justify-center lg:justify-start gap-3">
-              <img src="/logo-printica.png" className="h-10 w-auto shrink-0 bg-transparent" alt="Printica Logo" />
-              <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl text-[#00B4D8]" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+            <div className="flex items-center justify-center lg:justify-start gap-3 bg-transparent">
+              <img src="/logo-symbol.png" className="h-10 w-auto shrink-0" alt="Printica Logo" />
+              <span className="text-2xl sm:text-3xl text-[#00B4D8]" style={{ fontFamily: "'Pacifico', cursive" }}>
                 Printica
-              </h1>
+              </span>
             </div>
             <p className="mt-1 text-sm text-slate-600 sm:text-base">
               Încarcă PDF-urile, configurează opțiunile și plătește în siguranță.
