@@ -6,11 +6,11 @@
   --foreground: #0f172a;
   --card: #ffffff;
   --card-border: #e2e8f0;
-  --primary: #00D1FF;
-  --primary-end: #00FFD1;
-  --primary-hover: #00b8e6;
-  --primary-light: #e6faff;
-  --primary-gradient: linear-gradient(135deg, #00D1FF, #00FFD1);
+  --primary: #00B4D8;
+  --primary-end: #00B4D8;
+  --primary-hover: #0099b8;
+  --primary-light: #e0f7fa;
+  --primary-gradient: linear-gradient(135deg, #00B4D8, #00B4D8);
   --muted: #64748b;
   --muted-light: #f1f5f9;
   --success: #059669;
