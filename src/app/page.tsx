@@ -935,8 +935,8 @@ export default function Home() {
               Rapid · Sigur · Stripe
             </div>
             <div className="flex items-center justify-center lg:justify-start gap-3">
-              <img src="/logo-final-printica.jpg" className="h-10 w-auto shrink-0" alt="Printica Logo" />
-              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl" style={{ fontFamily: "'Montserrat', sans-serif", background: 'linear-gradient(135deg, #00D1FF, #00FFD1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              <img src="/logo-printica.png" className="h-10 w-auto shrink-0 bg-transparent" alt="Printica Logo" />
+              <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl text-[#00B4D8]" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                 Printica
               </h1>
             </div>
