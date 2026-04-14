@@ -12,23 +12,27 @@ export function isPdfBuffer(buffer: ArrayBuffer): boolean {
 
 /**
  * Verifică tipul MIME (din header Content-Type sau file.type).
+ * Unele browsere/sisteme pot trimite tipul gol sau generic pentru PDF-uri valide.
  */
 export function isPdfMime(type: string | null): boolean {
   if (!type) return false;
   const normalized = type.toLowerCase().trim();
-  return normalized === "application/pdf";
+  return normalized === "application/pdf" || normalized === "application/x-pdf";
 }
 
 /**
- * Validare completă: tip MIME + magic bytes.
- * Aruncă dacă fișierul nu este un PDF valid.
+ * Validare completă: preferă semnătura reală a fișierului (%PDF).
+ * MIME-ul este folosit doar ca semnal suplimentar, nu ca blocaj strict.
  */
 export async function assertPdfFile(file: File): Promise<void> {
-  if (!isPdfMime(file.type)) {
-    throw new Error(`Fișierul "${file.name}" nu este un PDF (tip: ${file.type || "necunoscut"}).`);
-  }
   const buffer = await file.arrayBuffer();
   if (!isPdfBuffer(buffer)) {
     throw new Error(`Fișierul "${file.name}" nu pare a fi un PDF valid (conținut invalid).`);
+  }
+
+  const hasPdfMime = isPdfMime(file.type);
+  const hasPdfExtension = file.name.toLowerCase().endsWith(".pdf");
+  if (!hasPdfMime && !hasPdfExtension) {
+    throw new Error(`Fișierul "${file.name}" nu este un PDF valid.`);
   }
 }
