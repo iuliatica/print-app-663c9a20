@@ -508,12 +508,26 @@ export default function Home() {
   );
 
   const onFileInput = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
       const selected = e.target.files;
       if (!selected?.length) return;
       const allFiles = Array.from(selected);
-      const pdfFiles = allFiles.filter((f) => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf"));
-      const nonPdfFiles = allFiles.filter((f) => f.type !== "application/pdf" && !f.name.toLowerCase().endsWith(".pdf"));
+
+      // Validate files are actually readable (cloud-sourced files from Drive/Dropbox may fail)
+      const readableFiles: File[] = [];
+      for (const f of allFiles) {
+        try {
+          // Try reading a small slice to verify the file is locally accessible
+          await f.slice(0, 4).arrayBuffer();
+          readableFiles.push(f);
+        } catch {
+          addToast(`Fișierul "${f.name}" nu poate fi citit. Te rugăm să descarci fișierul pe telefon și să îl încarci din memoria internă.`, "error");
+        }
+      }
+      if (readableFiles.length === 0) { e.target.value = ""; return; }
+
+      const pdfFiles = readableFiles.filter((f) => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf"));
+      const nonPdfFiles = readableFiles.filter((f) => f.type !== "application/pdf" && !f.name.toLowerCase().endsWith(".pdf"));
       if (nonPdfFiles.length > 0) {
         addToast(`Acceptăm doar fișiere PDF. ${nonPdfFiles.length} fișier${nonPdfFiles.length > 1 ? "e" : ""} respins${nonPdfFiles.length > 1 ? "e" : ""}.`, "error");
       }
@@ -1508,9 +1522,9 @@ export default function Home() {
                                     <ChevronDown className="h-4 w-4" />
                                   </button>
                                   <input
-                                    type="number"
-                                    min={1}
-                                    max={100}
+                                    type="text"
+                                    inputMode="numeric"
+                                    pattern="[0-9]*"
                                     value={opts.copies}
                                     onChange={(e) => {
                                       const raw = Number(e.target.value) || 1;
@@ -1525,7 +1539,7 @@ export default function Home() {
                                         return prev.map((f) => idsInGroup.has(f.id) ? { ...f, copies: next } : f);
                                       });
                                     }}
-                                    className="w-16 rounded-xl border border-slate-300 px-3 py-2 text-sm text-center focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                                    className="w-16 rounded-xl border border-slate-300 px-3 py-2 text-sm text-center focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 [appearance:textfield]"
                                   />
                                   <button
                                     type="button"
