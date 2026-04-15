@@ -716,10 +716,10 @@ export default function Home() {
   };
 
   const handleSubmitCheckout = async () => {
-    const errors = validateShipping(shipping);
+    const errors = validateShipping(shipping, deliveryMethod);
     if (Object.keys(errors).length > 0) {
       setShippingErrors(errors);
-      setCheckoutError("Te rugăm completează corect toate câmpurile pentru livrare (nume, telefon, email, adresă).");
+      setCheckoutError("Te rugăm completează corect toate câmpurile obligatorii.");
       return;
     }
     setShippingErrors({});
