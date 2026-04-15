@@ -5,6 +5,20 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, Home, Loader2, AlertTriangle, FileText, Printer, Phone, Mail } from "lucide-react";
 
+type FileInfo = {
+  name: string;
+  pages: number | null;
+  printMode: "bw" | "color";
+  duplex: boolean;
+  copies: number;
+};
+
+type GroupInfo = {
+  files: FileInfo[];
+  spiralType?: string;
+  spiralColor?: string;
+};
+
 type OrderDetails = {
   id: string;
   created_at: string;
@@ -14,15 +28,12 @@ type OrderDetails = {
   payment_method: string;
   status: string;
   config_details: {
-    files?: Array<{
-      name: string;
-      pages: number | null;
-      printMode: "bw" | "color";
-      duplex: boolean;
-      copies: number;
-    }>;
+    files?: FileInfo[];
+    bindingGroupSizes?: number[];
+    bindingOptions?: { spiralType?: string; spiralColor?: string }[];
     spiralType?: string;
     spiralColor?: string;
+    deliveryMethod?: "curier" | "ridicare";
   } | null;
 };
 
@@ -49,6 +60,34 @@ function formatDate(iso: string) {
     minute: "2-digit",
   });
 }
+
+function getGroups(order: OrderDetails): GroupInfo[] {
+  const files = order.config_details?.files ?? [];
+  const sizes = order.config_details?.bindingGroupSizes;
+  const options = order.config_details?.bindingOptions;
+
+  if (!sizes || sizes.length === 0) {
+    return [{
+      files,
+      spiralType: order.config_details?.spiralType,
+      spiralColor: order.config_details?.spiralColor,
+    }];
+  }
+
+  const groups: GroupInfo[] = [];
+  let idx = 0;
+  sizes.forEach((size, gIdx) => {
+    groups.push({
+      files: files.slice(idx, idx + size),
+      spiralType: options?.[gIdx]?.spiralType ?? "none",
+      spiralColor: options?.[gIdx]?.spiralColor,
+    });
+    idx += size;
+  });
+  return groups;
+}
+
+const PICKUP_ADDRESS = "Alba Iulia, localitatea Barabant, strada Mureșului";
 
 function SuccessContent() {
   const searchParams = useSearchParams();
@@ -114,7 +153,8 @@ function SuccessContent() {
   }
 
   const order = data?.order;
-  const files = order?.config_details?.files ?? [];
+  const groups = order ? getGroups(order) : [];
+  const isPickup = order?.config_details?.deliveryMethod === "ridicare";
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex flex-col items-center justify-center px-4 py-12">
@@ -126,9 +166,18 @@ function SuccessContent() {
             Mulțumim pentru comandă!
           </h1>
           <p className="mt-3 text-slate-700">Plata a fost confirmată cu succes.</p>
-          <p className="mt-4 rounded-xl bg-white/80 px-4 py-3 text-sm font-semibold text-slate-800 shadow-sm">
-            Livrarea se face în <strong>2-4 zile lucrătoare</strong>.
-          </p>
+          {isPickup ? (
+            <div className="mt-4 rounded-xl bg-cyan-50 border border-cyan-200 px-4 py-3 text-left">
+              <p className="text-sm font-semibold text-cyan-800">📍 Ridicare de la sediu</p>
+              <p className="mt-1 text-xs text-cyan-700">{PICKUP_ADDRESS}</p>
+              <p className="mt-1 text-xs text-cyan-700">📱 Vei fi informat prin mesaj când documentele sunt pregătite.</p>
+              <p className="mt-0.5 text-xs text-cyan-700">⏰ Ai la dispoziție <strong>3 zile lucrătoare</strong> pentru ridicare.</p>
+            </div>
+          ) : (
+            <p className="mt-4 rounded-xl bg-white/80 px-4 py-3 text-sm font-semibold text-slate-800 shadow-sm">
+              Livrarea se face în <strong>2-4 zile lucrătoare</strong>.
+            </p>
+          )}
         </div>
 
         {/* Detalii comandă */}
@@ -163,15 +212,16 @@ function SuccessContent() {
             )}
           </div>
 
-          {/* Fișiere */}
-          {files.length > 0 && (
-            <div className="space-y-2">
-              <h2 className="text-sm font-semibold text-slate-700 flex items-center gap-1.5">
-                <FileText className="h-4 w-4" />
-                Fișiere comandate
-              </h2>
+          {/* Fișiere grupate cu legare */}
+          {groups.map((group, gIdx) => (
+            <div key={gIdx} className="space-y-2">
+              {groups.length > 1 && (
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  Volum {gIdx + 1}
+                </p>
+              )}
               <div className="space-y-2">
-                {files.map((f, i) => (
+                {group.files.map((f, i) => (
                   <div key={i} className="flex items-start gap-3 rounded-lg bg-slate-50 p-3">
                     <Printer className="h-4 w-4 text-slate-400 mt-0.5 shrink-0" />
                     <div className="min-w-0 flex-1">
@@ -184,19 +234,18 @@ function SuccessContent() {
                   </div>
                 ))}
               </div>
+              {/* Legare sub fișiere */}
+              {group.spiralType && group.spiralType !== "none" && (
+                <div className="rounded-lg bg-cyan-50 px-4 py-2.5 text-sm text-cyan-800">
+                  🔗 Legare: <strong className="capitalize">{group.spiralType}</strong>
+                  {group.spiralColor ? ` (${group.spiralColor})` : ""}
+                </div>
+              )}
             </div>
-          )}
-
-          {/* Legare */}
-          {order?.config_details?.spiralType && order.config_details.spiralType !== "none" && (
-            <div className="rounded-lg bg-cyan-50 px-4 py-2.5 text-sm text-cyan-800">
-              🔗 Legare: <strong className="capitalize">{order.config_details.spiralType}</strong>
-              {order.config_details.spiralColor ? ` (${order.config_details.spiralColor})` : ""}
-            </div>
-          )}
+          ))}
 
           <p className="text-sm text-slate-600 text-center">
-            Veți primi un email de confirmare. Coletul va fi livrat la adresa indicată.
+            Veți primi un email de confirmare.
           </p>
 
           <Link

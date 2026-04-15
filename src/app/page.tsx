@@ -157,21 +157,46 @@ function calculateFilePrice(f: UploadedFile): number {
   const effectiveDuplex = duplex && f.pages > 1;
 
   if (mode === "bw") {
-    const sides = f.pages * copies;
-    return effectiveDuplex ? Math.ceil(sides / 2) * PRICE_BW_DUPLEX : sides * PRICE_BW_ONE_SIDE;
+    if (effectiveDuplex) {
+      const totalPages = f.pages * copies;
+      // If odd number of pages, last page of each copy is simplex
+      const fullSheets = Math.floor(f.pages / 2) * copies;
+      const oddLastPages = (f.pages % 2 !== 0) ? copies : 0;
+      return fullSheets * PRICE_BW_DUPLEX + oddLastPages * PRICE_BW_ONE_SIDE;
+    }
+    return f.pages * copies * PRICE_BW_ONE_SIDE;
   }
 
   if (f.colorAnalysis) {
-    const colorSides = f.colorAnalysis.colorPages * copies;
-    const bwSides = f.colorAnalysis.bwPages * copies;
+    const colorPages = f.colorAnalysis.colorPages;
+    const bwPages = f.colorAnalysis.bwPages;
     if (effectiveDuplex) {
-      return Math.ceil(colorSides / 2) * PRICE_COLOR_DUPLEX + Math.ceil(bwSides / 2) * PRICE_BW_DUPLEX;
+      // For duplex with color analysis, if total pages odd, last page is simplex
+      // We approximate: pair pages into sheets, last odd page at simplex rate
+      const totalPagesPerCopy = f.pages;
+      const fullSheets = Math.floor(totalPagesPerCopy / 2);
+      const hasOddPage = totalPagesPerCopy % 2 !== 0;
+      // Proportional split for duplex sheets
+      const colorRatio = colorPages / totalPagesPerCopy;
+      const colorSheets = Math.round(fullSheets * colorRatio) * copies;
+      const bwSheets = (fullSheets - Math.round(fullSheets * colorRatio)) * copies;
+      let price = colorSheets * PRICE_COLOR_DUPLEX + bwSheets * PRICE_BW_DUPLEX;
+      if (hasOddPage) {
+        // Last page: determine if it's color or bw based on ratio
+        const lastPageColor = colorRatio > 0.5;
+        price += copies * (lastPageColor ? PRICE_COLOR_ONE_SIDE : PRICE_BW_ONE_SIDE);
+      }
+      return price;
     }
-    return colorSides * PRICE_COLOR_ONE_SIDE + bwSides * PRICE_BW_ONE_SIDE;
+    return colorPages * copies * PRICE_COLOR_ONE_SIDE + bwPages * copies * PRICE_BW_ONE_SIDE;
   }
 
-  const sides = f.pages * copies;
-  return effectiveDuplex ? Math.ceil(sides / 2) * PRICE_COLOR_DUPLEX : sides * PRICE_COLOR_ONE_SIDE;
+  if (effectiveDuplex) {
+    const fullSheets = Math.floor(f.pages / 2) * copies;
+    const oddLastPages = (f.pages % 2 !== 0) ? copies : 0;
+    return fullSheets * PRICE_COLOR_DUPLEX + oddLastPages * PRICE_COLOR_ONE_SIDE;
+  }
+  return f.pages * copies * PRICE_COLOR_ONE_SIDE;
 }
 
 // ─── Progress Stepper Component ──────────────────────────────────────────────
@@ -486,7 +511,14 @@ export default function Home() {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const selected = e.target.files;
       if (!selected?.length) return;
-      const newItems = createFileItems(Array.from(selected));
+      const allFiles = Array.from(selected);
+      const pdfFiles = allFiles.filter((f) => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf"));
+      const nonPdfFiles = allFiles.filter((f) => f.type !== "application/pdf" && !f.name.toLowerCase().endsWith(".pdf"));
+      if (nonPdfFiles.length > 0) {
+        addToast(`Acceptăm doar fișiere PDF. ${nonPdfFiles.length} fișier${nonPdfFiles.length > 1 ? "e" : ""} respins${nonPdfFiles.length > 1 ? "e" : ""}.`, "error");
+      }
+      if (pdfFiles.length === 0) { e.target.value = ""; return; }
+      const newItems = createFileItems(pdfFiles);
       const tooBigFiles = newItems.filter((f) => f.error);
       const validNewFiles = newItems.filter((f) => !f.error);
       if (tooBigFiles.length > 0) {
@@ -638,7 +670,11 @@ export default function Home() {
         0
       );
       const opts = groupOptions[groupIndex] ?? defaultGroupOpts;
-      if (groupPages > 0 && opts.spiralType === "spirala") sum += SPIRAL_PRICE;
+      if (groupPages > 0 && opts.spiralType === "spirala") {
+        // Spiral price per copy (use max copies in group)
+        const maxCopies = Math.max(...grp.filesInGroup.map(f => f.copies ?? 1));
+        sum += SPIRAL_PRICE * maxCopies;
+      }
     });
     return sum;
   }, [bindingGroups, groupOptions]);
@@ -691,9 +727,13 @@ export default function Home() {
         )
       : totalPages;
 
+  const selectedGroupMaxCopies = selectedGroupIndex !== null
+    ? Math.max(...bindingGroups[selectedGroupIndex].filesInGroup.map(f => f.copies ?? 1))
+    : 1;
+
   const spiralOptions: { value: SpiralType; label: string; icon: React.ReactNode; description: string }[] = [
     { value: "none", label: "Doar print", icon: <BookOpen className="h-6 w-6" />, description: "Fără legare" },
-    { value: "spirala", label: "Spiralare", icon: <Circle className="h-6 w-6" />, description: "+5 lei" },
+    { value: "spirala", label: "Spiralare", icon: <Circle className="h-6 w-6" />, description: selectedGroupMaxCopies > 1 ? `+${(SPIRAL_PRICE * selectedGroupMaxCopies).toFixed(0)} lei (${SPIRAL_PRICE} lei × ${selectedGroupMaxCopies} copii)` : `+${SPIRAL_PRICE} lei` },
     { value: "perforare2", label: "Perforare", icon: <BookMarked className="h-6 w-6" />, description: "2 găuri" },
     { value: "capsare", label: "Capsare", icon: <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="3" width="16" height="18" rx="1" /><path d="M7 3 L7 7 L11 7" /><line x1="7" y1="3" x2="7" y2="7" strokeWidth="2.5" /><line x1="7" y1="7" x2="11" y2="7" strokeWidth="2.5" /></svg>, description: `Max ${MAX_CAPSARE_SHEETS} file` },
   ];
@@ -1053,7 +1093,7 @@ export default function Home() {
                   : "border-slate-200 bg-white hover:border-cyan-300 hover:bg-cyan-50/50 hover:shadow-[var(--shadow)]"
               }`}
             >
-              <input type="file" accept="application/pdf,.pdf" multiple onChange={onFileInput} className="hidden" />
+              <input type="file" accept=".pdf,application/pdf" multiple onChange={onFileInput} className="hidden" />
               {/* Custom illustration */}
               <div className="relative mb-4">
                 <div className={`drop-zone-icon flex h-24 w-24 items-center justify-center rounded-2xl ${isDragging ? "bg-cyan-100" : "bg-gradient-to-br from-cyan-50 to-slate-100"} transition-colors`}>
@@ -1112,7 +1152,7 @@ export default function Home() {
                       : "border-cyan-400 bg-gradient-to-r from-cyan-50 to-cyan-100/60 hover:border-cyan-500 hover:bg-cyan-100 hover:shadow-sm"
                   }`}
                 >
-                  <input ref={fileInputRef} type="file" accept="application/pdf,.pdf" multiple onChange={onFileInput} className="hidden" />
+                  <input ref={fileInputRef} type="file" accept=".pdf,application/pdf" multiple onChange={onFileInput} className="hidden" />
                   <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${isDragging ? "bg-cyan-300 text-cyan-800" : "bg-cyan-200 text-cyan-700"}`}>
                     <Plus className="h-6 w-6" />
                   </div>
@@ -1247,11 +1287,19 @@ export default function Home() {
                                 <p className="mt-0.5 text-xs text-amber-600">Toate paginile taxate ca color</p>
                               )}
                               {/* Price per file */}
-                              {item.pages != null && (
-                                <p className="mt-0.5 text-xs font-semibold text-cyan-600 tabular-nums">
-                                  {filePrice.toFixed(2)} lei
-                                </p>
-                              )}
+                              {item.pages != null && (() => {
+                                const groupInfo2 = bindingGroups.find((g) => g.filesInGroup.some((f) => f.id === item.id));
+                                const groupIdx2 = groupInfo2 ? bindingGroups.indexOf(groupInfo2) : -1;
+                                const opts2 = groupIdx2 >= 0 ? (groupOptions[groupIdx2] ?? defaultGroupOpts) : defaultGroupOpts;
+                                const hasSpiralForFile = opts2.spiralType === "spirala";
+                                const isFirstInGrp = groupInfo2 ? groupInfo2.filesInGroup[0].id === item.id : false;
+                                const spiralPriceForFile = hasSpiralForFile && isFirstInGrp ? SPIRAL_PRICE * (item.copies ?? 1) : 0;
+                                return (
+                                  <p className="mt-0.5 text-xs font-semibold text-cyan-600 tabular-nums">
+                                    {filePrice.toFixed(2)} lei{spiralPriceForFile > 0 ? ` + ${spiralPriceForFile.toFixed(2)} lei spiralare` : ""}
+                                  </p>
+                                );
+                              })()}
                             </div>
                             <div className="flex shrink-0 items-center gap-0.5">
                               <div className="flex flex-col rounded-lg border border-slate-200 bg-slate-50/80 p-0.5">
@@ -1437,29 +1485,69 @@ export default function Home() {
                               </label>
 
                               {/* Copies */}
-                              <label className="flex items-center gap-3">
+                              <div>
                                 <span className="text-sm font-semibold text-slate-700">Copii</span>
-                                <input
-                                  type="number"
-                                  min={1}
-                                  max={50}
-                                  value={opts.copies}
-                                  onChange={(e) => {
-                                    const raw = Number(e.target.value) || 1;
-                                    const next = Math.min(50, Math.max(1, raw));
-                                    setFiles((prev) => {
-                                      const groups = getBindingGroups(prev);
-                                      const group = groups.find((g) => g.filesInGroup.some((f) => f.id === file.id));
-                                      if (!group || group.filesInGroup.length === 1) {
-                                        return prev.map((f) => f.id === file.id ? { ...f, copies: next } : f);
-                                      }
-                                      const idsInGroup = new Set(group.filesInGroup.map((f) => f.id));
-                                      return prev.map((f) => idsInGroup.has(f.id) ? { ...f, copies: next } : f);
-                                    });
-                                  }}
-                                  className="w-20 rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
-                                />
-                              </label>
+                                <div className="mt-1 flex items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const next = Math.max(1, opts.copies - 1);
+                                      setFiles((prev) => {
+                                        const groups = getBindingGroups(prev);
+                                        const group = groups.find((g) => g.filesInGroup.some((f) => f.id === file.id));
+                                        if (!group || group.filesInGroup.length === 1) {
+                                          return prev.map((f) => f.id === file.id ? { ...f, copies: next } : f);
+                                        }
+                                        const idsInGroup = new Set(group.filesInGroup.map((f) => f.id));
+                                        return prev.map((f) => idsInGroup.has(f.id) ? { ...f, copies: next } : f);
+                                      });
+                                    }}
+                                    disabled={opts.copies <= 1}
+                                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-600 hover:bg-slate-100 disabled:opacity-40"
+                                  >
+                                    <ChevronDown className="h-4 w-4" />
+                                  </button>
+                                  <input
+                                    type="number"
+                                    min={1}
+                                    max={100}
+                                    value={opts.copies}
+                                    onChange={(e) => {
+                                      const raw = Number(e.target.value) || 1;
+                                      const next = Math.min(100, Math.max(1, raw));
+                                      setFiles((prev) => {
+                                        const groups = getBindingGroups(prev);
+                                        const group = groups.find((g) => g.filesInGroup.some((f) => f.id === file.id));
+                                        if (!group || group.filesInGroup.length === 1) {
+                                          return prev.map((f) => f.id === file.id ? { ...f, copies: next } : f);
+                                        }
+                                        const idsInGroup = new Set(group.filesInGroup.map((f) => f.id));
+                                        return prev.map((f) => idsInGroup.has(f.id) ? { ...f, copies: next } : f);
+                                      });
+                                    }}
+                                    className="w-16 rounded-xl border border-slate-300 px-3 py-2 text-sm text-center focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const next = Math.min(100, opts.copies + 1);
+                                      setFiles((prev) => {
+                                        const groups = getBindingGroups(prev);
+                                        const group = groups.find((g) => g.filesInGroup.some((f) => f.id === file.id));
+                                        if (!group || group.filesInGroup.length === 1) {
+                                          return prev.map((f) => f.id === file.id ? { ...f, copies: next } : f);
+                                        }
+                                        const idsInGroup = new Set(group.filesInGroup.map((f) => f.id));
+                                        return prev.map((f) => idsInGroup.has(f.id) ? { ...f, copies: next } : f);
+                                      });
+                                    }}
+                                    disabled={opts.copies >= 100}
+                                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-600 hover:bg-slate-100 disabled:opacity-40"
+                                  >
+                                    <ChevronUp className="h-4 w-4" />
+                                  </button>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         );
@@ -1594,8 +1682,13 @@ export default function Home() {
                     <div className="mt-3 flex flex-wrap items-center gap-3">
                       <span className="inline-flex items-center gap-1.5 bg-slate-100 px-3 py-2 text-base font-bold text-slate-800">
                         <CreditCard className="h-4 w-4 text-slate-500" />
-                        {effectivePrice.toFixed(2)} lei printare
+                        {pagePrice.toFixed(2)} lei printare
                       </span>
+                      {spiralPrice > 0 && (
+                        <span className="inline-flex items-center gap-1.5 bg-cyan-100 px-3 py-2 text-sm font-bold text-cyan-700">
+                          +{spiralPrice.toFixed(2)} lei spiralare
+                        </span>
+                      )}
                       {deliveryMethod !== "ridicare" && totalPrice < MIN_ORDER_LEI && totalPrice > 0 && (
                         <span className="inline-flex items-center gap-1.5 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 border border-amber-200 rounded">
                           Minim {MIN_ORDER_LEI} lei (valoare printare: {totalPrice.toFixed(2)} lei)
@@ -2008,34 +2101,60 @@ export default function Home() {
               {orderSuccessDetails.paymentMethod !== "ramburs" && (
                 <p className="mt-3 text-slate-700">Plata a fost procesată cu succes.</p>
               )}
-              {orderSuccessDetails.deliveryMethod === "ridicare" && (
+              {orderSuccessDetails.deliveryMethod === "ridicare" ? (
                 <div className="mt-4 rounded-xl bg-cyan-50 border border-cyan-200 px-4 py-3 text-left">
                   <p className="text-sm font-semibold text-cyan-800">📍 Ridicare de la sediu</p>
                   <p className="mt-1 text-xs text-cyan-700">{PICKUP_ADDRESS}</p>
                   <p className="mt-1 text-xs text-cyan-700">📱 Vei fi informat prin mesaj când documentele sunt pregătite.</p>
                   <p className="mt-0.5 text-xs text-cyan-700">⏰ Ai la dispoziție <strong>3 zile lucrătoare</strong> pentru ridicare.</p>
                 </div>
+              ) : (
+                <p className="mt-4 rounded-xl bg-white/80 px-4 py-3 text-sm font-semibold text-slate-800 shadow-sm">
+                  Livrarea se face în <strong>2-4 zile lucrătoare</strong>.
+                </p>
               )}
             </div>
 
-            {/* Detalii */}
-            <div className="px-6 py-6 space-y-4">
+            {/* Detalii complete */}
+            <div className="px-6 py-6 space-y-5">
               <div className="rounded-xl bg-slate-50 p-4 space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-500">Total pagini</span>
-                  <span className="font-medium text-slate-800">{orderSuccessDetails.totalPages}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-500">Total de plată</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-slate-500">Total de plată</span>
                   <span className="text-lg font-bold text-green-700">{orderSuccessDetails.totalWithShipping.toFixed(2)} lei</span>
                 </div>
               </div>
 
+              {/* Fișiere grupate */}
+              {orderSuccessDetails.groups.map((group, gIdx) => (
+                <div key={gIdx} className="space-y-2">
+                  {orderSuccessDetails.groups.length > 1 && (
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      Volum {gIdx + 1}
+                    </p>
+                  )}
+                  {group.files.map((f, fIdx) => (
+                    <div key={fIdx} className="flex items-start gap-3 rounded-lg bg-slate-50 p-3">
+                      <Printer className="h-4 w-4 text-slate-400 mt-0.5 shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-slate-800 truncate">{f.name}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {f.pages ?? "?"} pag. · {f.printMode === "color" ? "Color" : "Alb-negru"}
+                          {f.duplex ? " · Față-verso" : ""} · {f.copies} {f.copies === 1 ? "copie" : "copii"}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                  {group.spiralType && group.spiralType !== "none" && (
+                    <div className="rounded-lg bg-cyan-50 px-4 py-2.5 text-sm text-cyan-800">
+                      🔗 Legare: <strong className="capitalize">{group.spiralType}</strong>
+                      {group.spiralColor ? ` (${group.spiralColor})` : ""}
+                    </div>
+                  )}
+                </div>
+              ))}
+
               <p className="text-sm text-slate-600 text-center">
-                {orderSuccessDetails.deliveryMethod === "ridicare"
-                  ? "Vei fi notificat când documentele sunt pregătite pentru ridicare."
-                  : <>Livrarea se face în <strong>2-4 zile lucrătoare</strong>.</>}
-                {orderSuccessDetails.paymentMethod === "ramburs" && " Vei primi un email de confirmare."}
+                Vei primi un email de confirmare.
               </p>
 
               <button
@@ -2043,8 +2162,7 @@ export default function Home() {
                 onClick={() => setOrderSuccessDetails(null)}
                 className="flex items-center justify-center gap-2 w-full rounded-xl bg-slate-800 py-3 text-sm font-semibold text-white hover:bg-slate-900 transition-colors"
               >
-                ←
-                Înapoi la pagina principală
+                ← Înapoi la pagina principală
               </button>
             </div>
           </div>
@@ -2123,7 +2241,7 @@ export default function Home() {
                       </label>
                       <label className="flex items-center gap-2">
                         <span>Copii:</span>
-                        <input type="number" min={1} max={50} value={file.copies} onChange={(e) => { const next = Number(e.target.value) || 1; setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, copies: Math.min(50, Math.max(1, next)) } : f)); }} className="w-16 rounded border border-slate-300 px-2 py-1 text-xs" />
+                        <input type="number" min={1} max={100} value={file.copies} onChange={(e) => { const next = Number(e.target.value) || 1; setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, copies: Math.min(100, Math.max(1, next)) } : f)); }} className="w-16 rounded border border-slate-300 px-2 py-1 text-xs" />
                       </label>
                     </div>
                   </div>
