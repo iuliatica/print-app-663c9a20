@@ -727,9 +727,13 @@ export default function Home() {
         )
       : totalPages;
 
+  const selectedGroupMaxCopies = selectedGroupIndex !== null
+    ? Math.max(...bindingGroups[selectedGroupIndex].filesInGroup.map(f => f.copies ?? 1))
+    : 1;
+
   const spiralOptions: { value: SpiralType; label: string; icon: React.ReactNode; description: string }[] = [
     { value: "none", label: "Doar print", icon: <BookOpen className="h-6 w-6" />, description: "Fără legare" },
-    { value: "spirala", label: "Spiralare", icon: <Circle className="h-6 w-6" />, description: "+5 lei" },
+    { value: "spirala", label: "Spiralare", icon: <Circle className="h-6 w-6" />, description: selectedGroupMaxCopies > 1 ? `+${(SPIRAL_PRICE * selectedGroupMaxCopies).toFixed(0)} lei (${SPIRAL_PRICE} lei × ${selectedGroupMaxCopies} copii)` : `+${SPIRAL_PRICE} lei` },
     { value: "perforare2", label: "Perforare", icon: <BookMarked className="h-6 w-6" />, description: "2 găuri" },
     { value: "capsare", label: "Capsare", icon: <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="3" width="16" height="18" rx="1" /><path d="M7 3 L7 7 L11 7" /><line x1="7" y1="3" x2="7" y2="7" strokeWidth="2.5" /><line x1="7" y1="7" x2="11" y2="7" strokeWidth="2.5" /></svg>, description: `Max ${MAX_CAPSARE_SHEETS} file` },
   ];
