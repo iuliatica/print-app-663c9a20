@@ -30,6 +30,16 @@ export async function GET(request: Request) {
     let order = null;
     if (orderId) {
       const supabase = getServerSupabase();
+
+      // If Stripe says paid, update the order status in DB (in case webhook didn't fire)
+      if (paid) {
+        await supabase
+          .from("orders")
+          .update({ status: "paid", stripe_session_id: sessionId })
+          .eq("id", orderId)
+          .neq("status", "paid"); // only update if not already paid
+      }
+
       const { data } = await supabase
         .from("orders")
         .select("id, created_at, phone, customer_email, total_price, payment_method, status, config_details")
