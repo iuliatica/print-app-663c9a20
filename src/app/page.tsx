@@ -814,8 +814,8 @@ export default function Home() {
           customer_email: email.trim().toLowerCase(),
           phone: phone.trim().replace(/\s/g, ""),
           customer_name: name.trim(),
-          shipping_address: address.trim(),
-          config_details,
+          shipping_address: deliveryMethod === "ridicare" ? `RIDICARE: ${PICKUP_ADDRESS}` : address.trim(),
+          config_details: { ...config_details, deliveryMethod },
         }),
       });
       const orderText = await orderRes.text();
