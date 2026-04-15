@@ -1634,7 +1634,7 @@ export default function Home() {
                     <p className="text-sm font-medium text-slate-600">Total comandă</p>
                     <p className="mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">{totalWithShipping.toFixed(2)} lei</p>
                     <p className="mt-1 text-xs text-slate-500">
-                      {effectivePrice.toFixed(2)} lei printare + {SHIPPING_COST_LEI} lei transport · {totalPages} pagini
+                      {effectivePrice.toFixed(2)} lei printare{shippingCost > 0 ? ` + ${shippingCost} lei transport` : " · Ridicare de la sediu (gratuit)"} · {totalPages} pagini
                     </p>
                     {detectedColorPages > 0 && (
                       <p className="mt-0.5 text-xs text-slate-500">
@@ -1645,7 +1645,7 @@ export default function Home() {
                     )}
                     {totalPrice > 0 && totalPrice < MIN_ORDER_LEI && (
                       <p className="mt-1 text-xs font-semibold text-amber-600">
-                        ⚠ Costul real: {totalPrice.toFixed(2)} lei. Comanda minimă este de {MIN_ORDER_LEI} lei, prețul a fost ajustat automat (+ {SHIPPING_COST_LEI} lei transport).
+                        ⚠ Costul real: {totalPrice.toFixed(2)} lei. Comanda minimă este de {MIN_ORDER_LEI} lei, prețul a fost ajustat automat{shippingCost > 0 ? ` (+ ${shippingCost} lei transport)` : ""}.
                       </p>
                     )}
                   </>
@@ -1725,7 +1725,7 @@ export default function Home() {
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
               <p className="text-lg font-bold text-cyan-600 tabular-nums">{totalWithShipping.toFixed(2)} lei</p>
-              <p className="text-xs text-slate-500 truncate">{totalPages} pag. · incl. {SHIPPING_COST_LEI} lei transport</p>
+              <p className="text-xs text-slate-500 truncate">{totalPages} pag.{shippingCost > 0 ? ` · incl. ${shippingCost} lei transport` : " · Ridicare gratuită"}</p>
             </div>
             <button
               type="button"
@@ -1828,8 +1828,8 @@ export default function Home() {
                     </div>
                   )}
                   <div className="flex justify-between text-slate-600">
-                    <span>Transport</span>
-                    <span>{SHIPPING_COST_LEI.toFixed(2)} lei</span>
+                    <span>{deliveryMethod === "ridicare" ? "Transport (ridicare)" : "Transport (curier)"}</span>
+                    <span>{shippingCost > 0 ? `${shippingCost.toFixed(2)} lei` : "GRATUIT"}</span>
                   </div>
                   <div className="flex justify-between font-semibold text-slate-800">
                     <span>Total</span>
@@ -1838,10 +1838,40 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Shipping form */}
+              {/* Delivery method */}
+              <div>
+                <p className="mb-3 text-sm font-medium text-slate-700">Modalitate livrare</p>
+                <div className="space-y-2">
+                  <label className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 p-4 transition-colors hover:bg-slate-50 ${deliveryMethod === "curier" ? "border-cyan-500 bg-cyan-50/50" : ""}`}>
+                    <input type="radio" name="deliveryMethod" checked={deliveryMethod === "curier"} onChange={() => setDeliveryMethod("curier")} className="h-4 w-4 text-cyan-600" />
+                    <div>
+                      <span className="font-medium text-slate-800">Livrare prin curier</span>
+                      <p className="text-xs text-slate-500">2-4 zile lucrătoare · {SHIPPING_COST_LEI} lei</p>
+                    </div>
+                  </label>
+                  <label className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 p-4 transition-colors hover:bg-slate-50 ${deliveryMethod === "ridicare" ? "border-cyan-500 bg-cyan-50/50" : ""}`}>
+                    <input type="radio" name="deliveryMethod" checked={deliveryMethod === "ridicare"} onChange={() => setDeliveryMethod("ridicare")} className="h-4 w-4 text-cyan-600" />
+                    <div>
+                      <span className="font-medium text-slate-800">Ridicare de la sediu</span>
+                      <p className="text-xs text-slate-500">GRATUIT · {PICKUP_ADDRESS}</p>
+                    </div>
+                  </label>
+                </div>
+                {deliveryMethod === "ridicare" && (
+                  <div className="mt-3 rounded-xl border border-cyan-200 bg-cyan-50/80 px-4 py-3 text-xs text-cyan-800 space-y-1.5">
+                    <p className="font-semibold">📍 Adresa de ridicare:</p>
+                    <p>{PICKUP_ADDRESS}</p>
+                    <p>📱 Vei fi informat prin mesaj când documentele sunt pregătite.</p>
+                    <p>⏰ Ai la dispoziție <strong>3 zile lucrătoare</strong> pentru ridicare.</p>
+                    <p className="text-cyan-600 italic">Programul de ridicare va fi comunicat în mesajul de notificare.</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Contact form */}
               <div>
                 <p className="mb-3 text-sm font-medium text-slate-700">
-                  Date livrare <span className="text-red-500">*</span>
+                  {deliveryMethod === "curier" ? "Date livrare" : "Date contact"} <span className="text-red-500">*</span>
                 </p>
                 <div className="space-y-3">
                   {([
@@ -1867,23 +1897,25 @@ export default function Home() {
                       {shippingErrors[key] && <p className="mt-1 text-xs text-red-600">{shippingErrors[key]}</p>}
                     </label>
                   ))}
-                  <label className="block">
-                    <span className="mb-1 block text-xs text-slate-500">Adresă livrare <span className="text-red-500">*</span></span>
-                    <textarea
-                      required
-                      value={shipping.address}
-                      onChange={(e) => {
-                        setShipping((s) => ({ ...s, address: e.target.value }));
-                        if (shippingErrors.address) setShippingErrors((prev) => ({ ...prev, address: undefined }));
-                      }}
-                      placeholder="Strada, nr., localitate, județ, cod poștal"
-                      rows={3}
-                      className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 ${
-                        shippingErrors.address ? "border-red-400 focus:border-red-500 bg-red-50/50" : "border-slate-300 focus:border-cyan-500"
-                      }`}
-                    />
-                    {shippingErrors.address && <p className="mt-1 text-xs text-red-600">{shippingErrors.address}</p>}
-                  </label>
+                  {deliveryMethod === "curier" && (
+                    <label className="block">
+                      <span className="mb-1 block text-xs text-slate-500">Adresă livrare <span className="text-red-500">*</span></span>
+                      <textarea
+                        required
+                        value={shipping.address}
+                        onChange={(e) => {
+                          setShipping((s) => ({ ...s, address: e.target.value }));
+                          if (shippingErrors.address) setShippingErrors((prev) => ({ ...prev, address: undefined }));
+                        }}
+                        placeholder="Strada, nr., localitate, județ, cod poștal"
+                        rows={3}
+                        className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 ${
+                          shippingErrors.address ? "border-red-400 focus:border-red-500 bg-red-50/50" : "border-slate-300 focus:border-cyan-500"
+                        }`}
+                      />
+                      {shippingErrors.address && <p className="mt-1 text-xs text-red-600">{shippingErrors.address}</p>}
+                    </label>
+                  )}
                 </div>
               </div>
 
@@ -1901,8 +1933,8 @@ export default function Home() {
                   <label className="flex cursor-pointer items-center gap-3 rounded-xl border-2 p-4 transition-colors hover:bg-slate-50">
                     <input type="radio" name="paymentMethod" checked={paymentMethod === "ramburs"} onChange={() => setPaymentMethod("ramburs")} className="h-4 w-4 text-cyan-600" />
                     <div>
-                      <span className="font-medium text-slate-800">Plată la livrare (ramburs)</span>
-                      <p className="text-xs text-slate-500">Achit la curier · {totalWithShipping.toFixed(2)} lei</p>
+                      <span className="font-medium text-slate-800">{deliveryMethod === "ridicare" ? "Plată la ridicare" : "Plată la livrare (ramburs)"}</span>
+                      <p className="text-xs text-slate-500">{deliveryMethod === "ridicare" ? "Achit la ridicarea documentelor" : "Achit la curier"} · {totalWithShipping.toFixed(2)} lei</p>
                     </div>
                   </label>
                 </div>
