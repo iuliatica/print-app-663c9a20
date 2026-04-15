@@ -2239,10 +2239,42 @@ export default function Home() {
                         <input type="checkbox" checked={file.duplex} onChange={(e) => setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, duplex: e.target.checked } : f))} className="h-3.5 w-3.5 rounded border-slate-300 text-cyan-600" />
                         <span>Față-verso</span>
                       </label>
-                      <label className="flex items-center gap-2">
-                        <span>Copii:</span>
-                        <input type="number" min={1} max={100} value={file.copies} onChange={(e) => { const next = Number(e.target.value) || 1; setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, copies: Math.min(100, Math.max(1, next)) } : f)); }} className="w-16 rounded border border-slate-300 px-2 py-1 text-xs" />
-                      </label>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] uppercase tracking-wide text-slate-500">Copii:</span>
+                        <div className="flex items-center">
+                          <button
+                            type="button"
+                            onClick={() => setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, copies: Math.max(1, (f.copies ?? 1) - 1) } : f))}
+                            disabled={(file.copies ?? 1) <= 1}
+                            className="rounded-l-md border border-r-0 border-slate-300 bg-slate-50 px-2 py-1 text-slate-600 hover:bg-slate-100 disabled:opacity-40"
+                            aria-label="Scade copii"
+                          >
+                            <ChevronDown className="h-3.5 w-3.5" />
+                          </button>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            min={1}
+                            max={100}
+                            value={file.copies}
+                            onChange={(e) => {
+                              const val = e.target.value.replace(/[^0-9]/g, "");
+                              const next = val === "" ? 1 : Math.min(100, Math.max(1, parseInt(val, 10)));
+                              setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, copies: next } : f));
+                            }}
+                            className="w-12 border border-slate-300 px-2 py-1 text-center text-xs [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, copies: Math.min(100, (f.copies ?? 1) + 1) } : f))}
+                            disabled={(file.copies ?? 1) >= 100}
+                            className="rounded-r-md border border-l-0 border-slate-300 bg-slate-50 px-2 py-1 text-slate-600 hover:bg-slate-100 disabled:opacity-40"
+                            aria-label="Adaugă copii"
+                          >
+                            <ChevronUp className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
