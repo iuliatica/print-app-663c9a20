@@ -22,6 +22,7 @@ type ConfirmationBody = {
   customerName?: string;
   totalPrice: number;
   paymentMethod: string;
+  deliveryMethod?: "curier" | "ridicare";
   groups: GroupInfo[];
   shippingAddress?: string;
   // Legacy flat fields (backwards compat)
@@ -30,6 +31,8 @@ type ConfirmationBody = {
   spiralColor?: string;
   coverBackColor?: string;
 };
+
+const PICKUP_ADDRESS = "Alba Iulia, localitatea Barabant, strada Mureșului";
 
 function getSpiralLabel(spiralType?: string, spiralColor?: string): string {
   if (spiralType === "spirala") return `Spirală ${spiralColor ?? "neagră"}`;
@@ -149,7 +152,11 @@ function buildEmailHtml(data: ConfirmationBody): string {
                   <td style="padding:6px 0;font-size:14px;color:#64748b;">Metodă plată</td>
                   <td style="padding:6px 0;font-size:14px;color:#1e293b;font-weight:600;text-align:right;">${paymentLabel}</td>
                 </tr>
-                ${data.shippingAddress ? `<tr>
+                <tr>
+                  <td style="padding:6px 0;font-size:14px;color:#64748b;">Livrare</td>
+                  <td style="padding:6px 0;font-size:14px;color:#1e293b;font-weight:600;text-align:right;">${data.deliveryMethod === "ridicare" ? "Ridicare de la sediu (GRATUIT)" : "Curier (15 lei)"}</td>
+                </tr>
+                ${data.deliveryMethod !== "ridicare" && data.shippingAddress ? `<tr>
                   <td style="padding:6px 0;font-size:14px;color:#64748b;">Adresă livrare</td>
                   <td style="padding:6px 0;font-size:14px;color:#1e293b;font-weight:600;text-align:right;">${data.shippingAddress}</td>
                 </tr>` : ""}
@@ -164,11 +171,21 @@ function buildEmailHtml(data: ConfirmationBody): string {
             </div>
 
             <!-- Info -->
+            ${data.deliveryMethod === "ridicare" ? `
+            <div style="background-color:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:16px 20px;margin-bottom:24px;">
+              <p style="margin:0 0 8px;font-size:14px;font-weight:700;color:#065f46;">📍 Ridicare de la sediu</p>
+              <p style="margin:0 0 4px;font-size:14px;color:#065f46;">${PICKUP_ADDRESS}</p>
+              <p style="margin:0 0 4px;font-size:14px;color:#065f46;">📱 Vei fi informat prin mesaj când documentele sunt pregătite.</p>
+              <p style="margin:0 0 4px;font-size:14px;color:#065f46;">⏰ Ai la dispoziție <strong>3 zile lucrătoare</strong> pentru ridicare.</p>
+              <p style="margin:0;font-size:13px;color:#065f46;font-style:italic;">Programul de ridicare va fi comunicat în mesajul de notificare.</p>
+            </div>
+            ` : `
             <div style="background-color:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:16px 20px;margin-bottom:24px;">
               <p style="margin:0;font-size:14px;color:#065f46;line-height:1.6;">
                 📦 Comanda va fi procesată și livrată prin curier în <strong>2-4 zile lucrătoare</strong>.
               </p>
             </div>
+            `}
 
             <p style="margin:0;font-size:14px;color:#475569;line-height:1.6;">
               Dacă ai întrebări, nu ezita să ne contactezi la <a href="mailto:contact@printica.ro" style="color:#0ea5a0;text-decoration:underline;">contact@printica.ro</a>.
