@@ -645,7 +645,8 @@ export default function Home() {
 
   const totalPrice = pagePrice + spiralPrice;
   const effectivePrice = Math.max(totalPrice, totalPages > 0 ? MIN_ORDER_LEI : 0);
-  const totalWithShipping = effectivePrice + SHIPPING_COST_LEI;
+  const shippingCost = deliveryMethod === "ridicare" ? 0 : SHIPPING_COST_LEI;
+  const totalWithShipping = effectivePrice + shippingCost;
 
   // ─── Options data ──────────────────────────────────────────────────────────
   const coverBackColors: { value: CoverBackColor; label: string; circleClass: string }[] = [
@@ -852,6 +853,7 @@ export default function Home() {
       if (paymentMethod === "ramburs") {
         setOrderSuccessDetails({
           paymentMethod: "ramburs",
+          deliveryMethod,
           groups: validBindingGroups.map((grp, groupIndex) => {
             const opts = validBindingOptions[groupIndex] ?? defaultGroupOpts;
             return {
