@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin-comenzi
+Disallow: /api/
+Disallow: /auth/
+Disallow: /success
+Disallow: /login
+
+Sitemap: https://printica.lovable.app/sitemap.xml
