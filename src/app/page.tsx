@@ -1424,7 +1424,21 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
-                  <div className="p-5 sm:p-6">
+                  <div className="p-5 sm:p-6 relative">
+                    {/* Processing overlay - covers entire config area */}
+                    {selectedFileId && files.some((f) => f.id === selectedFileId) && (() => {
+                      const file = files.find((f) => f.id === selectedFileId)!;
+                      return file.pages == null && isLoadingPages;
+                    })() && (
+                      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm">
+                        <Loader2 className="h-10 w-10 animate-spin text-cyan-500" />
+                        <p className="mt-3 text-sm font-medium text-slate-700">Se procesează fișierul…</p>
+                        <p className="mt-1 text-xs text-slate-500 truncate max-w-[280px] px-4 text-center">
+                          {files.find((f) => f.id === selectedFileId)?.name}
+                        </p>
+                      </div>
+                    )}
+
                     {/* Print options for selected file */}
                     {selectedFileId && files.some((f) => f.id === selectedFileId) ? (
                       (() => {
@@ -1434,13 +1448,7 @@ export default function Home() {
                           duplex: file.duplex ?? DEFAULT_PRINT_OPTIONS.duplex,
                           copies: file.copies ?? DEFAULT_PRINT_OPTIONS.copies,
                         };
-                        return file.pages == null && isLoadingPages ? (
-                          <div key={file.id} className="flex flex-col items-center justify-center py-12 gap-3">
-                            <Loader2 className="h-8 w-8 animate-spin text-cyan-500" />
-                            <p className="text-sm font-medium text-slate-600">Se procesează fișierul…</p>
-                            <p className="text-xs text-slate-400 truncate max-w-[250px]" title={file.name}>{file.name}</p>
-                          </div>
-                        ) : (
+                        return (
                           <div key={file.id}>
                             <div className="mb-5 flex items-start gap-3">
                               <span className="flex h-10 w-10 shrink-0 items-center justify-center bg-cyan-100 text-cyan-600">
