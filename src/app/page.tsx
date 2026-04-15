@@ -40,7 +40,7 @@ const PRICE_BW_ONE_SIDE = 0.2;
 const PRICE_BW_DUPLEX = 0.35;
 const PRICE_COLOR_ONE_SIDE = 0.7;
 const PRICE_COLOR_DUPLEX = 1.2;
-const SPIRAL_PRICE = 3;
+const SPIRAL_PRICE = 5;
 const SHIPPING_COST_LEI = 15;
 const MIN_ORDER_LEI = 30;
 const MAX_CAPSARE_SHEETS = 220;
@@ -445,7 +445,7 @@ export default function Home() {
     (e: React.DragEvent) => {
       e.preventDefault();
       setIsDragging(false);
-      const dropped = Array.from(e.dataTransfer.files).filter((f) => f.type === "application/pdf");
+      const dropped = Array.from(e.dataTransfer.files).filter((f) => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf"));
       if (dropped.length === 0) return;
       const newItems = createFileItems(dropped);
       const tooBigFiles = newItems.filter((f) => f.error);
@@ -673,7 +673,7 @@ export default function Home() {
 
   const spiralOptions: { value: SpiralType; label: string; icon: React.ReactNode; description: string }[] = [
     { value: "none", label: "Doar print", icon: <BookOpen className="h-6 w-6" />, description: "Fără legare" },
-    { value: "spirala", label: "Spiralare", icon: <Circle className="h-6 w-6" />, description: "+3 lei" },
+    { value: "spirala", label: "Spiralare", icon: <Circle className="h-6 w-6" />, description: "+5 lei" },
     { value: "perforare2", label: "Perforare", icon: <BookMarked className="h-6 w-6" />, description: "2 găuri" },
     { value: "capsare", label: "Capsare", icon: <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="3" width="16" height="18" rx="1" /><path d="M7 3 L7 7 L11 7" /><line x1="7" y1="3" x2="7" y2="7" strokeWidth="2.5" /><line x1="7" y1="7" x2="11" y2="7" strokeWidth="2.5" /></svg>, description: `Max ${MAX_CAPSARE_SHEETS} file` },
   ];
@@ -935,8 +935,8 @@ export default function Home() {
               Rapid · Sigur · Stripe
             </div>
             <div className="flex items-center justify-center lg:justify-start gap-3 bg-transparent">
-              <img src="/logo-symbol.png" className="h-10 w-auto shrink-0" alt="Printica Logo" />
-              <span className="text-2xl sm:text-3xl text-[#00B4D8]" style={{ fontFamily: "'Pacifico', cursive" }}>
+              <img src="/logo-symbol.png" className="h-12 w-auto shrink-0 rounded-lg" alt="Printica Logo" />
+              <span className="text-2xl sm:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-[#00D1FF] to-[#0096C7]" style={{ fontFamily: "'Pacifico', cursive" }}>
                 Printica
               </span>
             </div>
@@ -1031,7 +1031,7 @@ export default function Home() {
                   : "border-slate-200 bg-white hover:border-cyan-300 hover:bg-cyan-50/50 hover:shadow-[var(--shadow)]"
               }`}
             >
-              <input type="file" accept="application/pdf" multiple onChange={onFileInput} className="hidden" />
+              <input type="file" accept="application/pdf,.pdf" multiple onChange={onFileInput} className="hidden" />
               {/* Custom illustration */}
               <div className="relative mb-4">
                 <div className={`drop-zone-icon flex h-24 w-24 items-center justify-center rounded-2xl ${isDragging ? "bg-cyan-100" : "bg-gradient-to-br from-cyan-50 to-slate-100"} transition-colors`}>
@@ -1090,7 +1090,7 @@ export default function Home() {
                       : "border-cyan-400 bg-gradient-to-r from-cyan-50 to-cyan-100/60 hover:border-cyan-500 hover:bg-cyan-100 hover:shadow-sm"
                   }`}
                 >
-                  <input ref={fileInputRef} type="file" accept="application/pdf" multiple onChange={onFileInput} className="hidden" />
+                  <input ref={fileInputRef} type="file" accept="application/pdf,.pdf" multiple onChange={onFileInput} className="hidden" />
                   <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${isDragging ? "bg-cyan-300 text-cyan-800" : "bg-cyan-200 text-cyan-700"}`}>
                     <Plus className="h-6 w-6" />
                   </div>
@@ -1637,15 +1637,23 @@ export default function Home() {
                   </>
                 )}
               </div>
-              <button
-                type="button"
-                onClick={handleOpenCheckout}
-                disabled={files.length === 0 || isCheckoutLoading || totalPages === 0}
-                className="flex items-center gap-2 rounded-xl px-8 py-4 text-lg font-semibold text-white shadow-md shadow-[#00D1FF]/20 transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none" style={{ background: '#00D1FF' }}
-              >
-                <CreditCard className="h-5 w-5" />
-                Finalizează comanda
-              </button>
+              <div className="flex flex-col items-center sm:items-end gap-2">
+                {(isLoadingPages || isUploading) && (
+                  <div className="flex items-center gap-2 text-cyan-700">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span className="text-xs font-medium">Se încarcă documentele...</span>
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={handleOpenCheckout}
+                  disabled={files.length === 0 || isCheckoutLoading || totalPages === 0 || isLoadingPages}
+                  className="flex items-center gap-2 rounded-xl px-8 py-4 text-lg font-semibold text-white shadow-md shadow-[#00D1FF]/20 transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none" style={{ background: '#00D1FF' }}
+                >
+                  <CreditCard className="h-5 w-5" />
+                  Finalizează comanda
+                </button>
+              </div>
             </div>
           </div>
         </section>
@@ -1977,38 +1985,54 @@ export default function Home() {
         const file = files.find((f) => f.id === previewFileId);
         if (!file) return null;
         return (
-          <div className="fixed inset-0 z-50 flex min-h-0 flex-col items-center overflow-y-auto bg-black/60 px-4 py-6 backdrop-blur-sm">
-            <div className="flex max-h-[90vh] min-h-0 w-full max-w-6xl flex-1 flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-slate-200/50">
-              <div className="flex shrink-0 items-center justify-between border-b border-slate-200 bg-slate-50/80 px-6 py-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white shadow-sm">
+          <div className="fixed inset-0 z-50 flex min-h-0 flex-col items-center overflow-y-auto bg-black/60 px-2 sm:px-4 py-4 sm:py-6 backdrop-blur-sm">
+            <div className="flex max-h-[95vh] sm:max-h-[90vh] min-h-0 w-full max-w-6xl flex-1 flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-slate-200/50">
+              <div className="flex shrink-0 items-center justify-between border-b border-slate-200 bg-slate-50/80 px-3 sm:px-6 py-3 sm:py-4 gap-2">
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                  <div className="hidden sm:flex h-10 w-10 items-center justify-center rounded-lg bg-white shadow-sm">
                     <FileText className="h-5 w-5 text-slate-600" />
                   </div>
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900">Preview document</p>
-                    <p className="truncate text-xs text-slate-500">{file.name} {file.pages != null && `· ${file.pages} pagini`}</p>
+                  <div className="min-w-0">
+                    <p className="text-xs sm:text-sm font-semibold text-slate-900">Preview document</p>
+                    <p className="truncate text-[10px] sm:text-xs text-slate-500">{file.name} {file.pages != null && `· ${file.pages} pagini`}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                   {previewFromCheckout && (
                     <button
                       type="button"
                       onClick={() => { setPreviewFileId(null); setPreviewFromCheckout(false); setCheckoutModalOpen(true); }}
-                      className="flex items-center gap-1.5 rounded-lg bg-cyan-600 px-3 py-2 text-xs font-semibold text-white hover:bg-cyan-700 transition-colors"
+                      className="flex items-center gap-1 sm:gap-1.5 rounded-lg bg-cyan-600 px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs font-semibold text-white hover:bg-cyan-700 transition-colors"
                     >
-                      <ChevronRight className="h-3.5 w-3.5 rotate-180" />
-                      Înapoi la comandă
+                      <ChevronRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 rotate-180" />
+                      <span className="hidden xs:inline">Înapoi la</span> comandă
                     </button>
                   )}
-                  <button type="button" onClick={() => { setPreviewFileId(null); setPreviewFromCheckout(false); }} className="rounded-xl p-2.5 text-slate-500 hover:bg-white hover:text-slate-800" aria-label="Închide">
+                  <button type="button" onClick={() => { setPreviewFileId(null); setPreviewFromCheckout(false); }} className="rounded-xl p-2 sm:p-2.5 text-slate-500 hover:bg-white hover:text-slate-800" aria-label="Închide">
                     <X className="h-5 w-5" />
                   </button>
                 </div>
               </div>
-              <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto bg-slate-50/60 p-4 md:flex-row">
-                <div className="min-h-0 flex-1 rounded-xl border border-slate-200 bg-white" style={{ minHeight: "500px" }}>
+              <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto bg-slate-50/60 p-2 sm:p-4 md:flex-row">
+                <div className="min-h-0 flex-1 rounded-xl border border-slate-200 bg-white" style={{ minHeight: "400px" }}>
                   {file.previewUrl ? (
-                    <iframe src={file.previewUrl + "#toolbar=1&navpanes=0"} className="h-full w-full rounded-xl" style={{ minHeight: "500px" }} title={`Preview ${file.name}`} />
+                    <>
+                      {/* Desktop: iframe works fine */}
+                      <iframe src={file.previewUrl + "#toolbar=1&navpanes=0"} className="hidden md:block h-full w-full rounded-xl" style={{ minHeight: "500px" }} title={`Preview ${file.name}`} />
+                      {/* Mobile: use object with download fallback */}
+                      <div className="md:hidden h-full w-full flex flex-col rounded-xl" style={{ minHeight: "400px" }}>
+                        <object data={file.previewUrl} type="application/pdf" className="flex-1 w-full rounded-xl" style={{ minHeight: "400px" }}>
+                          <div className="flex flex-col items-center justify-center h-full gap-4 p-6 text-center">
+                            <FileText className="h-12 w-12 text-slate-400" />
+                            <p className="text-sm text-slate-600 font-medium">Preview-ul PDF nu este disponibil pe acest dispozitiv.</p>
+                            <a href={file.previewUrl} download={file.name} className="flex items-center gap-2 rounded-xl bg-cyan-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-cyan-700 transition-colors">
+                              <FileUp className="h-4 w-4" />
+                              Descarcă PDF-ul
+                            </a>
+                          </div>
+                        </object>
+                      </div>
+                    </>
                   ) : (
                     <div className="flex h-full items-center justify-center text-sm text-slate-500">Preview indisponibil</div>
                   )}
