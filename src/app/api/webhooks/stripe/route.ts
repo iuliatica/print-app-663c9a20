@@ -56,6 +56,22 @@ export async function POST(request: Request) {
         }
 
         console.log(`Order ${orderId} marked as paid (session: ${session.id})`);
+
+        // Send WhatsApp notification for confirmed payment
+        try {
+          const { sendCallMeBotNotification } = await import("@/lib/callmebot");
+          const { data: orderData } = await supabase
+            .from("orders")
+            .select("customer_name, total_price")
+            .eq("id", orderId)
+            .single();
+          const name = orderData?.customer_name || "Necunoscut";
+          const total = orderData?.total_price ? Number(orderData.total_price).toFixed(2) : "?";
+          const now = new Date().toLocaleString("ro-RO", { timeZone: "Europe/Bucharest" });
+          await sendCallMeBotNotification(`✅ Plată confirmată Printica!\n📅 ${now}\n👤 ${name}\n💰 ${total} lei\n💳 Card online`);
+        } catch (notifErr) {
+          console.error("CallMeBot notification error:", notifErr);
+        }
       } catch (err) {
         console.error("Error updating order:", err);
         return NextResponse.json({ error: "Internal error" }, { status: 500 });

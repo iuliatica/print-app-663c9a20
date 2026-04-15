@@ -180,18 +180,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // Send WhatsApp notification via CallMeBot (fire-and-forget)
+    // Send WhatsApp notification via CallMeBot
     try {
-      const phone = process.env.CALLMEBOT_PHONE;
-      const apiKey = process.env.CALLMEBOT_API_KEY;
-      if (phone && apiKey) {
-        const now = new Date().toLocaleString("ro-RO", { timeZone: "Europe/Bucharest" });
-        const name = data.customer_name || "Necunoscut";
-        const payLabel = data.payment_method === "ramburs" ? "Ramburs" : "Card online";
-        const msg = `🛒 Comandă nouă Printica!\n📅 ${now}\n👤 ${name}\n💰 ${data.total_price.toFixed(2)} lei\n💳 ${payLabel}`;
-        const url = `https://api.callmebot.com/whatsapp.php?phone=${encodeURIComponent(phone)}&text=${encodeURIComponent(msg)}&apikey=${encodeURIComponent(apiKey)}`;
-        fetch(url).catch((e) => console.error("CallMeBot error:", e));
-      }
+      const { sendCallMeBotNotification } = await import("@/lib/callmebot");
+      const now = new Date().toLocaleString("ro-RO", { timeZone: "Europe/Bucharest" });
+      const name = data.customer_name || "Necunoscut";
+      const payLabel = data.payment_method === "ramburs" ? "Ramburs" : "Card online";
+      const msg = `🛒 Comandă nouă Printica!\n📅 ${now}\n👤 ${name}\n💰 ${data.total_price.toFixed(2)} lei\n💳 ${payLabel}`;
+      await sendCallMeBotNotification(msg);
     } catch (e) {
       console.error("WhatsApp notification error:", e);
     }

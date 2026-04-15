@@ -33,11 +33,26 @@ export async function GET(request: Request) {
 
       // If Stripe says paid, update the order status in DB (in case webhook didn't fire)
       if (paid) {
-        await supabase
+        const { data: updateData } = await supabase
           .from("orders")
           .update({ status: "paid", stripe_session_id: sessionId })
           .eq("id", orderId)
-          .neq("status", "paid"); // only update if not already paid
+          .neq("status", "paid")
+          .select("customer_name, total_price")
+          .maybeSingle();
+
+        // Send WhatsApp notification if we just flipped to paid (webhook missed)
+        if (updateData) {
+          try {
+            const { sendCallMeBotNotification } = await import("@/lib/callmebot");
+            const name = updateData.customer_name || "Necunoscut";
+            const total = Number(updateData.total_price).toFixed(2);
+            const now = new Date().toLocaleString("ro-RO", { timeZone: "Europe/Bucharest" });
+            await sendCallMeBotNotification(`✅ Plată confirmată Printica!\n📅 ${now}\n👤 ${name}\n💰 ${total} lei\n💳 Card online`);
+          } catch (notifErr) {
+            console.error("CallMeBot notification error:", notifErr);
+          }
+        }
       }
 
       const { data } = await supabase
