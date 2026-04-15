@@ -81,10 +81,14 @@ button:active:not(:disabled) {
   animation: pulse-soft 1.5s ease-in-out infinite;
 }
 
-/* Butoane și input-uri consistente */
+/* Hide native number spinners */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
-  opacity: 1;
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
 }
 
 /* Scrollbar discret */
