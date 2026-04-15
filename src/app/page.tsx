@@ -45,6 +45,7 @@ const SHIPPING_COST_LEI = 15;
 const MIN_ORDER_LEI = 30;
 const MAX_CAPSARE_SHEETS = 220;
 const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024;
+const MAX_FILES = 20;
 const FILE_SIZE_ERROR_MSG = "Fișier prea mare (max 50 MB).";
 const LS_KEY_SHIPPING = "printica_shipping";
 const LS_KEY_PAYMENT = "printica_payment";
@@ -487,7 +488,16 @@ export default function Home() {
       setIsDragging(false);
       const dropped = Array.from(e.dataTransfer.files).filter((f) => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf"));
       if (dropped.length === 0) return;
-      const newItems = createFileItems(dropped);
+      const remaining = MAX_FILES - files.length;
+      if (remaining <= 0) {
+        addToast(`Poți adăuga maximum ${MAX_FILES} fișiere.`, "error");
+        return;
+      }
+      const limited = dropped.slice(0, remaining);
+      if (dropped.length > remaining) {
+        addToast(`Ai putut adăuga doar ${remaining} fișier${remaining > 1 ? "e" : ""} (limită: ${MAX_FILES}).`, "error");
+      }
+      const newItems = createFileItems(limited);
       const tooBigFiles = newItems.filter((f) => f.error);
       const validNewFiles = newItems.filter((f) => !f.error);
       if (tooBigFiles.length > 0) {
@@ -513,13 +523,23 @@ export default function Home() {
       if (!selected?.length) return;
       const allFiles = Array.from(selected);
 
+      // Enforce max files limit
+      const remaining = MAX_FILES - files.length;
+      if (remaining <= 0) {
+        addToast(`Poți adăuga maximum ${MAX_FILES} fișiere.`, "error");
+        e.target.value = "";
+        return;
+      }
+      const limited = allFiles.slice(0, remaining);
+      if (allFiles.length > remaining) {
+        addToast(`Ai putut adăuga doar ${remaining} fișier${remaining > 1 ? "e" : ""} (limită: ${MAX_FILES}).`, "error");
+      }
+
       // Validate files are actually readable (cloud-sourced files from Drive/Dropbox may fail)
       const readableFiles: File[] = [];
-      for (const f of allFiles) {
+      for (const f of limited) {
         try {
-          // Read the entire file to verify it's locally accessible
-          // A small slice may succeed for cloud files but the full read fails during upload
-          await f.arrayBuffer();
+          await f.slice(0, 65536).arrayBuffer();
           readableFiles.push(f);
         } catch {
           addToast(`Fișierul "${f.name}" nu poate fi citit direct din Drive/Dropbox. Descarcă-l pe telefon și încarcă-l din memoria internă.`, "error");
