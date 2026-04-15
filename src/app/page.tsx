@@ -508,7 +508,7 @@ export default function Home() {
   );
 
   const onFileInput = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
       const selected = e.target.files;
       if (!selected?.length) return;
       const allFiles = Array.from(selected);
