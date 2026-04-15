@@ -349,6 +349,15 @@ export default function Home() {
     } catch { /* ignore */ }
     return "stripe";
   });
+  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>(() => {
+    if (typeof window === "undefined") return "curier";
+    try {
+      const saved = localStorage.getItem(LS_KEY_DELIVERY);
+      if (saved === "ridicare") return "ridicare";
+    } catch { /* ignore */ }
+    return "curier";
+  });
+  });
   const [orderSuccess, setOrderSuccess] = useState<string | null>(null);
   const [orderSuccessDetails, setOrderSuccessDetails] = useState<OrderSuccessDetails | null>(null);
   const [scrollToFileId, setScrollToFileId] = useState<string | null>(null);
@@ -560,6 +569,10 @@ export default function Home() {
   useEffect(() => {
     try { localStorage.setItem(LS_KEY_PAYMENT, paymentMethod); } catch { /* ignore */ }
   }, [paymentMethod]);
+
+  useEffect(() => {
+    try { localStorage.setItem(LS_KEY_DELIVERY, deliveryMethod); } catch { /* ignore */ }
+  }, [deliveryMethod]);
 
   useEffect(() => {
     try { localStorage.setItem(LS_KEY_GROUP_OPTS, JSON.stringify(groupOptions)); } catch { /* ignore */ }
