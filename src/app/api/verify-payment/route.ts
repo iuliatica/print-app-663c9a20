@@ -41,18 +41,7 @@ export async function GET(request: Request) {
           .select("customer_name, total_price")
           .maybeSingle();
 
-        // Send WhatsApp notification if we just flipped to paid (webhook missed)
-        if (updateData) {
-          try {
-            const { sendCallMeBotNotification } = await import("@/lib/callmebot");
-            const name = updateData.customer_name || "Necunoscut";
-            const total = Number(updateData.total_price).toFixed(2);
-            const now = new Date().toLocaleString("ro-RO", { timeZone: "Europe/Bucharest" });
-            await sendCallMeBotNotification(`✅ Plată confirmată Printica!\n📅 ${now}\n👤 ${name}\n💰 ${total} lei\n💳 Card online`);
-          } catch (notifErr) {
-            console.error("CallMeBot notification error:", notifErr);
-          }
-        }
+        // Payment status update handled - no extra notification needed
       }
 
       const { data } = await supabase
