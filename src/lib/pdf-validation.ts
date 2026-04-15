@@ -25,7 +25,9 @@ export function isPdfMime(type: string | null): boolean {
  * MIME-ul este folosit doar ca semnal suplimentar, nu ca blocaj strict.
  */
 export async function assertPdfFile(file: File): Promise<void> {
-  const buffer = await file.arrayBuffer();
+  // Only read the first 8 bytes to check magic number — avoid reading entire large files
+  const headerSlice = file.slice(0, 8);
+  const buffer = await headerSlice.arrayBuffer();
   if (!isPdfBuffer(buffer)) {
     throw new Error(`Fișierul "${file.name}" nu pare a fi un PDF valid (conținut invalid).`);
   }
