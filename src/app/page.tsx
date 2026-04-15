@@ -357,7 +357,6 @@ export default function Home() {
     } catch { /* ignore */ }
     return "curier";
   });
-  });
   const [orderSuccess, setOrderSuccess] = useState<string | null>(null);
   const [orderSuccessDetails, setOrderSuccessDetails] = useState<OrderSuccessDetails | null>(null);
   const [scrollToFileId, setScrollToFileId] = useState<string | null>(null);
