@@ -847,7 +847,8 @@ export default function Home() {
               coverBackColor: opts.coverBackColor,
             };
           }),
-          shippingAddress: address.trim(),
+          shippingAddress: deliveryMethod === "ridicare" ? `RIDICARE: ${PICKUP_ADDRESS}` : address.trim(),
+          deliveryMethod,
         }),
       }).catch(() => {});
       if (paymentMethod === "ramburs") {
