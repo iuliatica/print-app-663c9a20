@@ -2092,34 +2092,60 @@ export default function Home() {
               {orderSuccessDetails.paymentMethod !== "ramburs" && (
                 <p className="mt-3 text-slate-700">Plata a fost procesată cu succes.</p>
               )}
-              {orderSuccessDetails.deliveryMethod === "ridicare" && (
+              {orderSuccessDetails.deliveryMethod === "ridicare" ? (
                 <div className="mt-4 rounded-xl bg-cyan-50 border border-cyan-200 px-4 py-3 text-left">
                   <p className="text-sm font-semibold text-cyan-800">📍 Ridicare de la sediu</p>
                   <p className="mt-1 text-xs text-cyan-700">{PICKUP_ADDRESS}</p>
                   <p className="mt-1 text-xs text-cyan-700">📱 Vei fi informat prin mesaj când documentele sunt pregătite.</p>
                   <p className="mt-0.5 text-xs text-cyan-700">⏰ Ai la dispoziție <strong>3 zile lucrătoare</strong> pentru ridicare.</p>
                 </div>
+              ) : (
+                <p className="mt-4 rounded-xl bg-white/80 px-4 py-3 text-sm font-semibold text-slate-800 shadow-sm">
+                  Livrarea se face în <strong>2-4 zile lucrătoare</strong>.
+                </p>
               )}
             </div>
 
-            {/* Detalii */}
-            <div className="px-6 py-6 space-y-4">
+            {/* Detalii complete */}
+            <div className="px-6 py-6 space-y-5">
               <div className="rounded-xl bg-slate-50 p-4 space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-500">Total pagini</span>
-                  <span className="font-medium text-slate-800">{orderSuccessDetails.totalPages}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-500">Total de plată</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-slate-500">Total de plată</span>
                   <span className="text-lg font-bold text-green-700">{orderSuccessDetails.totalWithShipping.toFixed(2)} lei</span>
                 </div>
               </div>
 
+              {/* Fișiere grupate */}
+              {orderSuccessDetails.groups.map((group, gIdx) => (
+                <div key={gIdx} className="space-y-2">
+                  {orderSuccessDetails.groups.length > 1 && (
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      Volum {gIdx + 1}
+                    </p>
+                  )}
+                  {group.files.map((f, fIdx) => (
+                    <div key={fIdx} className="flex items-start gap-3 rounded-lg bg-slate-50 p-3">
+                      <Printer className="h-4 w-4 text-slate-400 mt-0.5 shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-slate-800 truncate">{f.name}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {f.pages ?? "?"} pag. · {f.printMode === "color" ? "Color" : "Alb-negru"}
+                          {f.duplex ? " · Față-verso" : ""} · {f.copies} {f.copies === 1 ? "copie" : "copii"}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                  {group.spiralType && group.spiralType !== "none" && (
+                    <div className="rounded-lg bg-cyan-50 px-4 py-2.5 text-sm text-cyan-800">
+                      🔗 Legare: <strong className="capitalize">{group.spiralType}</strong>
+                      {group.spiralColor ? ` (${group.spiralColor})` : ""}
+                    </div>
+                  )}
+                </div>
+              ))}
+
               <p className="text-sm text-slate-600 text-center">
-                {orderSuccessDetails.deliveryMethod === "ridicare"
-                  ? "Vei fi notificat când documentele sunt pregătite pentru ridicare."
-                  : <>Livrarea se face în <strong>2-4 zile lucrătoare</strong>.</>}
-                {orderSuccessDetails.paymentMethod === "ramburs" && " Vei primi un email de confirmare."}
+                Vei primi un email de confirmare.
               </p>
 
               <button
@@ -2127,8 +2153,7 @@ export default function Home() {
                 onClick={() => setOrderSuccessDetails(null)}
                 className="flex items-center justify-center gap-2 w-full rounded-xl bg-slate-800 py-3 text-sm font-semibold text-white hover:bg-slate-900 transition-colors"
               >
-                ←
-                Înapoi la pagina principală
+                ← Înapoi la pagina principală
               </button>
             </div>
           </div>
@@ -2207,7 +2232,7 @@ export default function Home() {
                       </label>
                       <label className="flex items-center gap-2">
                         <span>Copii:</span>
-                        <input type="number" min={1} max={50} value={file.copies} onChange={(e) => { const next = Number(e.target.value) || 1; setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, copies: Math.min(50, Math.max(1, next)) } : f)); }} className="w-16 rounded border border-slate-300 px-2 py-1 text-xs" />
+                        <input type="number" min={1} max={100} value={file.copies} onChange={(e) => { const next = Number(e.target.value) || 1; setFiles((prev) => prev.map((f) => f.id === file.id ? { ...f, copies: Math.min(100, Math.max(1, next)) } : f)); }} className="w-16 rounded border border-slate-300 px-2 py-1 text-xs" />
                       </label>
                     </div>
                   </div>
