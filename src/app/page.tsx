@@ -1759,8 +1759,8 @@ export default function Home() {
               )}
             </div>
             <div className="space-y-6 text-sm">
-              {/* Upload progress */}
-              <UploadProgressBar isUploading={isUploading} progress={uploadProgress} />
+
+
 
               {/* Order summary */}
               <div>
