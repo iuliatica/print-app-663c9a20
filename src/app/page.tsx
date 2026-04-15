@@ -1414,7 +1414,13 @@ export default function Home() {
                           duplex: file.duplex ?? DEFAULT_PRINT_OPTIONS.duplex,
                           copies: file.copies ?? DEFAULT_PRINT_OPTIONS.copies,
                         };
-                        return (
+                        return file.pages == null && isLoadingPages ? (
+                          <div key={file.id} className="flex flex-col items-center justify-center py-12 gap-3">
+                            <Loader2 className="h-8 w-8 animate-spin text-cyan-500" />
+                            <p className="text-sm font-medium text-slate-600">Se procesează fișierul…</p>
+                            <p className="text-xs text-slate-400 truncate max-w-[250px]" title={file.name}>{file.name}</p>
+                          </div>
+                        ) : (
                           <div key={file.id}>
                             <div className="mb-5 flex items-start gap-3">
                               <span className="flex h-10 w-10 shrink-0 items-center justify-center bg-cyan-100 text-cyan-600">
