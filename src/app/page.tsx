@@ -511,7 +511,14 @@ export default function Home() {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const selected = e.target.files;
       if (!selected?.length) return;
-      const newItems = createFileItems(Array.from(selected));
+      const allFiles = Array.from(selected);
+      const pdfFiles = allFiles.filter((f) => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf"));
+      const nonPdfFiles = allFiles.filter((f) => f.type !== "application/pdf" && !f.name.toLowerCase().endsWith(".pdf"));
+      if (nonPdfFiles.length > 0) {
+        addToast(`Acceptăm doar fișiere PDF. ${nonPdfFiles.length} fișier${nonPdfFiles.length > 1 ? "e" : ""} respins${nonPdfFiles.length > 1 ? "e" : ""}.`, "error");
+      }
+      if (pdfFiles.length === 0) { e.target.value = ""; return; }
+      const newItems = createFileItems(pdfFiles);
       const tooBigFiles = newItems.filter((f) => f.error);
       const validNewFiles = newItems.filter((f) => !f.error);
       if (tooBigFiles.length > 0) {
@@ -1276,11 +1283,19 @@ export default function Home() {
                                 <p className="mt-0.5 text-xs text-amber-600">Toate paginile taxate ca color</p>
                               )}
                               {/* Price per file */}
-                              {item.pages != null && (
-                                <p className="mt-0.5 text-xs font-semibold text-cyan-600 tabular-nums">
-                                  {filePrice.toFixed(2)} lei
-                                </p>
-                              )}
+                              {item.pages != null && (() => {
+                                const groupInfo2 = bindingGroups.find((g) => g.filesInGroup.some((f) => f.id === item.id));
+                                const groupIdx2 = groupInfo2 ? bindingGroups.indexOf(groupInfo2) : -1;
+                                const opts2 = groupIdx2 >= 0 ? (groupOptions[groupIdx2] ?? defaultGroupOpts) : defaultGroupOpts;
+                                const hasSpiralForFile = opts2.spiralType === "spirala";
+                                const isFirstInGrp = groupInfo2 ? groupInfo2.filesInGroup[0].id === item.id : false;
+                                const spiralPriceForFile = hasSpiralForFile && isFirstInGrp ? SPIRAL_PRICE * (item.copies ?? 1) : 0;
+                                return (
+                                  <p className="mt-0.5 text-xs font-semibold text-cyan-600 tabular-nums">
+                                    {filePrice.toFixed(2)} lei{spiralPriceForFile > 0 ? ` + ${spiralPriceForFile.toFixed(2)} lei spiralare` : ""}
+                                  </p>
+                                );
+                              })()}
                             </div>
                             <div className="flex shrink-0 items-center gap-0.5">
                               <div className="flex flex-col rounded-lg border border-slate-200 bg-slate-50/80 p-0.5">
