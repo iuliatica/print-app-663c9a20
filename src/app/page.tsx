@@ -644,7 +644,7 @@ export default function Home() {
   }, [bindingGroups, groupOptions]);
 
   const totalPrice = pagePrice + spiralPrice;
-  const effectivePrice = Math.max(totalPrice, totalPages > 0 ? MIN_ORDER_LEI : 0);
+  const effectivePrice = deliveryMethod === "ridicare" ? totalPrice : Math.max(totalPrice, totalPages > 0 ? MIN_ORDER_LEI : 0);
   const shippingCost = deliveryMethod === "ridicare" ? 0 : SHIPPING_COST_LEI;
   const totalWithShipping = effectivePrice + shippingCost;
 
@@ -1596,13 +1596,13 @@ export default function Home() {
                         <CreditCard className="h-4 w-4 text-slate-500" />
                         {effectivePrice.toFixed(2)} lei printare
                       </span>
-                      {totalPrice < MIN_ORDER_LEI && totalPrice > 0 && (
+                      {deliveryMethod !== "ridicare" && totalPrice < MIN_ORDER_LEI && totalPrice > 0 && (
                         <span className="inline-flex items-center gap-1.5 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 border border-amber-200 rounded">
                           Minim {MIN_ORDER_LEI} lei (valoare printare: {totalPrice.toFixed(2)} lei)
                         </span>
                       )}
                       <span className="inline-flex items-center gap-1.5 bg-amber-100 px-3 py-2 text-base font-bold text-amber-800">
-                        +{SHIPPING_COST_LEI} lei transport
+                        {deliveryMethod === "ridicare" ? "Ridicare gratuită" : `+${SHIPPING_COST_LEI} lei transport`}
                       </span>
                       <span className="inline-flex items-center gap-1.5 bg-slate-800 px-3 py-2 text-base font-bold text-white">
                         = {totalWithShipping.toFixed(2)} lei total
@@ -1644,7 +1644,7 @@ export default function Home() {
                         <span className="font-semibold">{detectedBwPages} pag. alb-negru</span>
                       </p>
                     )}
-                    {totalPrice > 0 && totalPrice < MIN_ORDER_LEI && (
+                    {deliveryMethod !== "ridicare" && totalPrice > 0 && totalPrice < MIN_ORDER_LEI && (
                       <p className="mt-1 text-xs font-semibold text-amber-600">
                         ⚠ Costul real: {totalPrice.toFixed(2)} lei. Comanda minimă este de {MIN_ORDER_LEI} lei, prețul a fost ajustat automat{shippingCost > 0 ? ` (+ ${shippingCost} lei transport)` : ""}.
                       </p>
@@ -1743,22 +1743,24 @@ export default function Home() {
 
 
       {checkoutModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 px-4 py-6 backdrop-blur-sm overflow-hidden">
-          <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-slate-200/50 sm:p-8 animate-[fade-in_0.3s_ease-out]">
+        <div className={`fixed inset-0 z-50 flex items-start justify-center bg-black/50 px-4 py-6 backdrop-blur-sm overflow-hidden ${isCheckoutLoading || isUploading ? "pointer-events-none" : ""}`}>
+          <div className={`w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-slate-200/50 sm:p-8 animate-[fade-in_0.3s_ease-out] ${isCheckoutLoading || isUploading ? "pointer-events-auto" : ""}`}>
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-bold text-slate-900">Finalizare comandă</h2>
-              <button
-                type="button"
-                onClick={() => setCheckoutModalOpen(false)}
-                className="rounded-xl p-2.5 text-slate-500 hover:bg-slate-100 hover:text-slate-800"
-                aria-label="Închide"
-              >
-                <X className="h-5 w-5" />
-              </button>
+              {!isCheckoutLoading && !isUploading && (
+                <button
+                  type="button"
+                  onClick={() => setCheckoutModalOpen(false)}
+                  className="rounded-xl p-2.5 text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+                  aria-label="Închide"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              )}
             </div>
             <div className="space-y-6 text-sm">
-              {/* Upload progress */}
-              <UploadProgressBar isUploading={isUploading} progress={uploadProgress} />
+
+
 
               {/* Order summary */}
               <div>
@@ -1822,7 +1824,7 @@ export default function Home() {
                     <span>Subtotal printare</span>
                     <span>{totalPrice.toFixed(2)} lei</span>
                   </div>
-                  {totalPrice < MIN_ORDER_LEI && totalPrice > 0 && (
+                  {deliveryMethod !== "ridicare" && totalPrice < MIN_ORDER_LEI && totalPrice > 0 && (
                     <div className="flex justify-between text-amber-600">
                       <span>Ajustare comandă minimă (valoare printare: {totalPrice.toFixed(2)} lei)</span>
                       <span>+{(MIN_ORDER_LEI - totalPrice).toFixed(2)} lei</span>
@@ -1951,6 +1953,9 @@ export default function Home() {
                   <span>Documentele se procesează, te rugăm așteaptă…</span>
                 </div>
               )}
+
+              {/* Upload progress - bottom of modal for mobile visibility */}
+              <UploadProgressBar isUploading={isUploading} progress={uploadProgress} />
 
               <button
                 type="button"

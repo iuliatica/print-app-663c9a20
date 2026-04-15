@@ -188,14 +188,14 @@ function buildEmailHtml(data: ConfirmationBody): string {
             `}
 
             <p style="margin:0;font-size:14px;color:#475569;line-height:1.6;">
-              Dacă ai întrebări, nu ezita să ne contactezi la <a href="mailto:contact@printica.ro" style="color:#0ea5a0;text-decoration:underline;">contact@printica.ro</a>.
+              Dacă ai întrebări, nu ezita să ne contactezi la <a href="mailto:contact@printica.ro" style="color:#0ea5a0;text-decoration:underline;">contact@printica.ro</a> sau telefonic la <a href="tel:+40771545868" style="color:#0ea5a0;text-decoration:underline;">0771 545 868</a>.
             </p>
           </td>
         </tr>
         <!-- Footer -->
         <tr>
           <td style="background-color:#f8fafc;padding:24px 40px;border-top:1px solid #e2e8f0;text-align:center;">
-            <p style="margin:0;font-size:13px;color:#94a3b8;">Printica — Tica M. Genoveva PFA · CUI 51541140</p>
+            <p style="margin:0;font-size:13px;color:#94a3b8;">Printica</p>
             <p style="margin:4px 0 0;font-size:12px;color:#cbd5e1;">Acest email a fost trimis automat. Nu răspunde la acest mesaj.</p>
           </td>
         </tr>
