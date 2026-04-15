@@ -157,21 +157,46 @@ function calculateFilePrice(f: UploadedFile): number {
   const effectiveDuplex = duplex && f.pages > 1;
 
   if (mode === "bw") {
-    const sides = f.pages * copies;
-    return effectiveDuplex ? Math.ceil(sides / 2) * PRICE_BW_DUPLEX : sides * PRICE_BW_ONE_SIDE;
+    if (effectiveDuplex) {
+      const totalPages = f.pages * copies;
+      // If odd number of pages, last page of each copy is simplex
+      const fullSheets = Math.floor(f.pages / 2) * copies;
+      const oddLastPages = (f.pages % 2 !== 0) ? copies : 0;
+      return fullSheets * PRICE_BW_DUPLEX + oddLastPages * PRICE_BW_ONE_SIDE;
+    }
+    return f.pages * copies * PRICE_BW_ONE_SIDE;
   }
 
   if (f.colorAnalysis) {
-    const colorSides = f.colorAnalysis.colorPages * copies;
-    const bwSides = f.colorAnalysis.bwPages * copies;
+    const colorPages = f.colorAnalysis.colorPages;
+    const bwPages = f.colorAnalysis.bwPages;
     if (effectiveDuplex) {
-      return Math.ceil(colorSides / 2) * PRICE_COLOR_DUPLEX + Math.ceil(bwSides / 2) * PRICE_BW_DUPLEX;
+      // For duplex with color analysis, if total pages odd, last page is simplex
+      // We approximate: pair pages into sheets, last odd page at simplex rate
+      const totalPagesPerCopy = f.pages;
+      const fullSheets = Math.floor(totalPagesPerCopy / 2);
+      const hasOddPage = totalPagesPerCopy % 2 !== 0;
+      // Proportional split for duplex sheets
+      const colorRatio = colorPages / totalPagesPerCopy;
+      const colorSheets = Math.round(fullSheets * colorRatio) * copies;
+      const bwSheets = (fullSheets - Math.round(fullSheets * colorRatio)) * copies;
+      let price = colorSheets * PRICE_COLOR_DUPLEX + bwSheets * PRICE_BW_DUPLEX;
+      if (hasOddPage) {
+        // Last page: determine if it's color or bw based on ratio
+        const lastPageColor = colorRatio > 0.5;
+        price += copies * (lastPageColor ? PRICE_COLOR_ONE_SIDE : PRICE_BW_ONE_SIDE);
+      }
+      return price;
     }
-    return colorSides * PRICE_COLOR_ONE_SIDE + bwSides * PRICE_BW_ONE_SIDE;
+    return colorPages * copies * PRICE_COLOR_ONE_SIDE + bwPages * copies * PRICE_BW_ONE_SIDE;
   }
 
-  const sides = f.pages * copies;
-  return effectiveDuplex ? Math.ceil(sides / 2) * PRICE_COLOR_DUPLEX : sides * PRICE_COLOR_ONE_SIDE;
+  if (effectiveDuplex) {
+    const fullSheets = Math.floor(f.pages / 2) * copies;
+    const oddLastPages = (f.pages % 2 !== 0) ? copies : 0;
+    return fullSheets * PRICE_COLOR_DUPLEX + oddLastPages * PRICE_COLOR_ONE_SIDE;
+  }
+  return f.pages * copies * PRICE_COLOR_ONE_SIDE;
 }
 
 // ─── Progress Stepper Component ──────────────────────────────────────────────
@@ -638,7 +663,11 @@ export default function Home() {
         0
       );
       const opts = groupOptions[groupIndex] ?? defaultGroupOpts;
-      if (groupPages > 0 && opts.spiralType === "spirala") sum += SPIRAL_PRICE;
+      if (groupPages > 0 && opts.spiralType === "spirala") {
+        // Spiral price per copy (use max copies in group)
+        const maxCopies = Math.max(...grp.filesInGroup.map(f => f.copies ?? 1));
+        sum += SPIRAL_PRICE * maxCopies;
+      }
     });
     return sum;
   }, [bindingGroups, groupOptions]);
@@ -1053,7 +1082,7 @@ export default function Home() {
                   : "border-slate-200 bg-white hover:border-cyan-300 hover:bg-cyan-50/50 hover:shadow-[var(--shadow)]"
               }`}
             >
-              <input type="file" accept="application/pdf,.pdf" multiple onChange={onFileInput} className="hidden" />
+              <input type="file" accept=".pdf,application/pdf" multiple onChange={onFileInput} className="hidden" />
               {/* Custom illustration */}
               <div className="relative mb-4">
                 <div className={`drop-zone-icon flex h-24 w-24 items-center justify-center rounded-2xl ${isDragging ? "bg-cyan-100" : "bg-gradient-to-br from-cyan-50 to-slate-100"} transition-colors`}>
@@ -1112,7 +1141,7 @@ export default function Home() {
                       : "border-cyan-400 bg-gradient-to-r from-cyan-50 to-cyan-100/60 hover:border-cyan-500 hover:bg-cyan-100 hover:shadow-sm"
                   }`}
                 >
-                  <input ref={fileInputRef} type="file" accept="application/pdf,.pdf" multiple onChange={onFileInput} className="hidden" />
+                  <input ref={fileInputRef} type="file" accept=".pdf,application/pdf" multiple onChange={onFileInput} className="hidden" />
                   <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${isDragging ? "bg-cyan-300 text-cyan-800" : "bg-cyan-200 text-cyan-700"}`}>
                     <Plus className="h-6 w-6" />
                   </div>
@@ -1437,29 +1466,69 @@ export default function Home() {
                               </label>
 
                               {/* Copies */}
-                              <label className="flex items-center gap-3">
+                              <div>
                                 <span className="text-sm font-semibold text-slate-700">Copii</span>
-                                <input
-                                  type="number"
-                                  min={1}
-                                  max={50}
-                                  value={opts.copies}
-                                  onChange={(e) => {
-                                    const raw = Number(e.target.value) || 1;
-                                    const next = Math.min(50, Math.max(1, raw));
-                                    setFiles((prev) => {
-                                      const groups = getBindingGroups(prev);
-                                      const group = groups.find((g) => g.filesInGroup.some((f) => f.id === file.id));
-                                      if (!group || group.filesInGroup.length === 1) {
-                                        return prev.map((f) => f.id === file.id ? { ...f, copies: next } : f);
-                                      }
-                                      const idsInGroup = new Set(group.filesInGroup.map((f) => f.id));
-                                      return prev.map((f) => idsInGroup.has(f.id) ? { ...f, copies: next } : f);
-                                    });
-                                  }}
-                                  className="w-20 rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
-                                />
-                              </label>
+                                <div className="mt-1 flex items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const next = Math.max(1, opts.copies - 1);
+                                      setFiles((prev) => {
+                                        const groups = getBindingGroups(prev);
+                                        const group = groups.find((g) => g.filesInGroup.some((f) => f.id === file.id));
+                                        if (!group || group.filesInGroup.length === 1) {
+                                          return prev.map((f) => f.id === file.id ? { ...f, copies: next } : f);
+                                        }
+                                        const idsInGroup = new Set(group.filesInGroup.map((f) => f.id));
+                                        return prev.map((f) => idsInGroup.has(f.id) ? { ...f, copies: next } : f);
+                                      });
+                                    }}
+                                    disabled={opts.copies <= 1}
+                                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-600 hover:bg-slate-100 disabled:opacity-40"
+                                  >
+                                    <ChevronDown className="h-4 w-4" />
+                                  </button>
+                                  <input
+                                    type="number"
+                                    min={1}
+                                    max={100}
+                                    value={opts.copies}
+                                    onChange={(e) => {
+                                      const raw = Number(e.target.value) || 1;
+                                      const next = Math.min(100, Math.max(1, raw));
+                                      setFiles((prev) => {
+                                        const groups = getBindingGroups(prev);
+                                        const group = groups.find((g) => g.filesInGroup.some((f) => f.id === file.id));
+                                        if (!group || group.filesInGroup.length === 1) {
+                                          return prev.map((f) => f.id === file.id ? { ...f, copies: next } : f);
+                                        }
+                                        const idsInGroup = new Set(group.filesInGroup.map((f) => f.id));
+                                        return prev.map((f) => idsInGroup.has(f.id) ? { ...f, copies: next } : f);
+                                      });
+                                    }}
+                                    className="w-16 rounded-xl border border-slate-300 px-3 py-2 text-sm text-center focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const next = Math.min(100, opts.copies + 1);
+                                      setFiles((prev) => {
+                                        const groups = getBindingGroups(prev);
+                                        const group = groups.find((g) => g.filesInGroup.some((f) => f.id === file.id));
+                                        if (!group || group.filesInGroup.length === 1) {
+                                          return prev.map((f) => f.id === file.id ? { ...f, copies: next } : f);
+                                        }
+                                        const idsInGroup = new Set(group.filesInGroup.map((f) => f.id));
+                                        return prev.map((f) => idsInGroup.has(f.id) ? { ...f, copies: next } : f);
+                                      });
+                                    }}
+                                    disabled={opts.copies >= 100}
+                                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-600 hover:bg-slate-100 disabled:opacity-40"
+                                  >
+                                    <ChevronUp className="h-4 w-4" />
+                                  </button>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         );
