@@ -1678,8 +1678,13 @@ export default function Home() {
                     <div className="mt-3 flex flex-wrap items-center gap-3">
                       <span className="inline-flex items-center gap-1.5 bg-slate-100 px-3 py-2 text-base font-bold text-slate-800">
                         <CreditCard className="h-4 w-4 text-slate-500" />
-                        {effectivePrice.toFixed(2)} lei printare
+                        {pagePrice.toFixed(2)} lei printare
                       </span>
+                      {spiralPrice > 0 && (
+                        <span className="inline-flex items-center gap-1.5 bg-cyan-100 px-3 py-2 text-sm font-bold text-cyan-700">
+                          +{spiralPrice.toFixed(2)} lei spiralare
+                        </span>
+                      )}
                       {deliveryMethod !== "ridicare" && totalPrice < MIN_ORDER_LEI && totalPrice > 0 && (
                         <span className="inline-flex items-center gap-1.5 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 border border-amber-200 rounded">
                           Minim {MIN_ORDER_LEI} lei (valoare printare: {totalPrice.toFixed(2)} lei)
