@@ -1994,12 +1994,22 @@ export default function Home() {
                     📞 Vei fi contactat telefonic pentru confirmarea comenzii
                   </p>
                   <p className="mt-1 text-xs text-slate-500">
-                    Plata se face la livrare (ramburs)
+                    {orderSuccessDetails.deliveryMethod === "ridicare"
+                      ? "Plata se face la ridicarea documentelor"
+                      : "Plata se face la livrare (ramburs)"}
                   </p>
                 </div>
               )}
               {orderSuccessDetails.paymentMethod !== "ramburs" && (
                 <p className="mt-3 text-slate-700">Plata a fost procesată cu succes.</p>
+              )}
+              {orderSuccessDetails.deliveryMethod === "ridicare" && (
+                <div className="mt-4 rounded-xl bg-cyan-50 border border-cyan-200 px-4 py-3 text-left">
+                  <p className="text-sm font-semibold text-cyan-800">📍 Ridicare de la sediu</p>
+                  <p className="mt-1 text-xs text-cyan-700">{PICKUP_ADDRESS}</p>
+                  <p className="mt-1 text-xs text-cyan-700">📱 Vei fi informat prin mesaj când documentele sunt pregătite.</p>
+                  <p className="mt-0.5 text-xs text-cyan-700">⏰ Ai la dispoziție <strong>3 zile lucrătoare</strong> pentru ridicare.</p>
+                </div>
               )}
             </div>
 
