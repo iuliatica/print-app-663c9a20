@@ -17,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="ro">
       <head>
-        {/* No favicon */}
+        <link rel="icon" href="/favicon.png" type="image/png" />
       </head>
       <body suppressHydrationWarning className="antialiased min-h-screen flex flex-col bg-[var(--background)] text-[var(--foreground)]">
         <ErrorBoundaryWrapper>

@@ -934,7 +934,8 @@ export default function Home() {
               <Printer className="h-3.5 w-3.5" />
               Rapid · Sigur · Stripe
             </div>
-            <div className="flex items-center justify-center lg:justify-start bg-transparent">
+            <div className="flex items-center justify-center lg:justify-start gap-2.5 bg-transparent">
+              <img src="/logo-symbol.png" className="h-9 sm:h-10 w-auto shrink-0" alt="Printica" style={{ border: 'none', outline: 'none' }} />
               <span className="text-2xl sm:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-[#00D1FF] to-[#0096C7]" style={{ fontFamily: "'Pacifico', cursive" }}>
                 Printica
               </span>
