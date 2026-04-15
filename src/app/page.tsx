@@ -2027,7 +2027,9 @@ export default function Home() {
               </div>
 
               <p className="text-sm text-slate-600 text-center">
-                Livrarea se face în <strong>2-4 zile lucrătoare</strong>.
+                {orderSuccessDetails.deliveryMethod === "ridicare"
+                  ? "Vei fi notificat când documentele sunt pregătite pentru ridicare."
+                  : <>Livrarea se face în <strong>2-4 zile lucrătoare</strong>.</>}
                 {orderSuccessDetails.paymentMethod === "ramburs" && " Vei primi un email de confirmare."}
               </p>
 
