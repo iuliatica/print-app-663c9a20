@@ -45,6 +45,7 @@ const SHIPPING_COST_LEI = 15;
 const MIN_ORDER_LEI = 30;
 const MAX_CAPSARE_SHEETS = 220;
 const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024;
+const MAX_FILES = 20;
 const FILE_SIZE_ERROR_MSG = "Fișier prea mare (max 50 MB).";
 const LS_KEY_SHIPPING = "printica_shipping";
 const LS_KEY_PAYMENT = "printica_payment";
