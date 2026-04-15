@@ -48,6 +48,7 @@ const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024;
 const FILE_SIZE_ERROR_MSG = "Fișier prea mare (max 50 MB).";
 const LS_KEY_SHIPPING = "printica_shipping";
 const LS_KEY_PAYMENT = "printica_payment";
+const LS_KEY_DELIVERY = "printica_delivery";
 const LS_KEY_GROUP_OPTS = "printica_group_opts";
 const LS_KEY_FILE_OPTS = "printica_file_opts";
 const MIN_NAME_LENGTH = 2;
@@ -57,6 +58,9 @@ const MAX_ADDRESS_LENGTH = 300;
 const ROMANIAN_PHONE_DIGITS = /^(0?7[0-9]{8}|407[0-9]{8})$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const VALID_NAME_REGEX = /^[a-zA-ZăâîșțĂÂÎȘȚ\s\-']+$/;
+const PICKUP_ADDRESS = "Alba Iulia, localitatea Barabant, strada Mureșului";
+
+type DeliveryMethod = "curier" | "ridicare";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 type ShippingForm = { name: string; phone: string; email: string; address: string };
