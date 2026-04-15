@@ -445,7 +445,7 @@ export default function Home() {
     (e: React.DragEvent) => {
       e.preventDefault();
       setIsDragging(false);
-      const dropped = Array.from(e.dataTransfer.files).filter((f) => f.type === "application/pdf");
+      const dropped = Array.from(e.dataTransfer.files).filter((f) => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf"));
       if (dropped.length === 0) return;
       const newItems = createFileItems(dropped);
       const tooBigFiles = newItems.filter((f) => f.error);
