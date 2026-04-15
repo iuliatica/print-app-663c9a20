@@ -517,11 +517,12 @@ export default function Home() {
       const readableFiles: File[] = [];
       for (const f of allFiles) {
         try {
-          // Try reading a small slice to verify the file is locally accessible
-          await f.slice(0, 4).arrayBuffer();
+          // Read the entire file to verify it's locally accessible
+          // A small slice may succeed for cloud files but the full read fails during upload
+          await f.arrayBuffer();
           readableFiles.push(f);
         } catch {
-          addToast(`Fișierul "${f.name}" nu poate fi citit. Te rugăm să descarci fișierul pe telefon și să îl încarci din memoria internă.`, "error");
+          addToast(`Fișierul "${f.name}" nu poate fi citit direct din Drive/Dropbox. Descarcă-l pe telefon și încarcă-l din memoria internă.`, "error");
         }
       }
       if (readableFiles.length === 0) { e.target.value = ""; return; }
