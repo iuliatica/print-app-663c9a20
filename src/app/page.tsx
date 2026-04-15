@@ -66,7 +66,7 @@ type DeliveryMethod = "curier" | "ridicare";
 type ShippingForm = { name: string; phone: string; email: string; address: string };
 type ShippingErrors = Partial<Record<keyof ShippingForm, string>>;
 
-function validateShipping(form: ShippingForm): ShippingErrors {
+function validateShipping(form: ShippingForm, deliveryMethod: DeliveryMethod): ShippingErrors {
   const err: ShippingErrors = {};
   const name = form.name.trim();
   const phone = form.phone.trim().replace(/\s/g, "");
@@ -81,9 +81,11 @@ function validateShipping(form: ShippingForm): ShippingErrors {
   else if (!ROMANIAN_PHONE_DIGITS.test(digitsOnly)) err.phone = "Introdu un număr de telefon valid (ex: 0712345678).";
   if (!email) err.email = "Emailul este obligatoriu.";
   else if (!EMAIL_REGEX.test(email)) err.email = "Introdu o adresă de email validă.";
-  if (!address) err.address = "Adresa de livrare este obligatorie.";
-  else if (address.length < MIN_ADDRESS_LENGTH) err.address = `Adresa trebuie să aibă cel puțin ${MIN_ADDRESS_LENGTH} caractere.`;
-  else if (address.length > MAX_ADDRESS_LENGTH) err.address = `Adresa nu poate depăși ${MAX_ADDRESS_LENGTH} caractere.`;
+  if (deliveryMethod === "curier") {
+    if (!address) err.address = "Adresa de livrare este obligatorie.";
+    else if (address.length < MIN_ADDRESS_LENGTH) err.address = `Adresa trebuie să aibă cel puțin ${MIN_ADDRESS_LENGTH} caractere.`;
+    else if (address.length > MAX_ADDRESS_LENGTH) err.address = `Adresa nu poate depăși ${MAX_ADDRESS_LENGTH} caractere.`;
+  }
   return err;
 }
 
@@ -101,6 +103,7 @@ type OrderSuccessGroup = {
 
 type OrderSuccessDetails = {
   paymentMethod: "stripe" | "ramburs";
+  deliveryMethod: DeliveryMethod;
   groups: OrderSuccessGroup[];
   totalPages: number;
   totalPrice: number;
