@@ -188,7 +188,7 @@ function buildEmailHtml(data: ConfirmationBody): string {
             `}
 
             <p style="margin:0;font-size:14px;color:#475569;line-height:1.6;">
-              Dacă ai întrebări, nu ezita să ne contactezi la <a href="mailto:contact@printica.ro" style="color:#0ea5a0;text-decoration:underline;">contact@printica.ro</a> sau telefonic la <a href="tel:+40771545868" style="color:#0ea5a0;text-decoration:underline;">0771 545 868</a>.
+              Dacă ai întrebări, nu ezita să ne contactezi la <a href="mailto:contact@printica.ro" style="color:#0ea5a0;text-decoration:underline;">contact@printica.ro</a> sau telefonic la <a href="tel:+40778124553" style="color:#0ea5a0;text-decoration:underline;">0778 124 553</a>.
             </p>
           </td>
         </tr>
