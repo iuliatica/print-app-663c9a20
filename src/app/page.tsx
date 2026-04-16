@@ -486,13 +486,21 @@ export default function Home() {
   const createUploadablePdfCopies = useCallback(async (selectedFiles: File[]) => {
     const uploadableFiles: File[] = [];
     const blockedCloudFiles: string[] = [];
+    const notPdfFiles: string[] = [];
 
     for (const file of selectedFiles) {
       try {
         const buffer = await file.arrayBuffer();
+        // Validate PDF magic bytes (%PDF)
+        const header = new Uint8Array(buffer, 0, Math.min(4, buffer.byteLength));
+        const isPdfMagic = header.length >= 4 && header[0] === 0x25 && header[1] === 0x50 && header[2] === 0x44 && header[3] === 0x46;
+        if (!isPdfMagic) {
+          notPdfFiles.push(file.name);
+          continue;
+        }
         uploadableFiles.push(
           new File([buffer], file.name, {
-            type: file.type || "application/pdf",
+            type: "application/pdf",
             lastModified: file.lastModified || Date.now(),
           })
         );
@@ -501,18 +509,16 @@ export default function Home() {
       }
     }
 
-    return { uploadableFiles, blockedCloudFiles };
+    return { uploadableFiles, blockedCloudFiles, notPdfFiles };
   }, []);
 
   const onDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
       setIsDragging(false);
-      const dropped = Array.from(e.dataTransfer.files).filter((f) => {
-        const name = f.name.toLowerCase();
-        const type = (f.type || "").toLowerCase();
-        return type === "application/pdf" || type === "application/x-pdf" || name.endsWith(".pdf");
-      });
+      // Accept all files — magic bytes validated in createUploadablePdfCopies
+      const dropped = Array.from(e.dataTransfer.files);
+      if (dropped.length === 0) return;
       const remaining = MAX_FILES - files.length;
       if (remaining <= 0) {
         addToast(`Poți adăuga maximum ${MAX_FILES} fișiere.`, "error");
@@ -560,17 +566,8 @@ export default function Home() {
         addToast(`Ai putut adăuga doar ${remaining} fișier${remaining > 1 ? "e" : ""} (limită: ${MAX_FILES}).`, "error");
       }
 
-      const isPdf = (f: File) => {
-        const name = f.name.toLowerCase();
-        const type = (f.type || "").toLowerCase();
-        return type === "application/pdf" || type === "application/x-pdf" || name.endsWith(".pdf");
-      };
-      const pdfFiles = limited.filter(isPdf);
-      const nonPdfFiles = limited.filter((f) => !isPdf(f));
-      if (nonPdfFiles.length > 0) {
-        addToast(`Acceptăm doar fișiere PDF. ${nonPdfFiles.length} fișier${nonPdfFiles.length > 1 ? "e" : ""} respins${nonPdfFiles.length > 1 ? "e" : ""}.`, "error");
-      }
-      if (pdfFiles.length === 0) { e.target.value = ""; return; }
+      // All files pass to createUploadablePdfCopies which validates magic bytes
+      const pdfFiles = limited;
 
       const oversizedFiles = pdfFiles.filter((f) => f.size > MAX_FILE_SIZE_BYTES);
       if (oversizedFiles.length > 0) {
@@ -582,7 +579,10 @@ export default function Home() {
       // Show processing indicator for large/multiple files
       setIsProcessingFiles(true);
       try {
-        const { uploadableFiles, blockedCloudFiles } = await createUploadablePdfCopies(filesToCopy);
+        const { uploadableFiles, blockedCloudFiles, notPdfFiles } = await createUploadablePdfCopies(filesToCopy);
+        if (notPdfFiles.length > 0) {
+          addToast(`${notPdfFiles.length} fișier${notPdfFiles.length > 1 ? "e" : ""} nu ${notPdfFiles.length > 1 ? "sunt" : "este"} PDF valid${notPdfFiles.length > 1 ? "e" : ""}.`, "error");
+        }
         if (blockedCloudFiles.length > 0) {
           blockedCloudFiles.forEach((name) => {
             addToast(`Fișierul "${name}" nu poate fi încărcat din Drive/Dropbox. Descarcă-l pe telefon și încarcă-l din memoria internă.`, "error");
@@ -1178,7 +1178,7 @@ export default function Home() {
                   : "border-slate-200 bg-white hover:border-cyan-300 hover:bg-cyan-50/50 hover:shadow-[var(--shadow)]"
               }`}
             >
-              <input type="file" accept=".pdf,application/pdf" multiple onChange={onFileInput} className="hidden" />
+              <input type="file" accept=".pdf,application/pdf,application/x-pdf,application/octet-stream" multiple onChange={onFileInput} className="hidden" />
               {/* Custom illustration */}
               <div className="relative mb-4">
                 <div className={`drop-zone-icon flex h-24 w-24 items-center justify-center rounded-2xl ${isDragging ? "bg-cyan-100" : "bg-gradient-to-br from-cyan-50 to-slate-100"} transition-colors`}>
@@ -1244,7 +1244,7 @@ export default function Home() {
                       : "border-cyan-400 bg-gradient-to-r from-cyan-50 to-cyan-100/60 hover:border-cyan-500 hover:bg-cyan-100 hover:shadow-sm"
                   }`}
                 >
-                  <input ref={fileInputRef} type="file" accept=".pdf,application/pdf" multiple onChange={onFileInput} className="hidden" />
+                  <input ref={fileInputRef} type="file" accept=".pdf,application/pdf,application/x-pdf,application/octet-stream" multiple onChange={onFileInput} className="hidden" />
                   <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${isDragging ? "bg-cyan-300 text-cyan-800" : "bg-cyan-200 text-cyan-700"}`}>
                     <Plus className="h-6 w-6" />
                   </div>
