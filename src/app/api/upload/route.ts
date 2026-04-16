@@ -71,7 +71,7 @@ export async function POST(request: Request) {
     }
 
     const supabase = getServerSupabase();
-    const signed: { path: string; signedUrl: string }[] = [];
+    const signed: { path: string; signedUrl: string; publicUrl: string }[] = [];
 
     for (const { name } of fileNames) {
       const path = uniquePath(name || "document.pdf");
