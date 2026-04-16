@@ -1178,7 +1178,7 @@ export default function Home() {
                   : "border-slate-200 bg-white hover:border-cyan-300 hover:bg-cyan-50/50 hover:shadow-[var(--shadow)]"
               }`}
             >
-              <input type="file" accept=".pdf,application/pdf" multiple onChange={onFileInput} className="hidden" />
+              <input type="file" accept=".pdf,application/pdf,application/x-pdf,application/octet-stream" multiple onChange={onFileInput} className="hidden" />
               {/* Custom illustration */}
               <div className="relative mb-4">
                 <div className={`drop-zone-icon flex h-24 w-24 items-center justify-center rounded-2xl ${isDragging ? "bg-cyan-100" : "bg-gradient-to-br from-cyan-50 to-slate-100"} transition-colors`}>
@@ -1244,7 +1244,7 @@ export default function Home() {
                       : "border-cyan-400 bg-gradient-to-r from-cyan-50 to-cyan-100/60 hover:border-cyan-500 hover:bg-cyan-100 hover:shadow-sm"
                   }`}
                 >
-                  <input ref={fileInputRef} type="file" accept=".pdf,application/pdf" multiple onChange={onFileInput} className="hidden" />
+                  <input ref={fileInputRef} type="file" accept=".pdf,application/pdf,application/x-pdf,application/octet-stream" multiple onChange={onFileInput} className="hidden" />
                   <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${isDragging ? "bg-cyan-300 text-cyan-800" : "bg-cyan-200 text-cyan-700"}`}>
                     <Plus className="h-6 w-6" />
                   </div>
