@@ -578,30 +578,37 @@ export default function Home() {
       }
 
       const filesToCopy = pdfFiles.filter((f) => f.size <= MAX_FILE_SIZE_BYTES);
-      const { uploadableFiles, blockedCloudFiles } = await createUploadablePdfCopies(filesToCopy);
-      if (blockedCloudFiles.length > 0) {
-        blockedCloudFiles.forEach((name) => {
-          addToast(`Fișierul "${name}" nu poate fi încărcat din Drive/Dropbox. Descarcă-l pe telefon și încarcă-l din memoria internă.`, "error");
-        });
-      }
-      if (uploadableFiles.length === 0) { e.target.value = ""; return; }
+      
+      // Show processing indicator for large/multiple files
+      setIsProcessingFiles(true);
+      try {
+        const { uploadableFiles, blockedCloudFiles } = await createUploadablePdfCopies(filesToCopy);
+        if (blockedCloudFiles.length > 0) {
+          blockedCloudFiles.forEach((name) => {
+            addToast(`Fișierul "${name}" nu poate fi încărcat din Drive/Dropbox. Descarcă-l pe telefon și încarcă-l din memoria internă.`, "error");
+          });
+        }
+        if (uploadableFiles.length === 0) { e.target.value = ""; return; }
 
-      const newItems = createFileItems(uploadableFiles);
-      const tooBigFiles = newItems.filter((f) => f.error);
-      const validNewFiles = newItems.filter((f) => !f.error);
-      if (tooBigFiles.length > 0) {
-        setRejectedFiles(tooBigFiles.map((f) => f.name));
+        const newItems = createFileItems(uploadableFiles);
+        const tooBigFiles = newItems.filter((f) => f.error);
+        const validNewFiles = newItems.filter((f) => !f.error);
+        if (tooBigFiles.length > 0) {
+          setRejectedFiles(tooBigFiles.map((f) => f.name));
+        }
+        if (validNewFiles.length === 0 && tooBigFiles.length > 0) return;
+        setFiles((prev) => {
+          const next = [...prev, ...validNewFiles];
+          if (prev.length === 0 && validNewFiles.length > 0) setSelectedFileId(validNewFiles[0].id);
+          return next;
+        });
+        if (validNewFiles.length > 0) {
+          addToast(`${validNewFiles.length} fișier${validNewFiles.length > 1 ? "e" : ""} adăugat${validNewFiles.length > 1 ? "e" : ""}`, "success");
+        }
+        loadPageCounts([...files, ...validNewFiles]);
+      } finally {
+        setIsProcessingFiles(false);
       }
-      if (validNewFiles.length === 0 && tooBigFiles.length > 0) return;
-      setFiles((prev) => {
-        const next = [...prev, ...validNewFiles];
-        if (prev.length === 0 && validNewFiles.length > 0) setSelectedFileId(validNewFiles[0].id);
-        return next;
-      });
-      if (validNewFiles.length > 0) {
-        addToast(`${validNewFiles.length} fișier${validNewFiles.length > 1 ? "e" : ""} adăugat${validNewFiles.length > 1 ? "e" : ""}`, "success");
-      }
-      loadPageCounts([...files, ...validNewFiles]);
       e.target.value = "";
     },
     [files, loadPageCounts, createFileItems, createUploadablePdfCopies, addToast]
