@@ -516,11 +516,9 @@ export default function Home() {
     (e: React.DragEvent) => {
       e.preventDefault();
       setIsDragging(false);
-      const dropped = Array.from(e.dataTransfer.files).filter((f) => {
-        const name = f.name.toLowerCase();
-        const type = (f.type || "").toLowerCase();
-        return type === "application/pdf" || type === "application/x-pdf" || name.endsWith(".pdf");
-      });
+      // Accept all files — magic bytes validated in createUploadablePdfCopies
+      const dropped = Array.from(e.dataTransfer.files);
+      if (dropped.length === 0) return;
       const remaining = MAX_FILES - files.length;
       if (remaining <= 0) {
         addToast(`Poți adăuga maximum ${MAX_FILES} fișiere.`, "error");
