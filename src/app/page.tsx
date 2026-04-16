@@ -878,14 +878,14 @@ export default function Home() {
           try { signData = JSON.parse(signText); } catch { signData = { error: signText?.slice(0, 200) || "Răspuns invalid de la server." }; }
           if (!signRes.ok) throw new Error((signData.error as string) || `Eroare la pregătirea încărcării (${signRes.status}).`);
 
-          const signed = signData.signed as { path: string; signedUrl: string }[];
+          const signed = signData.signed as { path: string; signedUrl: string; publicUrl: string }[];
           if (!signed || signed.length !== fileList.length) throw new Error("Eroare la pregătirea încărcării.");
 
           // Step 2: Upload each file directly to Supabase Storage using signed URLs
           const bucket = "comenzi";
           for (let i = 0; i < fileList.length; i++) {
             const file = fileList[i];
-            const { signedUrl, path } = signed[i];
+            const { signedUrl, publicUrl } = signed[i];
             setUploadProgress(Math.round(((i) / fileList.length) * 90));
 
             const uploadRes = await fetch(signedUrl, {
@@ -899,9 +899,6 @@ export default function Home() {
               throw new Error(`Eroare la încărcarea fișierului "${file.name}": ${errText.slice(0, 100) || uploadRes.status}`);
             }
 
-            // Build the public URL
-            const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-            const publicUrl = `${supabaseUrl}/storage/v1/object/public/${bucket}/${path}`;
             fileUrls.push(publicUrl);
           }
 
