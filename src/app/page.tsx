@@ -566,18 +566,8 @@ export default function Home() {
         addToast(`Ai putut adăuga doar ${remaining} fișier${remaining > 1 ? "e" : ""} (limită: ${MAX_FILES}).`, "error");
       }
 
-      const isPdf = (f: File) => {
-        const name = f.name.toLowerCase();
-        const type = (f.type || "").toLowerCase();
-        // Accept by MIME, extension, or if MIME is generic (octet-stream) — magic bytes validated later
-        return type === "application/pdf" || type === "application/x-pdf" || name.endsWith(".pdf") || type === "application/octet-stream" || type === "";
-      };
-      const pdfFiles = limited.filter(isPdf);
-      const nonPdfFiles = limited.filter((f) => !isPdf(f));
-      if (nonPdfFiles.length > 0) {
-        addToast(`Acceptăm doar fișiere PDF. ${nonPdfFiles.length} fișier${nonPdfFiles.length > 1 ? "e" : ""} respins${nonPdfFiles.length > 1 ? "e" : ""}.`, "error");
-      }
-      if (pdfFiles.length === 0) { e.target.value = ""; return; }
+      // All files pass to createUploadablePdfCopies which validates magic bytes
+      const pdfFiles = limited;
 
       const oversizedFiles = pdfFiles.filter((f) => f.size > MAX_FILE_SIZE_BYTES);
       if (oversizedFiles.length > 0) {
