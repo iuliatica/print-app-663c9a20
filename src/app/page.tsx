@@ -591,7 +591,10 @@ export default function Home() {
       // Show processing indicator for large/multiple files
       setIsProcessingFiles(true);
       try {
-        const { uploadableFiles, blockedCloudFiles } = await createUploadablePdfCopies(filesToCopy);
+        const { uploadableFiles, blockedCloudFiles, notPdfFiles } = await createUploadablePdfCopies(filesToCopy);
+        if (notPdfFiles.length > 0) {
+          addToast(`${notPdfFiles.length} fișier${notPdfFiles.length > 1 ? "e" : ""} nu ${notPdfFiles.length > 1 ? "sunt" : "este"} PDF valid${notPdfFiles.length > 1 ? "e" : ""}.`, "error");
+        }
         if (blockedCloudFiles.length > 0) {
           blockedCloudFiles.forEach((name) => {
             addToast(`Fișierul "${name}" nu poate fi încărcat din Drive/Dropbox. Descarcă-l pe telefon și încarcă-l din memoria internă.`, "error");
