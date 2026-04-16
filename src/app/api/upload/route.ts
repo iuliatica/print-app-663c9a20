@@ -88,12 +88,12 @@ export async function POST(request: Request) {
         );
       }
 
-      // Build the public URL for this path
       const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(path);
 
       signed.push({
         path,
         signedUrl: data.signedUrl,
+        publicUrl: urlData.publicUrl,
       });
     }
 
