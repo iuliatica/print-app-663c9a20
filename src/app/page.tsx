@@ -563,7 +563,8 @@ export default function Home() {
       const isPdf = (f: File) => {
         const name = f.name.toLowerCase();
         const type = (f.type || "").toLowerCase();
-        return type === "application/pdf" || type === "application/x-pdf" || name.endsWith(".pdf");
+        // Accept by MIME, extension, or if MIME is generic (octet-stream) — magic bytes validated later
+        return type === "application/pdf" || type === "application/x-pdf" || name.endsWith(".pdf") || type === "application/octet-stream" || type === "";
       };
       const pdfFiles = limited.filter(isPdf);
       const nonPdfFiles = limited.filter((f) => !isPdf(f));
