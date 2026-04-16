@@ -882,7 +882,7 @@ export default function Home() {
           if (!signed || signed.length !== fileList.length) throw new Error("Eroare la pregătirea încărcării.");
 
           // Step 2: Upload each file directly to Supabase Storage using signed URLs
-          const bucket = "comenzi";
+          
           for (let i = 0; i < fileList.length; i++) {
             const file = fileList[i];
             const { signedUrl, publicUrl } = signed[i];
