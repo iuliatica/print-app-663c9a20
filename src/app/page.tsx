@@ -866,22 +866,47 @@ export default function Home() {
       if (fileList.length > 0) {
         setIsUploading(true);
         setUploadProgress(0);
-        // Simulate progress
-        const progressInterval = setInterval(() => {
-          setUploadProgress((p) => Math.min(p + Math.random() * 15, 90));
-        }, 500);
         try {
-          const formData = new FormData();
-          fileList.forEach((file) => formData.append("files", file));
-          const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
-          let uploadData: Record<string, unknown> = {};
-          const resText = await uploadRes.text();
-          try { uploadData = JSON.parse(resText); } catch { uploadData = { error: resText?.slice(0, 200) || "Răspuns invalid de la server." }; }
-          if (!uploadRes.ok) throw new Error((uploadData.error as string) || `Eroare la încărcare (${uploadRes.status}). Te rugăm încearcă din nou.`);
-          fileUrls = (uploadData.urls as string[]) ?? [];
+          // Step 1: Get signed upload URLs from server (lightweight JSON request)
+          const signRes = await fetch("/api/upload", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ files: fileList.map((f) => ({ name: f.name })) }),
+          });
+          let signData: Record<string, unknown> = {};
+          const signText = await signRes.text();
+          try { signData = JSON.parse(signText); } catch { signData = { error: signText?.slice(0, 200) || "Răspuns invalid de la server." }; }
+          if (!signRes.ok) throw new Error((signData.error as string) || `Eroare la pregătirea încărcării (${signRes.status}).`);
+
+          const signed = signData.signed as { path: string; signedUrl: string }[];
+          if (!signed || signed.length !== fileList.length) throw new Error("Eroare la pregătirea încărcării.");
+
+          // Step 2: Upload each file directly to Supabase Storage using signed URLs
+          const bucket = "comenzi";
+          for (let i = 0; i < fileList.length; i++) {
+            const file = fileList[i];
+            const { signedUrl, path } = signed[i];
+            setUploadProgress(Math.round(((i) / fileList.length) * 90));
+
+            const uploadRes = await fetch(signedUrl, {
+              method: "PUT",
+              headers: { "Content-Type": "application/pdf" },
+              body: file,
+            });
+
+            if (!uploadRes.ok) {
+              const errText = await uploadRes.text().catch(() => "");
+              throw new Error(`Eroare la încărcarea fișierului "${file.name}": ${errText.slice(0, 100) || uploadRes.status}`);
+            }
+
+            // Build the public URL
+            const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+            const publicUrl = `${supabaseUrl}/storage/v1/object/public/${bucket}/${path}`;
+            fileUrls.push(publicUrl);
+          }
+
           setUploadProgress(100);
         } finally {
-          clearInterval(progressInterval);
           setTimeout(() => {
             setIsUploading(false);
             setUploadProgress(0);
