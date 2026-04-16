@@ -1,21 +1,13 @@
 import { NextResponse } from "next/server";
 import { getServerSupabase } from "@/lib/supabase-server";
-import { assertPdfFile } from "@/lib/pdf-validation";
-
-// Allow large file uploads (up to 60 MB per request)
-export const runtime = "nodejs";
-export const maxDuration = 60;
 
 const BUCKET = process.env.SUPABASE_STORAGE_BUCKET ?? "comenzi";
 const MAX_FILES = 20;
-const MAX_FILE_SIZE_MB = 50;
-const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
-const MAX_TOTAL_BYTES = MAX_FILES * MAX_FILE_SIZE_BYTES; // 1 GB
 
 // Simple in-memory IP rate limiter
 const ipRequests = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
-const RATE_LIMIT_MAX = 5; // 5 uploads per IP per minute
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX = 5;
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
@@ -28,7 +20,6 @@ function isRateLimited(ip: string): boolean {
   return entry.count > RATE_LIMIT_MAX;
 }
 
-// Periodically clean up stale entries (every 5 min)
 if (typeof globalThis !== "undefined") {
   const CLEANUP_INTERVAL = 5 * 60_000;
   setInterval(() => {
@@ -44,9 +35,13 @@ function uniquePath(fileName: string): string {
   return `${Date.now()}_${Math.random().toString(36).slice(2, 10)}_${safe}`;
 }
 
+/**
+ * POST — Generate signed upload URLs for direct-to-storage uploads.
+ * Body: JSON { files: [{ name: string }] }
+ * Returns: { signed: [{ path, token, url }] }
+ */
 export async function POST(request: Request) {
   try {
-    // Rate limit by IP
     const ip =
       request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
       request.headers.get("x-real-ip") ||
@@ -58,88 +53,53 @@ export async function POST(request: Request) {
       );
     }
 
-    // Content-Length check — fail fast on oversized requests
-    const contentLength = request.headers.get("content-length");
-    if (contentLength) {
-      const size = parseInt(contentLength, 10);
-      if (size > MAX_TOTAL_BYTES) {
-        return NextResponse.json(
-          { error: `Dimensiunea totală depășește limita de ${MAX_FILES * MAX_FILE_SIZE_MB} MB.` },
-          { status: 413 }
-        );
-      }
-    }
+    const body = await request.json();
+    const fileNames: { name: string }[] = body?.files;
 
-    const formData = await request.formData();
-    const files = formData.getAll("files");
-    const fileList = Array.isArray(files) ? files : [files].filter(Boolean);
-
-    if (fileList.length === 0) {
+    if (!Array.isArray(fileNames) || fileNames.length === 0) {
       return NextResponse.json(
-        { error: "Trimite cel puțin un fișier (câmpul 'files')." },
+        { error: "Trimite cel puțin un fișier." },
         { status: 400 }
       );
     }
 
-    if (fileList.length > MAX_FILES) {
+    if (fileNames.length > MAX_FILES) {
       return NextResponse.json(
         { error: `Maximum ${MAX_FILES} fișiere permise.` },
         { status: 400 }
       );
     }
 
-    const validFiles: { file: File; name: string }[] = [];
-    for (const f of fileList) {
-      if (!(f instanceof File)) continue;
-      if (f.size > MAX_FILE_SIZE_BYTES) {
-        return NextResponse.json(
-          { error: `Fișierul "${f.name}" depășește ${MAX_FILE_SIZE_MB} MB.` },
-          { status: 400 }
-        );
-      }
-      await assertPdfFile(f);
-      validFiles.push({ file: f, name: f.name });
-    }
-
-    if (validFiles.length === 0) {
-      return NextResponse.json(
-        { error: "Niciun fișier valid (trimite fișiere PDF)." },
-        { status: 400 }
-      );
-    }
-
     const supabase = getServerSupabase();
-    const urls: string[] = [];
+    const signed: { path: string; signedUrl: string }[] = [];
 
-    for (const { file, name } of validFiles) {
-      const path = uniquePath(name);
-      const buffer = await file.arrayBuffer();
-      const { data, error } = await supabase.storage.from(BUCKET).upload(path, buffer, {
-        cacheControl: "3600",
-        upsert: false,
-        contentType: "application/pdf",
-      });
+    for (const { name } of fileNames) {
+      const path = uniquePath(name || "document.pdf");
 
-      if (error) {
-        console.error("Upload error:", error);
+      const { data, error } = await supabase.storage
+        .from(BUCKET)
+        .createSignedUploadUrl(path);
+
+      if (error || !data) {
+        console.error("Signed URL error:", error);
         return NextResponse.json(
-          {
-            error: `Eroare Storage: ${error.message}. Verifică că bucket-ul "${BUCKET}" există în Supabase.`,
-          },
+          { error: `Eroare la generare URL: ${error?.message || "necunoscută"}` },
           { status: 500 }
         );
       }
 
-      const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(data.path);
-      urls.push(urlData.publicUrl);
+      // Build the public URL for this path
+      const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(path);
+
+      signed.push({
+        path,
+        signedUrl: data.signedUrl,
+      });
     }
 
-    return NextResponse.json({ urls });
+    return NextResponse.json({ signed });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Eroare la încărcare.";
-    if (message.includes("nu este un PDF") || message.includes("nu pare a fi")) {
-      return NextResponse.json({ error: message }, { status: 400 });
-    }
+    const message = err instanceof Error ? err.message : "Eroare la pregătirea încărcării.";
     if (message.includes("supabaseUrl") || message.includes("SUPABASE")) {
       return NextResponse.json(
         { error: "Serverul nu este configurat pentru upload. Verifică variabilele de mediu." },
@@ -148,7 +108,7 @@ export async function POST(request: Request) {
     }
     console.error("Upload API error:", err);
     return NextResponse.json(
-      { error: "Eroare la încărcarea fișierelor. Încearcă din nou." },
+      { error: "Eroare la pregătirea încărcării. Încearcă din nou." },
       { status: 500 }
     );
   }
