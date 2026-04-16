@@ -508,8 +508,11 @@ export default function Home() {
     (e: React.DragEvent) => {
       e.preventDefault();
       setIsDragging(false);
-      const dropped = Array.from(e.dataTransfer.files).filter((f) => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf"));
-      if (dropped.length === 0) return;
+      const dropped = Array.from(e.dataTransfer.files).filter((f) => {
+        const name = f.name.toLowerCase();
+        const type = (f.type || "").toLowerCase();
+        return type === "application/pdf" || type === "application/x-pdf" || name.endsWith(".pdf");
+      });
       const remaining = MAX_FILES - files.length;
       if (remaining <= 0) {
         addToast(`Poți adăuga maximum ${MAX_FILES} fișiere.`, "error");
@@ -557,8 +560,13 @@ export default function Home() {
         addToast(`Ai putut adăuga doar ${remaining} fișier${remaining > 1 ? "e" : ""} (limită: ${MAX_FILES}).`, "error");
       }
 
-      const pdfFiles = limited.filter((f) => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf"));
-      const nonPdfFiles = limited.filter((f) => f.type !== "application/pdf" && !f.name.toLowerCase().endsWith(".pdf"));
+      const isPdf = (f: File) => {
+        const name = f.name.toLowerCase();
+        const type = (f.type || "").toLowerCase();
+        return type === "application/pdf" || type === "application/x-pdf" || name.endsWith(".pdf");
+      };
+      const pdfFiles = limited.filter(isPdf);
+      const nonPdfFiles = limited.filter((f) => !isPdf(f));
       if (nonPdfFiles.length > 0) {
         addToast(`Acceptăm doar fișiere PDF. ${nonPdfFiles.length} fișier${nonPdfFiles.length > 1 ? "e" : ""} respins${nonPdfFiles.length > 1 ? "e" : ""}.`, "error");
       }
