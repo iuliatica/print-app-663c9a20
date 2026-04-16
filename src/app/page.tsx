@@ -1160,7 +1160,14 @@ export default function Home() {
 
         {/* ═══ Step 0: Empty state — full drop zone ═══ */}
         {files.length === 0 ? (
-          <div className="mx-auto w-full max-w-2xl">
+          <div className="relative mx-auto w-full max-w-2xl">
+            {isProcessingFiles && (
+              <div className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-2xl bg-white/90 backdrop-blur-sm">
+                <Loader2 className="h-10 w-10 animate-spin text-cyan-500" />
+                <p className="mt-3 text-sm font-medium text-slate-700">Se procesează documentele selectate…</p>
+                <p className="mt-1 text-xs text-slate-400">Poate dura câteva secunde pentru fișiere mari</p>
+              </div>
+            )}
             <label
               onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
               onDragLeave={() => setIsDragging(false)}
