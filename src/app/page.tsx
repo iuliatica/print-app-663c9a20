@@ -486,13 +486,21 @@ export default function Home() {
   const createUploadablePdfCopies = useCallback(async (selectedFiles: File[]) => {
     const uploadableFiles: File[] = [];
     const blockedCloudFiles: string[] = [];
+    const notPdfFiles: string[] = [];
 
     for (const file of selectedFiles) {
       try {
         const buffer = await file.arrayBuffer();
+        // Validate PDF magic bytes (%PDF)
+        const header = new Uint8Array(buffer, 0, Math.min(4, buffer.byteLength));
+        const isPdfMagic = header.length >= 4 && header[0] === 0x25 && header[1] === 0x50 && header[2] === 0x44 && header[3] === 0x46;
+        if (!isPdfMagic) {
+          notPdfFiles.push(file.name);
+          continue;
+        }
         uploadableFiles.push(
           new File([buffer], file.name, {
-            type: file.type || "application/pdf",
+            type: "application/pdf",
             lastModified: file.lastModified || Date.now(),
           })
         );
@@ -501,7 +509,7 @@ export default function Home() {
       }
     }
 
-    return { uploadableFiles, blockedCloudFiles };
+    return { uploadableFiles, blockedCloudFiles, notPdfFiles };
   }, []);
 
   const onDrop = useCallback(
