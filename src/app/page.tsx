@@ -350,6 +350,7 @@ export default function Home() {
   const [isDragging, setIsDragging] = useState(false);
   const [isLoadingPages, setIsLoadingPages] = useState(false);
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
+  const [isProcessingFiles, setIsProcessingFiles] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
