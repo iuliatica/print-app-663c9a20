@@ -482,6 +482,27 @@ export default function Home() {
     });
   }, []);
 
+  const createUploadablePdfCopies = useCallback(async (selectedFiles: File[]) => {
+    const uploadableFiles: File[] = [];
+    const blockedCloudFiles: string[] = [];
+
+    for (const file of selectedFiles) {
+      try {
+        const buffer = await file.arrayBuffer();
+        uploadableFiles.push(
+          new File([buffer], file.name, {
+            type: file.type || "application/pdf",
+            lastModified: file.lastModified || Date.now(),
+          })
+        );
+      } catch {
+        blockedCloudFiles.push(file.name);
+      }
+    }
+
+    return { uploadableFiles, blockedCloudFiles };
+  }, []);
+
   const onDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
@@ -535,25 +556,28 @@ export default function Home() {
         addToast(`Ai putut adăuga doar ${remaining} fișier${remaining > 1 ? "e" : ""} (limită: ${MAX_FILES}).`, "error");
       }
 
-      // Validate files are actually readable (cloud-sourced files from Drive/Dropbox may fail)
-      const readableFiles: File[] = [];
-      for (const f of limited) {
-        try {
-          await f.slice(0, 65536).arrayBuffer();
-          readableFiles.push(f);
-        } catch {
-          addToast(`Fișierul "${f.name}" nu poate fi citit direct din Drive/Dropbox. Descarcă-l pe telefon și încarcă-l din memoria internă.`, "error");
-        }
-      }
-      if (readableFiles.length === 0) { e.target.value = ""; return; }
-
-      const pdfFiles = readableFiles.filter((f) => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf"));
-      const nonPdfFiles = readableFiles.filter((f) => f.type !== "application/pdf" && !f.name.toLowerCase().endsWith(".pdf"));
+      const pdfFiles = limited.filter((f) => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf"));
+      const nonPdfFiles = limited.filter((f) => f.type !== "application/pdf" && !f.name.toLowerCase().endsWith(".pdf"));
       if (nonPdfFiles.length > 0) {
         addToast(`Acceptăm doar fișiere PDF. ${nonPdfFiles.length} fișier${nonPdfFiles.length > 1 ? "e" : ""} respins${nonPdfFiles.length > 1 ? "e" : ""}.`, "error");
       }
       if (pdfFiles.length === 0) { e.target.value = ""; return; }
-      const newItems = createFileItems(pdfFiles);
+
+      const oversizedFiles = pdfFiles.filter((f) => f.size > MAX_FILE_SIZE_BYTES);
+      if (oversizedFiles.length > 0) {
+        setRejectedFiles(oversizedFiles.map((f) => f.name));
+      }
+
+      const filesToCopy = pdfFiles.filter((f) => f.size <= MAX_FILE_SIZE_BYTES);
+      const { uploadableFiles, blockedCloudFiles } = await createUploadablePdfCopies(filesToCopy);
+      if (blockedCloudFiles.length > 0) {
+        blockedCloudFiles.forEach((name) => {
+          addToast(`Fișierul "${name}" nu poate fi încărcat din Drive/Dropbox. Descarcă-l pe telefon și încarcă-l din memoria internă.`, "error");
+        });
+      }
+      if (uploadableFiles.length === 0) { e.target.value = ""; return; }
+
+      const newItems = createFileItems(uploadableFiles);
       const tooBigFiles = newItems.filter((f) => f.error);
       const validNewFiles = newItems.filter((f) => !f.error);
       if (tooBigFiles.length > 0) {
@@ -571,7 +595,7 @@ export default function Home() {
       loadPageCounts([...files, ...validNewFiles]);
       e.target.value = "";
     },
-    [files, loadPageCounts, createFileItems, addToast]
+    [files, loadPageCounts, createFileItems, createUploadablePdfCopies, addToast]
   );
 
   const removeFile = (id: string) => {
@@ -1005,7 +1029,10 @@ export default function Home() {
         throw new Error("Nu s-a putut deschide pagina de plată. Încearcă din nou.");
       }
     } catch (e) {
-      const friendlyMsg = e instanceof Error ? e.message : "A apărut o problemă. Te rugăm încearcă din nou.";
+      const rawMessage = e instanceof Error ? e.message : "A apărut o problemă. Te rugăm încearcă din nou.";
+      const friendlyMsg = rawMessage === "Failed to fetch"
+        ? "Fișierul selectat nu mai poate fi citit. Dacă l-ai ales din Drive sau Dropbox, descarcă-l pe telefon și încarcă-l din memoria internă."
+        : rawMessage;
       setCheckoutError(friendlyMsg);
       addToast(friendlyMsg, "error");
     } finally {
