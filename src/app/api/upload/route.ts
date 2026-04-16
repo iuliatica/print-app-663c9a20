@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { getServerSupabase } from "@/lib/supabase-server";
 import { assertPdfFile } from "@/lib/pdf-validation";
 
+// Allow large file uploads (up to 60 MB per request)
+export const runtime = "nodejs";
+export const maxDuration = 60;
+
 const BUCKET = process.env.SUPABASE_STORAGE_BUCKET ?? "comenzi";
 const MAX_FILES = 20;
 const MAX_FILE_SIZE_MB = 50;
