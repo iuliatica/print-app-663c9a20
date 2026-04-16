@@ -1223,7 +1223,14 @@ export default function Home() {
         ) : (
           <>
             {/* ═══ Step 1: Files loaded — configure ═══ */}
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,420px)_1fr] lg:gap-8">
+            <div className="relative grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,420px)_1fr] lg:gap-8">
+              {isProcessingFiles && (
+                <div className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-2xl bg-white/90 backdrop-blur-sm">
+                  <Loader2 className="h-10 w-10 animate-spin text-cyan-500" />
+                  <p className="mt-3 text-sm font-medium text-slate-700">Se procesează documentele selectate…</p>
+                  <p className="mt-1 text-xs text-slate-400">Poate dura câteva secunde pentru fișiere mari</p>
+                </div>
+              )}
               {/* ─── Left: File list ─── */}
               <div className="flex min-h-0 flex-col">
                 {/* Compact add-more drop zone */}
