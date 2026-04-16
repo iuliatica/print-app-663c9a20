@@ -350,6 +350,7 @@ export default function Home() {
   const [isDragging, setIsDragging] = useState(false);
   const [isLoadingPages, setIsLoadingPages] = useState(false);
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
+  const [isProcessingFiles, setIsProcessingFiles] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
@@ -507,8 +508,11 @@ export default function Home() {
     (e: React.DragEvent) => {
       e.preventDefault();
       setIsDragging(false);
-      const dropped = Array.from(e.dataTransfer.files).filter((f) => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf"));
-      if (dropped.length === 0) return;
+      const dropped = Array.from(e.dataTransfer.files).filter((f) => {
+        const name = f.name.toLowerCase();
+        const type = (f.type || "").toLowerCase();
+        return type === "application/pdf" || type === "application/x-pdf" || name.endsWith(".pdf");
+      });
       const remaining = MAX_FILES - files.length;
       if (remaining <= 0) {
         addToast(`Poți adăuga maximum ${MAX_FILES} fișiere.`, "error");
@@ -556,8 +560,13 @@ export default function Home() {
         addToast(`Ai putut adăuga doar ${remaining} fișier${remaining > 1 ? "e" : ""} (limită: ${MAX_FILES}).`, "error");
       }
 
-      const pdfFiles = limited.filter((f) => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf"));
-      const nonPdfFiles = limited.filter((f) => f.type !== "application/pdf" && !f.name.toLowerCase().endsWith(".pdf"));
+      const isPdf = (f: File) => {
+        const name = f.name.toLowerCase();
+        const type = (f.type || "").toLowerCase();
+        return type === "application/pdf" || type === "application/x-pdf" || name.endsWith(".pdf");
+      };
+      const pdfFiles = limited.filter(isPdf);
+      const nonPdfFiles = limited.filter((f) => !isPdf(f));
       if (nonPdfFiles.length > 0) {
         addToast(`Acceptăm doar fișiere PDF. ${nonPdfFiles.length} fișier${nonPdfFiles.length > 1 ? "e" : ""} respins${nonPdfFiles.length > 1 ? "e" : ""}.`, "error");
       }
@@ -569,30 +578,37 @@ export default function Home() {
       }
 
       const filesToCopy = pdfFiles.filter((f) => f.size <= MAX_FILE_SIZE_BYTES);
-      const { uploadableFiles, blockedCloudFiles } = await createUploadablePdfCopies(filesToCopy);
-      if (blockedCloudFiles.length > 0) {
-        blockedCloudFiles.forEach((name) => {
-          addToast(`Fișierul "${name}" nu poate fi încărcat din Drive/Dropbox. Descarcă-l pe telefon și încarcă-l din memoria internă.`, "error");
-        });
-      }
-      if (uploadableFiles.length === 0) { e.target.value = ""; return; }
+      
+      // Show processing indicator for large/multiple files
+      setIsProcessingFiles(true);
+      try {
+        const { uploadableFiles, blockedCloudFiles } = await createUploadablePdfCopies(filesToCopy);
+        if (blockedCloudFiles.length > 0) {
+          blockedCloudFiles.forEach((name) => {
+            addToast(`Fișierul "${name}" nu poate fi încărcat din Drive/Dropbox. Descarcă-l pe telefon și încarcă-l din memoria internă.`, "error");
+          });
+        }
+        if (uploadableFiles.length === 0) { e.target.value = ""; return; }
 
-      const newItems = createFileItems(uploadableFiles);
-      const tooBigFiles = newItems.filter((f) => f.error);
-      const validNewFiles = newItems.filter((f) => !f.error);
-      if (tooBigFiles.length > 0) {
-        setRejectedFiles(tooBigFiles.map((f) => f.name));
+        const newItems = createFileItems(uploadableFiles);
+        const tooBigFiles = newItems.filter((f) => f.error);
+        const validNewFiles = newItems.filter((f) => !f.error);
+        if (tooBigFiles.length > 0) {
+          setRejectedFiles(tooBigFiles.map((f) => f.name));
+        }
+        if (validNewFiles.length === 0 && tooBigFiles.length > 0) return;
+        setFiles((prev) => {
+          const next = [...prev, ...validNewFiles];
+          if (prev.length === 0 && validNewFiles.length > 0) setSelectedFileId(validNewFiles[0].id);
+          return next;
+        });
+        if (validNewFiles.length > 0) {
+          addToast(`${validNewFiles.length} fișier${validNewFiles.length > 1 ? "e" : ""} adăugat${validNewFiles.length > 1 ? "e" : ""}`, "success");
+        }
+        loadPageCounts([...files, ...validNewFiles]);
+      } finally {
+        setIsProcessingFiles(false);
       }
-      if (validNewFiles.length === 0 && tooBigFiles.length > 0) return;
-      setFiles((prev) => {
-        const next = [...prev, ...validNewFiles];
-        if (prev.length === 0 && validNewFiles.length > 0) setSelectedFileId(validNewFiles[0].id);
-        return next;
-      });
-      if (validNewFiles.length > 0) {
-        addToast(`${validNewFiles.length} fișier${validNewFiles.length > 1 ? "e" : ""} adăugat${validNewFiles.length > 1 ? "e" : ""}`, "success");
-      }
-      loadPageCounts([...files, ...validNewFiles]);
       e.target.value = "";
     },
     [files, loadPageCounts, createFileItems, createUploadablePdfCopies, addToast]
@@ -1144,7 +1160,14 @@ export default function Home() {
 
         {/* ═══ Step 0: Empty state — full drop zone ═══ */}
         {files.length === 0 ? (
-          <div className="mx-auto w-full max-w-2xl">
+          <div className="relative mx-auto w-full max-w-2xl">
+            {isProcessingFiles && (
+              <div className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-2xl bg-white/90 backdrop-blur-sm">
+                <Loader2 className="h-10 w-10 animate-spin text-cyan-500" />
+                <p className="mt-3 text-sm font-medium text-slate-700">Se procesează documentele selectate…</p>
+                <p className="mt-1 text-xs text-slate-400">Poate dura câteva secunde pentru fișiere mari</p>
+              </div>
+            )}
             <label
               onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
               onDragLeave={() => setIsDragging(false)}
@@ -1200,7 +1223,14 @@ export default function Home() {
         ) : (
           <>
             {/* ═══ Step 1: Files loaded — configure ═══ */}
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,420px)_1fr] lg:gap-8">
+            <div className="relative grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,420px)_1fr] lg:gap-8">
+              {isProcessingFiles && (
+                <div className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-2xl bg-white/90 backdrop-blur-sm">
+                  <Loader2 className="h-10 w-10 animate-spin text-cyan-500" />
+                  <p className="mt-3 text-sm font-medium text-slate-700">Se procesează documentele selectate…</p>
+                  <p className="mt-1 text-xs text-slate-400">Poate dura câteva secunde pentru fișiere mari</p>
+                </div>
+              )}
               {/* ─── Left: File list ─── */}
               <div className="flex min-h-0 flex-col">
                 {/* Compact add-more drop zone */}
