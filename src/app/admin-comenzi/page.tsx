@@ -434,6 +434,24 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+/** Badge pentru statusul de plată raportat de Stripe (paid / failed / abandoned / canceled). */
+function PaymentStatusBadge({ status }: { status: string }) {
+  const s = (status ?? "").toLowerCase();
+  const map: Record<string, { label: string; cls: string }> = {
+    paid: { label: "✓ Plătit", cls: "bg-emerald-100 text-emerald-800 border-emerald-200" },
+    failed: { label: "✗ Plată eșuată", cls: "bg-red-100 text-red-800 border-red-200" },
+    abandoned: { label: "⏳ Abandonat", cls: "bg-amber-100 text-amber-800 border-amber-200" },
+    canceled: { label: "⊘ Anulat", cls: "bg-slate-200 text-slate-700 border-slate-300" },
+  };
+  const m = map[s];
+  if (!m) return null;
+  return (
+    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold ${m.cls}`}>
+      {m.label}
+    </span>
+  );
+}
+
 function getAdminHeaders(): HeadersInit {
   const token = typeof window !== "undefined" ? sessionStorage.getItem("admin_token") : null;
   const h: Record<string, string> = { "Content-Type": "application/json" };
