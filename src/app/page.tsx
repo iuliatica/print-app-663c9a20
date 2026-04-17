@@ -808,7 +808,7 @@ export default function Home() {
 
   const spiralOptions: { value: SpiralType; label: string; icon: React.ReactNode; description: string }[] = [
     { value: "none", label: "Doar print", icon: <BookOpen className="h-6 w-6" />, description: "Fără legare" },
-    { value: "spirala", label: "Spiralare", icon: <Circle className="h-6 w-6" />, description: selectedGroupMaxCopies > 1 ? `+${(SPIRAL_PRICE * selectedGroupMaxCopies).toFixed(0)} lei (${SPIRAL_PRICE} lei × ${selectedGroupMaxCopies} copii)` : `+${SPIRAL_PRICE} lei` },
+    { value: "spirala", label: "Spiralare", icon: <Circle className="h-6 w-6" />, description: selectedGroupMaxCopies > 1 ? `+${(SPIRAL_PRICE * selectedGroupMaxCopies).toFixed(0)}  RON (${SPIRAL_PRICE}  RON × ${selectedGroupMaxCopies} copii)` : `+${SPIRAL_PRICE} RON` },
     { value: "perforare2", label: "Perforare", icon: <BookMarked className="h-6 w-6" />, description: "2 găuri" },
     { value: "capsare", label: "Capsare", icon: <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="3" width="16" height="18" rx="1" /><path d="M7 3 L7 7 L11 7" /><line x1="7" y1="3" x2="7" y2="7" strokeWidth="2.5" /><line x1="7" y1="7" x2="11" y2="7" strokeWidth="2.5" /></svg>, description: `Max ${MAX_CAPSARE_SHEETS} file` },
   ];
@@ -1419,7 +1419,7 @@ export default function Home() {
                                 const spiralPriceForFile = hasSpiralForFile && isFirstInGrp ? SPIRAL_PRICE * (item.copies ?? 1) : 0;
                                 return (
                                   <p className="mt-0.5 text-xs font-semibold text-cyan-600 tabular-nums">
-                                    {filePrice.toFixed(2)} lei{spiralPriceForFile > 0 ? ` + ${spiralPriceForFile.toFixed(2)} lei spiralare` : ""}
+                                    {filePrice.toFixed(2)} lei{spiralPriceForFile > 0 ? ` + ${spiralPriceForFile.toFixed(2)}  RON spiralare` : ""}
                                   </p>
                                 );
                               })()}
@@ -1823,23 +1823,23 @@ export default function Home() {
                     <div className="mt-3 flex flex-wrap items-center gap-3">
                       <span className="inline-flex items-center gap-1.5 bg-slate-100 px-3 py-2 text-base font-bold text-slate-800">
                         <CreditCard className="h-4 w-4 text-slate-500" />
-                        {pagePrice.toFixed(2)} lei printare
+                        {pagePrice.toFixed(2)}  RON printare
                       </span>
                       {spiralPrice > 0 && (
                         <span className="inline-flex items-center gap-1.5 bg-cyan-100 px-3 py-2 text-sm font-bold text-cyan-700">
-                          +{spiralPrice.toFixed(2)} lei spiralare
+                          +{spiralPrice.toFixed(2)}  RON spiralare
                         </span>
                       )}
                       {deliveryMethod !== "ridicare" && totalPrice < MIN_ORDER_LEI && totalPrice > 0 && (
                         <span className="inline-flex items-center gap-1.5 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 border border-amber-200 rounded">
-                          Minim {MIN_ORDER_LEI} lei (valoare printare: {totalPrice.toFixed(2)} lei)
+                          Minim {MIN_ORDER_LEI}  RON (valoare printare: {totalPrice.toFixed(2)} lei)
                         </span>
                       )}
                       <span className="inline-flex items-center gap-1.5 bg-amber-100 px-3 py-2 text-base font-bold text-amber-800">
-                        {deliveryMethod === "ridicare" ? "Ridicare gratuită" : `+${SHIPPING_COST_LEI} lei transport`}
+                        {deliveryMethod === "ridicare" ? "Ridicare gratuită" : `+${SHIPPING_COST_LEI}  RON transport`}
                       </span>
                       <span className="inline-flex items-center gap-1.5 bg-slate-800 px-3 py-2 text-base font-bold text-white">
-                        = {totalWithShipping.toFixed(2)} lei total
+                        = {totalWithShipping.toFixed(2)}  RON total
                       </span>
                     </div>
                   )}
@@ -1869,7 +1869,7 @@ export default function Home() {
                     <p className="text-sm font-medium text-slate-600">Total comandă</p>
                     <p className="mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">{totalWithShipping.toFixed(2)} lei</p>
                     <p className="mt-1 text-xs text-slate-500">
-                      {effectivePrice.toFixed(2)} lei printare{shippingCost > 0 ? ` + ${shippingCost} lei transport` : " · Ridicare de la sediu (gratuit)"} · {totalPages} pagini
+                      {effectivePrice.toFixed(2)}  RON printare{shippingCost > 0 ? ` + ${shippingCost}  RON transport` : " · Ridicare de la sediu (gratuit)"} · {totalPages} pagini
                     </p>
                     {detectedColorPages > 0 && (
                       <p className="mt-0.5 text-xs text-slate-500">
@@ -1880,7 +1880,7 @@ export default function Home() {
                     )}
                     {deliveryMethod !== "ridicare" && totalPrice > 0 && totalPrice < MIN_ORDER_LEI && (
                       <p className="mt-1 text-xs font-semibold text-amber-600">
-                        ⚠ Costul real: {totalPrice.toFixed(2)} lei. Comanda minimă este de {MIN_ORDER_LEI} lei, prețul a fost ajustat automat{shippingCost > 0 ? ` (+ ${shippingCost} lei transport)` : ""}.
+                        ⚠ Costul real: {totalPrice.toFixed(2)} lei. Comanda minimă este de {MIN_ORDER_LEI} lei, prețul a fost ajustat automat{shippingCost > 0 ? ` (+ ${shippingCost}  RON transport)` : ""}.
                       </p>
                     )}
                   </>
@@ -1960,7 +1960,7 @@ export default function Home() {
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
               <p className="text-lg font-bold text-cyan-600 tabular-nums">{totalWithShipping.toFixed(2)} lei</p>
-              <p className="text-xs text-slate-500 truncate">{totalPages} pag.{shippingCost > 0 ? ` · incl. ${shippingCost} lei transport` : " · Ridicare gratuită"}</p>
+              <p className="text-xs text-slate-500 truncate">{totalPages} pag.{shippingCost > 0 ? ` · incl. ${shippingCost}  RON transport` : " · Ridicare gratuită"}</p>
             </div>
             <button
               type="button"
@@ -2066,7 +2066,7 @@ export default function Home() {
                   )}
                   <div className="flex justify-between text-slate-600">
                     <span>{deliveryMethod === "ridicare" ? "Transport (ridicare)" : "Transport (curier)"}</span>
-                    <span>{shippingCost > 0 ? `${shippingCost.toFixed(2)} lei` : "GRATUIT"}</span>
+                    <span>{shippingCost > 0 ? `${shippingCost.toFixed(2)} RON` : "GRATUIT"}</span>
                   </div>
                   <div className="flex justify-between font-semibold text-slate-800">
                     <span>Total</span>
@@ -2207,8 +2207,8 @@ export default function Home() {
                   : isCheckoutLoading
                   ? "Se procesează..."
                   : paymentMethod === "ramburs"
-                    ? `Confirmă comanda · ${totalWithShipping.toFixed(2)} lei`
-                    : `Plătește ${totalWithShipping.toFixed(2)} lei online`}
+                    ? `Confirmă comanda · ${totalWithShipping.toFixed(2)} RON`
+                    : `Plătește ${totalWithShipping.toFixed(2)}  RON online`}
               </button>
             </div>
           </div>
