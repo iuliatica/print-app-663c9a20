@@ -186,7 +186,7 @@ export async function POST(request: Request) {
       const now = new Date().toLocaleString("ro-RO", { timeZone: "Europe/Bucharest" });
       const name = data.customer_name || "Necunoscut";
       const payLabel = data.payment_method === "ramburs" ? "Ramburs" : "Card online";
-      const msg = `🛒 Comandă nouă Printica!\n📅 ${now}\n👤 ${name}\n💰 ${data.total_price.toFixed(2)} lei\n💳 ${payLabel}`;
+      const msg = `🛒 Comandă nouă Printica!\n📅 ${now}\n👤 ${name}\n💰 ${data.total_price.toFixed(2)} RON\n💳 ${payLabel}`;
       await sendCallMeBotNotification(msg);
     } catch (e) {
       console.error("WhatsApp notification error:", e);

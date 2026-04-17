@@ -48,7 +48,7 @@ type VerifyResponse = {
 };
 
 function formatPrice(bani: number) {
-  return (bani / 100).toFixed(2).replace(".", ",") + " lei";
+  return (bani / 100).toFixed(2).replace(".", ",") + " RON";
 }
 
 function formatDate(iso: string) {
@@ -187,7 +187,7 @@ function SuccessContent() {
             <div className="flex items-center justify-between">
               <span className="text-sm text-slate-500">Total plătit</span>
               <span className="text-lg font-bold text-green-700">
-                {data?.amount_total ? formatPrice(data.amount_total) : order ? `${order.total_price.toFixed(2).replace(".", ",")} lei` : "—"}
+                {data?.amount_total ? formatPrice(data.amount_total) : order ? `${order.total_price.toFixed(2).replace(".", ",")} RON` : "—"}
               </span>
             </div>
 
