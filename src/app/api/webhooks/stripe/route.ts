@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getServerSupabase } from "@/lib/supabase-server";
+import { sendLifecycleEmail, type LifecycleKind } from "@/lib/lifecycle-emails";
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -10,10 +11,77 @@ function getStripe() {
 
 type OrderStatus = "paid" | "failed" | "abandoned" | "canceled";
 
-/**
- * Actualizează statusul comenzii în Supabase.
- * Caută ordinul după `order_id` din metadata sau, ca fallback, după `stripe_session_id`.
- */
+type OrderRecipient = {
+  customer_email: string | null;
+  customer_name: string | null;
+  total_price: number | null;
+};
+
+/** Citește emailul + numele clientului pentru a putea trimite emailul de lifecycle. */
+async function fetchOrderRecipient(params: {
+  orderId?: string | null;
+  sessionId?: string | null;
+}): Promise<OrderRecipient | null> {
+  const { orderId, sessionId } = params;
+  const supabase = getServerSupabase();
+  const sel = "customer_email, customer_name, total_price";
+  const q = supabase.from("orders").select(sel).limit(1);
+  let res;
+  if (orderId) res = await q.eq("id", orderId).maybeSingle();
+  else if (sessionId) res = await q.eq("stripe_session_id", sessionId).maybeSingle();
+  else return null;
+
+  if (res.error) {
+    console.error("[stripe-webhook] fetchOrderRecipient eroare:", res.error);
+    return null;
+  }
+  return (res.data as OrderRecipient) ?? null;
+}
+
+/** Construiește o nouă sesiune Checkout pentru retry. */
+async function buildRetryCheckoutUrl(orderId: string | null | undefined): Promise<string | undefined> {
+  if (!orderId) return undefined;
+  try {
+    const supabase = getServerSupabase();
+    const { data: order } = await supabase
+      .from("orders")
+      .select("id, total_price, customer_email, status")
+      .eq("id", orderId)
+      .maybeSingle();
+    if (!order || order.status === "paid") return undefined;
+    const totalPrice = Number(order.total_price);
+    if (!totalPrice || totalPrice <= 0) return undefined;
+
+    const stripe = getStripe();
+    const origin = process.env.NEXT_PUBLIC_SITE_URL ?? "https://printica.ro";
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "ron",
+            product_data: {
+              name: "Printare documente (reluare plată)",
+            },
+            unit_amount: Math.round(totalPrice * 100),
+          },
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/`,
+      metadata: { order_id: order.id, retry: "true" },
+      ...(order.customer_email ? { customer_email: String(order.customer_email).trim().toLowerCase() } : {}),
+    });
+    return session.url ?? undefined;
+  } catch (err) {
+    console.error("[stripe-webhook] Nu am putut crea sesiunea de retry:", err);
+    return undefined;
+  }
+}
+
+/** Actualizează statusul comenzii în DB. */
 async function updateOrderStatus(params: {
   orderId?: string | null;
   sessionId?: string | null;
@@ -25,31 +93,23 @@ async function updateOrderStatus(params: {
 
   const query = supabase.from("orders").update({ status });
   let result;
-  if (orderId) {
-    result = await query.eq("id", orderId);
-  } else if (sessionId) {
-    result = await query.eq("stripe_session_id", sessionId);
-  } else {
+  if (orderId) result = await query.eq("id", orderId);
+  else if (sessionId) result = await query.eq("stripe_session_id", sessionId);
+  else {
     console.warn(`[stripe-webhook] ${context}: lipsesc atât order_id cât și session_id`);
-    return { matched: false, error: null as Error | null };
+    return { matched: false };
   }
 
   if (result.error) {
     console.error(`[stripe-webhook] ${context}: eroare DB`, result.error);
-    return { matched: false, error: result.error };
+    return { matched: false };
   }
-
   console.log(
     `[stripe-webhook] ${context}: comanda marcată "${status}" (order_id=${orderId ?? "-"}, session=${sessionId ?? "-"})`
   );
-  return { matched: true, error: null as Error | null };
+  return { matched: true };
 }
 
-/**
- * Pentru evenimentele payment_intent.* nu avem direct order_id în metadata
- * (Stripe nu propagă metadata-ul Checkout Session pe PaymentIntent).
- * Recuperăm sesiunea de Checkout asociată acestui PaymentIntent ca să aflăm order_id.
- */
 async function resolveOrderFromPaymentIntent(
   paymentIntentId: string
 ): Promise<{ orderId?: string; sessionId?: string }> {
@@ -71,14 +131,31 @@ async function resolveOrderFromPaymentIntent(
   }
 }
 
+async function notifyClient(params: {
+  kind: LifecycleKind;
+  orderId?: string | null;
+  sessionId?: string | null;
+  retryUrl?: string;
+}) {
+  const recipient = await fetchOrderRecipient({ orderId: params.orderId, sessionId: params.sessionId });
+  if (!recipient?.customer_email) {
+    console.warn(`[stripe-webhook] notifyClient(${params.kind}): nu am email destinatar`);
+    return;
+  }
+  await sendLifecycleEmail({
+    to: recipient.customer_email,
+    customerName: recipient.customer_name,
+    kind: params.kind,
+    retryUrl: params.retryUrl,
+  });
+}
+
 /**
  * POST /api/webhooks/stripe
- *
- * Evenimente gestionate:
- *  - checkout.session.completed   → status: paid
- *  - payment_intent.payment_failed → status: failed
- *  - checkout.session.expired     → status: abandoned
- *  - payment_intent.canceled      → status: canceled
+ *  - checkout.session.completed   → paid     + email succes
+ *  - payment_intent.payment_failed → failed  + email cu retry URL
+ *  - checkout.session.expired     → abandoned + email reluare comandă
+ *  - payment_intent.canceled      → canceled  + email confirmare anulare
  */
 export async function POST(request: Request) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -89,7 +166,6 @@ export async function POST(request: Request) {
 
   const body = await request.text();
   const signature = request.headers.get("stripe-signature");
-
   if (!signature) {
     return NextResponse.json({ error: "Missing stripe-signature header" }, { status: 400 });
   }
@@ -108,7 +184,6 @@ export async function POST(request: Request) {
         const session = event.data.object as Stripe.Checkout.Session;
         const orderId = session.metadata?.order_id ?? null;
 
-        // Update status + payment intent + session id (păstrăm comportamentul anterior)
         const supabase = getServerSupabase();
         const updatePayload: Record<string, unknown> = {
           status: "paid",
@@ -124,8 +199,10 @@ export async function POST(request: Request) {
           return NextResponse.json({ error: "DB update failed" }, { status: 500 });
         }
         console.log(
-          `[stripe-webhook] checkout.session.completed: order ${orderId ?? "(via session)"} marcat ca PAID (${session.id})`
+          `[stripe-webhook] checkout.session.completed: order ${orderId ?? "(via session)"} PAID (${session.id})`
         );
+
+        await notifyClient({ kind: "paid", orderId, sessionId: session.id });
         break;
       }
 
@@ -138,6 +215,8 @@ export async function POST(request: Request) {
           status: "abandoned",
           context: "checkout.session.expired",
         });
+        const retryUrl = await buildRetryCheckoutUrl(orderId);
+        await notifyClient({ kind: "expired", orderId, sessionId: session.id, retryUrl });
         break;
       }
 
@@ -151,6 +230,13 @@ export async function POST(request: Request) {
           status: "failed",
           context: "payment_intent.payment_failed",
         });
+        const retryUrl = await buildRetryCheckoutUrl(resolved.orderId ?? null);
+        await notifyClient({
+          kind: "failed",
+          orderId: resolved.orderId ?? null,
+          sessionId: resolved.sessionId ?? null,
+          retryUrl,
+        });
         break;
       }
 
@@ -163,6 +249,11 @@ export async function POST(request: Request) {
           sessionId: resolved.sessionId ?? null,
           status: "canceled",
           context: "payment_intent.canceled",
+        });
+        await notifyClient({
+          kind: "canceled",
+          orderId: resolved.orderId ?? null,
+          sessionId: resolved.sessionId ?? null,
         });
         break;
       }
