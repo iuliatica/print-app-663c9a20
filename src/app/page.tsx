@@ -988,6 +988,15 @@ export default function Home() {
           deliveryMethod,
         }),
       }).catch(() => {});
+      // Curățăm localStorage acum că comanda a fost trimisă cu succes
+      try {
+        localStorage.removeItem(LS_KEY_SHIPPING);
+        localStorage.removeItem(LS_KEY_PAYMENT);
+        localStorage.removeItem(LS_KEY_DELIVERY);
+        localStorage.removeItem(LS_KEY_GROUP_OPTS);
+        localStorage.removeItem(LS_KEY_FILE_OPTS);
+      } catch { /* ignore */ }
+
       if (paymentMethod === "ramburs") {
         setOrderSuccessDetails({
           paymentMethod: "ramburs",
@@ -1580,14 +1589,18 @@ export default function Home() {
                                   </button>
                                 </div>
                                 {opts.printMode === "color" && file.colorAnalysis && (
-                                  <div className="mt-2 flex items-center gap-2 rounded-lg bg-cyan-50 border border-cyan-200 px-3 py-2">
-                                    <span className="text-xs font-bold text-cyan-700">
-                                      {file.colorAnalysis.colorPages} pag. color
-                                    </span>
-                                    <span className="text-xs text-slate-400">·</span>
-                                    <span className="text-xs font-bold text-slate-700">
-                                      {file.colorAnalysis.bwPages} pag. alb-negru
-                                    </span>
+                                  <div className="mt-2 rounded-lg bg-cyan-50 border border-cyan-200 px-3 py-2">
+                                    <p className="text-xs text-slate-700 leading-relaxed">
+                                      Au fost identificate:{" "}
+                                      <span className="font-bold text-cyan-700">
+                                        {file.colorAnalysis.colorPages} {file.colorAnalysis.colorPages === 1 ? "pagină" : "pagini"} color
+                                      </span>
+                                      {" "}și{" "}
+                                      <span className="font-bold text-slate-800">
+                                        {file.colorAnalysis.bwPages} {file.colorAnalysis.bwPages === 1 ? "pagină" : "pagini"} alb-negru
+                                      </span>
+                                      {" "}în document. Vei plăti preț de color doar pentru paginile efectiv colorate, restul fiind taxate la preț de alb-negru.
+                                    </p>
                                   </div>
                                 )}
                                 {opts.printMode === "color" && file.colorAnalysis?.hasScannedPages && file.colorAnalysis.colorPages > 0 && (
