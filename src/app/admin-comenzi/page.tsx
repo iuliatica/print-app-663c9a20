@@ -921,7 +921,7 @@ export default function AdminComenziPage() {
                           </div>
                         </td>
                         <td className={`px-4 py-3 font-medium text-slate-800 ${isCanceled ? "line-through" : ""}`}>
-                          {Number(order.total_price).toFixed(2)} lei
+                          {Number(order.total_price).toFixed(2)} RON
                         </td>
                         <td className="px-4 py-3 text-slate-700">
                           <div className="flex flex-col gap-1">
@@ -1087,7 +1087,7 @@ export default function AdminComenziPage() {
                                 </div>
                                 <div>
                                   <span className="text-slate-500">Total</span>
-                                  <p className="font-medium text-slate-800">{Number(order.total_price).toFixed(2)} lei</p>
+                                  <p className="font-medium text-slate-800">{Number(order.total_price).toFixed(2)} RON</p>
                                 </div>
                                 {(() => {
                                   const isDeleted = !!order.files_deleted_at;

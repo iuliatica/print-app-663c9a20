@@ -154,7 +154,7 @@ function buildEmailHtml(data: ConfirmationBody): string {
                 </tr>
                 <tr>
                   <td style="padding:6px 0;font-size:14px;color:#64748b;">Livrare</td>
-                  <td style="padding:6px 0;font-size:14px;color:#1e293b;font-weight:600;text-align:right;">${data.deliveryMethod === "ridicare" ? "Ridicare de la sediu (GRATUIT)" : "Curier (15 lei)"}</td>
+                  <td style="padding:6px 0;font-size:14px;color:#1e293b;font-weight:600;text-align:right;">${data.deliveryMethod === "ridicare" ? "Ridicare de la sediu (GRATUIT)" : "Curier (15 RON)"}</td>
                 </tr>
                 ${data.deliveryMethod !== "ridicare" && data.shippingAddress ? `<tr>
                   <td style="padding:6px 0;font-size:14px;color:#64748b;">Adresă livrare</td>
@@ -165,7 +165,7 @@ function buildEmailHtml(data: ConfirmationBody): string {
                 </tr>
                 <tr>
                   <td style="padding:6px 0;font-size:18px;font-weight:800;color:#1e293b;">Total</td>
-                  <td style="padding:6px 0;font-size:18px;font-weight:800;color:#0ea5a0;text-align:right;">${data.totalPrice.toFixed(2)} lei</td>
+                  <td style="padding:6px 0;font-size:18px;font-weight:800;color:#0ea5a0;text-align:right;">${data.totalPrice.toFixed(2)} RON</td>
                 </tr>
               </table>
             </div>
