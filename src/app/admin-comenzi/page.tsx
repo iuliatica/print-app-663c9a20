@@ -434,6 +434,24 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+/** Badge pentru statusul de plată raportat de Stripe (paid / failed / abandoned / canceled). */
+function PaymentStatusBadge({ status }: { status: string }) {
+  const s = (status ?? "").toLowerCase();
+  const map: Record<string, { label: string; cls: string }> = {
+    paid: { label: "✓ Plătit", cls: "bg-emerald-100 text-emerald-800 border-emerald-200" },
+    failed: { label: "✗ Plată eșuată", cls: "bg-red-100 text-red-800 border-red-200" },
+    abandoned: { label: "⏳ Abandonat", cls: "bg-amber-100 text-amber-800 border-amber-200" },
+    canceled: { label: "⊘ Anulat", cls: "bg-slate-200 text-slate-700 border-slate-300" },
+  };
+  const m = map[s];
+  if (!m) return null;
+  return (
+    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold ${m.cls}`}>
+      {m.label}
+    </span>
+  );
+}
+
 function getAdminHeaders(): HeadersInit {
   const token = typeof window !== "undefined" ? sessionStorage.getItem("admin_token") : null;
   const h: Record<string, string> = { "Content-Type": "application/json" };
@@ -858,12 +876,19 @@ export default function AdminComenziPage() {
                     const normalizedStatus = normalizeStatus(order.status);
                     const isDropdownOpen = statusDropdownId === order.id;
                     const isDetailsOpen = expandedDetailsId === order.id;
+                    const rawStatus = (order.status ?? "").toLowerCase();
+                    const isCanceled = rawStatus === "canceled";
+                    const isFailed = rawStatus === "failed";
+                    const isAbandoned = rawStatus === "abandoned";
                     const isRambursUnconfirmed = order.payment_method === "ramburs" && order.config_details?.ramburs_confirmed !== true;
-                    const isStripePaid = order.payment_method === "stripe" && order.status === "paid";
-                    const isStripeUnpaid = order.payment_method === "stripe" && order.status !== "paid";
+                    const isStripePaid = order.payment_method === "stripe" && rawStatus === "paid";
+                    const isStripeUnpaid =
+                      order.payment_method === "stripe" && !isStripePaid && !isCanceled;
                     const isPaidOrRambursConfirmed = isStripePaid || (order.payment_method === "ramburs" && order.config_details?.ramburs_confirmed === true);
                     const logs = order.change_logs ?? [];
-                    const rowBg = isStripeUnpaid
+                    const rowBg = isCanceled
+                      ? "bg-slate-200 hover:bg-slate-300 opacity-80"
+                      : isStripeUnpaid
                       ? "bg-red-100 hover:bg-red-200"
                       : isPaidOrRambursConfirmed
                       ? "bg-emerald-200 hover:bg-emerald-300"
@@ -891,52 +916,61 @@ export default function AdminComenziPage() {
                           </td>
                         <td className="px-4 py-3">
                           <div className="flex flex-col gap-0.5">
-                            <span className="text-slate-800">{order.customer_email || "—"}</span>
+                            <span className={`text-slate-800 ${isCanceled ? "line-through" : ""}`}>{order.customer_email || "—"}</span>
                             <span className="text-xs text-slate-500">{formatPhoneDisplay(order.phone)}</span>
                           </div>
                         </td>
-                        <td className="px-4 py-3 font-medium text-slate-800">
+                        <td className={`px-4 py-3 font-medium text-slate-800 ${isCanceled ? "line-through" : ""}`}>
                           {Number(order.total_price).toFixed(2)} lei
                         </td>
                         <td className="px-4 py-3 text-slate-700">
-                          {order.payment_method === "stripe"
-                            ? order.status === "paid"
-                              ? "Online (card) ✓"
-                              : <span className="flex items-center gap-2">
-                                  <span className="font-semibold text-red-700">Online — NEPLĂTIT</span>
-                                  <button
-                                    type="button"
-                                    className="text-xs px-2 py-0.5 rounded bg-cyan-600 text-white hover:bg-cyan-700 transition-colors"
-                                    onClick={async (e) => {
-                                      e.stopPropagation();
-                                      const btn = e.currentTarget;
-                                      btn.disabled = true;
-                                      btn.textContent = "Verificare...";
-                                      try {
-                                        const res = await fetch("/api/admin/verify-stripe", {
-                                          method: "POST",
-                                          headers: { "Content-Type": "application/json" },
-                                          body: JSON.stringify({ order_id: order.id }),
-                                        });
-                                        const data = await res.json();
-                                        if (data.status === "paid" || data.already_paid) {
-                                          setOrders((prev) => prev.map((o) => o.id === order.id ? { ...o, status: "paid" } : o));
-                                          btn.textContent = "✓ Plătit!";
-                                        } else {
-                                          btn.textContent = data.error || `Status: ${data.stripe_status}`;
+                          <div className="flex flex-col gap-1">
+                            {order.payment_method === "stripe"
+                              ? isStripePaid
+                                ? <span>Online (card) ✓</span>
+                                : isCanceled
+                                ? <span className="font-semibold text-slate-700">Online — anulat</span>
+                                : isFailed
+                                ? <span className="font-semibold text-red-700">Online — plată eșuată</span>
+                                : isAbandoned
+                                ? <span className="font-semibold text-amber-700">Online — abandonat</span>
+                                : <span className="flex items-center gap-2">
+                                    <span className="font-semibold text-red-700">Online — NEPLĂTIT</span>
+                                    <button
+                                      type="button"
+                                      className="text-xs px-2 py-0.5 rounded bg-cyan-600 text-white hover:bg-cyan-700 transition-colors"
+                                      onClick={async (e) => {
+                                        e.stopPropagation();
+                                        const btn = e.currentTarget;
+                                        btn.disabled = true;
+                                        btn.textContent = "Verificare...";
+                                        try {
+                                          const res = await fetch("/api/admin/verify-stripe", {
+                                            method: "POST",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify({ order_id: order.id }),
+                                          });
+                                          const data = await res.json();
+                                          if (data.status === "paid" || data.already_paid) {
+                                            setOrders((prev) => prev.map((o) => o.id === order.id ? { ...o, status: "paid" } : o));
+                                            btn.textContent = "✓ Plătit!";
+                                          } else {
+                                            btn.textContent = data.error || `Status: ${data.stripe_status}`;
+                                          }
+                                        } catch {
+                                          btn.textContent = "Eroare";
                                         }
-                                      } catch {
-                                        btn.textContent = "Eroare";
-                                      }
-                                      setTimeout(() => { btn.disabled = false; btn.textContent = "Verifică plata"; }, 3000);
-                                    }}
-                                  >
-                                    Verifică plata
-                                  </button>
-                                </span>
-                            : order.payment_method === "ramburs"
-                              ? "Ramburs"
-                              : order.payment_method}
+                                        setTimeout(() => { btn.disabled = false; btn.textContent = "Verifică plata"; }, 3000);
+                                      }}
+                                    >
+                                      Verifică plata
+                                    </button>
+                                  </span>
+                              : order.payment_method === "ramburs"
+                                ? "Ramburs"
+                                : order.payment_method}
+                            <PaymentStatusBadge status={order.status} />
+                          </div>
                         </td>
                         <td className="px-4 py-3 text-slate-600 text-sm">
                           {fileUrls.length > 0
