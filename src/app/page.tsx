@@ -681,13 +681,6 @@ export default function Home() {
     try { localStorage.setItem(LS_KEY_DELIVERY, deliveryMethod); } catch { /* ignore */ }
   }, [deliveryMethod]);
 
-  // Block card payment for pickup with very small orders (< 10 RON)
-  const isStripeBlocked = deliveryMethod === "ridicare" && totalWithShipping > 0 && totalWithShipping < MIN_STRIPE_PICKUP_LEI;
-  useEffect(() => {
-    if (isStripeBlocked && paymentMethod === "stripe") {
-      setPaymentMethod("ramburs");
-    }
-  }, [isStripeBlocked, paymentMethod]);
 
   useEffect(() => {
     try { localStorage.setItem(LS_KEY_GROUP_OPTS, JSON.stringify(groupOptions)); } catch { /* ignore */ }
