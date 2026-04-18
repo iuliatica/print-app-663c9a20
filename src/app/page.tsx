@@ -2173,11 +2173,15 @@ export default function Home() {
               <div>
                 <p className="mb-3 text-sm font-medium text-slate-700">Modalitate plată</p>
                 <div className="space-y-2">
-                  <label className="flex cursor-pointer items-center gap-3 rounded-xl border-2 p-4 transition-colors hover:bg-slate-50">
-                    <input type="radio" name="paymentMethod" checked={paymentMethod === "stripe"} onChange={() => setPaymentMethod("stripe")} className="h-4 w-4 text-cyan-600" />
+                  <label className={`flex items-center gap-3 rounded-xl border-2 p-4 transition-colors ${isStripeBlocked ? "cursor-not-allowed opacity-50 bg-slate-50" : "cursor-pointer hover:bg-slate-50"}`}>
+                    <input type="radio" name="paymentMethod" checked={paymentMethod === "stripe"} disabled={isStripeBlocked} onChange={() => !isStripeBlocked && setPaymentMethod("stripe")} className="h-4 w-4 text-cyan-600" />
                     <div>
                       <span className="font-medium text-slate-800">Plată online (card)</span>
-                      <p className="text-xs text-slate-500">Securizată prin Stripe · {totalWithShipping.toFixed(2)} RON</p>
+                      <p className="text-xs text-slate-500">
+                        {isStripeBlocked
+                          ? `Indisponibil pentru ridicare sub ${MIN_STRIPE_PICKUP_LEI} RON`
+                          : `Securizată prin Stripe · ${totalWithShipping.toFixed(2)} RON`}
+                      </p>
                     </div>
                   </label>
                   <label className="flex cursor-pointer items-center gap-3 rounded-xl border-2 p-4 transition-colors hover:bg-slate-50">
