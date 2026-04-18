@@ -17,6 +17,16 @@ type GroupInfo = {
   files: FileInfo[];
   spiralType?: string;
   spiralColor?: string;
+  coverBackColor?: string;
+};
+
+const COVER_BACK_LABELS: Record<string, string> = {
+  negru: "Negru",
+  alb: "Alb",
+  albastru_inchis: "Albastru închis",
+  galben: "Galben",
+  rosu: "Roșu",
+  verde: "Verde",
 };
 
 type OrderDetails = {
@@ -30,9 +40,10 @@ type OrderDetails = {
   config_details: {
     files?: FileInfo[];
     bindingGroupSizes?: number[];
-    bindingOptions?: { spiralType?: string; spiralColor?: string }[];
+    bindingOptions?: { spiralType?: string; spiralColor?: string; coverBackColor?: string }[];
     spiralType?: string;
     spiralColor?: string;
+    coverBackColor?: string;
     deliveryMethod?: "curier" | "ridicare";
   } | null;
 };
@@ -71,6 +82,7 @@ function getGroups(order: OrderDetails): GroupInfo[] {
       files,
       spiralType: order.config_details?.spiralType,
       spiralColor: order.config_details?.spiralColor,
+      coverBackColor: order.config_details?.coverBackColor,
     }];
   }
 
@@ -81,6 +93,7 @@ function getGroups(order: OrderDetails): GroupInfo[] {
       files: files.slice(idx, idx + size),
       spiralType: options?.[gIdx]?.spiralType ?? "none",
       spiralColor: options?.[gIdx]?.spiralColor,
+      coverBackColor: options?.[gIdx]?.coverBackColor,
     });
     idx += size;
   });
@@ -246,6 +259,9 @@ function SuccessContent() {
                       ? "Capsare"
                       : group.spiralType}
                   </strong>
+                  {group.spiralType === "spirala" && group.coverBackColor && (
+                    <span> · Copertă spate: <strong>{COVER_BACK_LABELS[group.coverBackColor] ?? group.coverBackColor}</strong></span>
+                  )}
                 </div>
               )}
             </div>
