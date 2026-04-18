@@ -1882,7 +1882,9 @@ export default function Home() {
                     <p className="text-sm font-medium text-slate-600">Total comandă</p>
                     <p className="mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">{totalWithShipping.toFixed(2)} RON</p>
                     <p className="mt-1 text-xs text-slate-500">
-                      {effectivePrice.toFixed(2)}  RON printare{shippingCost > 0 ? ` + ${shippingCost}  RON transport` : " · Ridicare de la sediu (gratuit)"} · {totalPages} pagini
+                      {deliveryMethod === "ridicare"
+                        ? `${totalPrice.toFixed(2)} RON printare · ${totalPages} pagini · Ridicare gratuită de la sediu`
+                        : `${effectivePrice.toFixed(2)} RON printare${shippingCost > 0 ? ` + ${shippingCost} RON transport` : ""} · ${totalPages} pagini`}
                     </p>
                     {detectedColorPages > 0 && (
                       <p className="mt-0.5 text-xs text-slate-500">
