@@ -43,6 +43,7 @@ const PRICE_COLOR_DUPLEX = 1.2;
 const SPIRAL_PRICE = 5;
 const SHIPPING_COST_LEI = 15;
 const MIN_ORDER_LEI = 30;
+const MIN_STRIPE_PICKUP_LEI = 10;
 const MAX_CAPSARE_SHEETS = 220;
 const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024;
 const MAX_FILES = 20;
@@ -680,6 +681,7 @@ export default function Home() {
     try { localStorage.setItem(LS_KEY_DELIVERY, deliveryMethod); } catch { /* ignore */ }
   }, [deliveryMethod]);
 
+
   useEffect(() => {
     try { localStorage.setItem(LS_KEY_GROUP_OPTS, JSON.stringify(groupOptions)); } catch { /* ignore */ }
   }, [groupOptions]);
@@ -758,6 +760,14 @@ export default function Home() {
   const effectivePrice = deliveryMethod === "ridicare" ? totalPrice : Math.max(totalPrice, totalPages > 0 ? MIN_ORDER_LEI : 0);
   const shippingCost = deliveryMethod === "ridicare" ? 0 : SHIPPING_COST_LEI;
   const totalWithShipping = effectivePrice + shippingCost;
+
+  // Block card payment for pickup with very small orders (< 10 RON)
+  const isStripeBlocked = deliveryMethod === "ridicare" && totalWithShipping > 0 && totalWithShipping < MIN_STRIPE_PICKUP_LEI;
+  useEffect(() => {
+    if (isStripeBlocked && paymentMethod === "stripe") {
+      setPaymentMethod("ramburs");
+    }
+  }, [isStripeBlocked, paymentMethod]);
 
   // ─── Options data ──────────────────────────────────────────────────────────
   const coverBackColors: { value: CoverBackColor; label: string; circleClass: string }[] = [
@@ -1157,14 +1167,17 @@ export default function Home() {
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs">
             <div className="flex items-center gap-1.5">
               <Truck className="h-3.5 w-3.5 text-emerald-600" />
-              <span className="font-medium text-emerald-800">Livrare în 2-4 zile lucrătoare</span>
+              <span className="font-medium text-emerald-800">Curier 2-4 zile · {SHIPPING_COST_LEI} RON transport</span>
             </div>
             <div className="hidden sm:block h-3.5 w-px bg-emerald-300" />
             <div className="flex items-center gap-1.5">
               <Shield className="h-3.5 w-3.5 text-emerald-600" />
-              <span className="text-emerald-700">Transport {SHIPPING_COST_LEI} RON</span>
+              <span className="font-medium text-emerald-800">Sau ridicare GRATUITĂ de la sediu (Alba-Iulia)</span>
             </div>
           </div>
+          <p className="mt-1 text-center text-[11px] text-emerald-700/80">
+            Comandă minimă <strong>{MIN_ORDER_LEI} RON</strong> pentru livrarea prin curier · fără minim la ridicare
+          </p>
         </div>
 
         {/* ═══ Color Detection Highlight ═══ */}
@@ -2160,11 +2173,15 @@ export default function Home() {
               <div>
                 <p className="mb-3 text-sm font-medium text-slate-700">Modalitate plată</p>
                 <div className="space-y-2">
-                  <label className="flex cursor-pointer items-center gap-3 rounded-xl border-2 p-4 transition-colors hover:bg-slate-50">
-                    <input type="radio" name="paymentMethod" checked={paymentMethod === "stripe"} onChange={() => setPaymentMethod("stripe")} className="h-4 w-4 text-cyan-600" />
+                  <label className={`flex items-center gap-3 rounded-xl border-2 p-4 transition-colors ${isStripeBlocked ? "cursor-not-allowed opacity-50 bg-slate-50" : "cursor-pointer hover:bg-slate-50"}`}>
+                    <input type="radio" name="paymentMethod" checked={paymentMethod === "stripe"} disabled={isStripeBlocked} onChange={() => !isStripeBlocked && setPaymentMethod("stripe")} className="h-4 w-4 text-cyan-600" />
                     <div>
                       <span className="font-medium text-slate-800">Plată online (card)</span>
-                      <p className="text-xs text-slate-500">Securizată prin Stripe · {totalWithShipping.toFixed(2)} RON</p>
+                      <p className="text-xs text-slate-500">
+                        {isStripeBlocked
+                          ? `Indisponibil pentru ridicare sub ${MIN_STRIPE_PICKUP_LEI} RON`
+                          : `Securizată prin Stripe · ${totalWithShipping.toFixed(2)} RON`}
+                      </p>
                     </div>
                   </label>
                   <label className="flex cursor-pointer items-center gap-3 rounded-xl border-2 p-4 transition-colors hover:bg-slate-50">

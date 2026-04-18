@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Mail, Phone, ArrowLeft } from "lucide-react";
+import { Mail, Phone, ArrowLeft, MapPin } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Contact | Printica",
@@ -56,11 +56,28 @@ export default function ContactPage() {
         </a>
       </div>
 
-      <div className="mt-12 rounded-2xl border border-slate-200 bg-slate-50 p-6">
+      {/* Adresa sediu */}
+      <div className="mt-10 flex items-start gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-cyan-50 text-cyan-600">
+          <MapPin className="h-6 w-6" />
+        </div>
+        <div>
+          <p className="text-sm font-medium text-slate-500">Adresă sediu (ridicare gratuită)</p>
+          <p className="mt-1 text-lg font-semibold text-slate-900">
+            Alba-Iulia, localitatea Barabanț, strada Mureșului, nr. 39
+          </p>
+          <p className="mt-1 text-xs text-slate-500">
+            Poți ridica comenzile gratuit de la sediul nostru, după confirmare.
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-6">
         <h2 className="text-lg font-semibold text-slate-800">Despre livrare</h2>
         <p className="mt-2 text-sm text-slate-600 leading-relaxed">
           Comenzile sunt procesate și expediate prin curier în toată România. 
           Timpul estimat de livrare este de 2-4 zile lucrătoare de la confirmarea plății.
+          Alternativ, poți alege ridicarea gratuită de la sediul nostru.
         </p>
       </div>
     </main>
