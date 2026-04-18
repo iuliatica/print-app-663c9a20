@@ -40,8 +40,9 @@ export async function POST(request: Request) {
 
     const { supabaseUrl, anonKey } = getSupabaseConfig();
     if (!supabaseUrl || !anonKey) {
+      console.error("Missing Supabase env vars on server", { hasUrl: !!supabaseUrl, hasAnon: !!anonKey });
       return NextResponse.json(
-        { error: "Configurarea Supabase lipsește pe server." },
+        { error: "Configurarea Supabase lipsește pe server (NEXT_PUBLIC_SUPABASE_URL sau NEXT_PUBLIC_SUPABASE_ANON_KEY)." },
         { status: 500 }
       );
     }
