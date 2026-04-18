@@ -53,11 +53,12 @@ export async function POST(request: Request) {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
+      console.error("Supabase signIn error:", error.message, error.status);
       const msg = error.message.toLowerCase();
       const friendly =
         msg.includes("invalid") && msg.includes("credentials")
           ? "Email sau parolă greșită. Verifică datele introduse și încearcă din nou."
-          : "Nu am putut face autentificarea acum. Încearcă din nou.";
+          : `Eroare Supabase: ${error.message}`;
       return NextResponse.json({ error: friendly }, { status: 401 });
     }
 
