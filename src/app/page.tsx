@@ -761,6 +761,14 @@ export default function Home() {
   const shippingCost = deliveryMethod === "ridicare" ? 0 : SHIPPING_COST_LEI;
   const totalWithShipping = effectivePrice + shippingCost;
 
+  // Block card payment for pickup with very small orders (< 10 RON)
+  const isStripeBlocked = deliveryMethod === "ridicare" && totalWithShipping > 0 && totalWithShipping < MIN_STRIPE_PICKUP_LEI;
+  useEffect(() => {
+    if (isStripeBlocked && paymentMethod === "stripe") {
+      setPaymentMethod("ramburs");
+    }
+  }, [isStripeBlocked, paymentMethod]);
+
   // ─── Options data ──────────────────────────────────────────────────────────
   const coverBackColors: { value: CoverBackColor; label: string; circleClass: string }[] = [
     { value: "negru", label: "Negru", circleClass: "bg-slate-800" },
