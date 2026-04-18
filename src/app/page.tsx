@@ -2288,7 +2288,7 @@ export default function Home() {
                   {group.spiralType && group.spiralType !== "none" && (
                     <div className="rounded-lg bg-cyan-50 px-4 py-2.5 text-sm text-cyan-800">
                       🔗 Legare: <strong className="capitalize">{group.spiralType}</strong>
-                      {group.spiralColor ? ` (${group.spiralColor})` : ""}
+                      {group.spiralType === "spirala" && group.spiralColor ? ` (${group.spiralColor})` : ""}
                     </div>
                   )}
                 </div>
