@@ -40,9 +40,10 @@ type OrderDetails = {
   config_details: {
     files?: FileInfo[];
     bindingGroupSizes?: number[];
-    bindingOptions?: { spiralType?: string; spiralColor?: string }[];
+    bindingOptions?: { spiralType?: string; spiralColor?: string; coverBackColor?: string }[];
     spiralType?: string;
     spiralColor?: string;
+    coverBackColor?: string;
     deliveryMethod?: "curier" | "ridicare";
   } | null;
 };
