@@ -40,8 +40,9 @@ export async function POST(request: Request) {
 
     const { supabaseUrl, anonKey } = getSupabaseConfig();
     if (!supabaseUrl || !anonKey) {
+      console.error("Missing Supabase env vars on server", { hasUrl: !!supabaseUrl, hasAnon: !!anonKey });
       return NextResponse.json(
-        { error: "Configurarea Supabase lipsește pe server." },
+        { error: "Configurarea Supabase lipsește pe server (NEXT_PUBLIC_SUPABASE_URL sau NEXT_PUBLIC_SUPABASE_ANON_KEY)." },
         { status: 500 }
       );
     }
@@ -53,11 +54,12 @@ export async function POST(request: Request) {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
+      console.error("Supabase signIn error:", error.message, error.status);
       const msg = error.message.toLowerCase();
       const friendly =
         msg.includes("invalid") && msg.includes("credentials")
           ? "Email sau parolă greșită. Verifică datele introduse și încearcă din nou."
-          : "Nu am putut face autentificarea acum. Încearcă din nou.";
+          : `Eroare Supabase: ${error.message}`;
       return NextResponse.json({ error: friendly }, { status: 401 });
     }
 
