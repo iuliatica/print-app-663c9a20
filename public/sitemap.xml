@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://printica.lovable.app/</loc>
-    <lastmod>2026-04-15</lastmod>
+    <loc>https://www.printica.ro/</loc>
+    <lastmod>2026-04-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://printica.lovable.app/contact</loc>
-    <lastmod>2026-04-15</lastmod>
+    <loc>https://www.printica.ro/contact</loc>
+    <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://printica.lovable.app/legal/termeni-si-conditii</loc>
-    <lastmod>2026-04-15</lastmod>
+    <loc>https://www.printica.ro/legal/termeni-si-conditii</loc>
+    <lastmod>2026-04-18</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://printica.lovable.app/legal/politica-confidentialitate</loc>
-    <lastmod>2026-04-15</lastmod>
+    <loc>https://www.printica.ro/legal/politica-confidentialitate</loc>
+    <lastmod>2026-04-18</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://printica.lovable.app/legal/politica-cookies</loc>
-    <lastmod>2026-04-15</lastmod>
+    <loc>https://www.printica.ro/legal/politica-cookies</loc>
+    <lastmod>2026-04-18</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>

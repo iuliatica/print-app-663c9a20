@@ -6,4 +6,4 @@ Disallow: /auth/
 Disallow: /success
 Disallow: /login
 
-Sitemap: https://printica.lovable.app/sitemap.xml
+Sitemap: https://www.printica.ro/sitemap.xml
