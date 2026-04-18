@@ -82,6 +82,7 @@ function getGroups(order: OrderDetails): GroupInfo[] {
       files,
       spiralType: order.config_details?.spiralType,
       spiralColor: order.config_details?.spiralColor,
+      coverBackColor: order.config_details?.coverBackColor,
     }];
   }
 
@@ -92,6 +93,7 @@ function getGroups(order: OrderDetails): GroupInfo[] {
       files: files.slice(idx, idx + size),
       spiralType: options?.[gIdx]?.spiralType ?? "none",
       spiralColor: options?.[gIdx]?.spiralColor,
+      coverBackColor: options?.[gIdx]?.coverBackColor,
     });
     idx += size;
   });
