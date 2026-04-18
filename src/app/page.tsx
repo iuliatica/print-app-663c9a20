@@ -1865,22 +1865,15 @@ export default function Home() {
                 {totalPages > 0 ? (
                   <>
                     <p className="text-sm font-medium text-slate-600">Total comandă</p>
-                    <p className="mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">{totalWithShipping.toFixed(2)} RON</p>
+                    <p className="mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">{totalPrice.toFixed(2)} RON</p>
                     <p className="mt-1 text-xs text-slate-500">
-                      {deliveryMethod === "ridicare"
-                        ? `${totalPrice.toFixed(2)} RON printare · ${totalPages} pagini · Ridicare gratuită de la sediu`
-                        : `${effectivePrice.toFixed(2)} RON printare${shippingCost > 0 ? ` + ${shippingCost} RON transport` : ""} · ${totalPages} pagini`}
+                      {totalPages} pagini · transportul se calculează la finalizare
                     </p>
                     {detectedColorPages > 0 && (
                       <p className="mt-0.5 text-xs text-slate-500">
                         Detectat: <span className="font-semibold text-cyan-600">{detectedColorPages} pag. color</span>
                         {" · "}
                         <span className="font-semibold">{detectedBwPages} pag. alb-negru</span>
-                      </p>
-                    )}
-                    {deliveryMethod !== "ridicare" && totalPrice > 0 && totalPrice < MIN_ORDER_LEI && (
-                      <p className="mt-1 text-xs font-semibold text-amber-600">
-                        ⚠ Costul real: {totalPrice.toFixed(2)} RON. Comanda minimă este de {MIN_ORDER_LEI} RON, prețul a fost ajustat automat{shippingCost > 0 ? ` (+ ${shippingCost}  RON transport)` : ""}.
                       </p>
                     )}
                   </>
