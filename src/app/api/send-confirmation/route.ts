@@ -86,7 +86,7 @@ function buildEmailHtml(data: ConfirmationBody): string {
     const coverRow = group.coverBackColor && group.spiralType === "spirala"
       ? `<tr>
           <td style="padding:4px 0;font-size:13px;color:#64748b;">Copertă spate</td>
-          <td style="padding:4px 0;font-size:13px;color:#1e293b;font-weight:600;text-align:right;">${group.coverBackColor}</td>
+          <td style="padding:4px 0;font-size:13px;color:#1e293b;font-weight:600;text-align:right;">${getCoverBackLabel(group.coverBackColor)}</td>
         </tr>`
       : "";
 
