@@ -1843,23 +1843,8 @@ export default function Home() {
                           +{spiralPrice.toFixed(2)}  RON spiralare
                         </span>
                       )}
-                      {deliveryMethod !== "ridicare" && totalPrice < MIN_ORDER_LEI && totalPrice > 0 && (
-                        <span className="inline-flex items-center gap-1.5 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 border border-amber-200 rounded">
-                          Minim {MIN_ORDER_LEI}  RON (valoare printare: {totalPrice.toFixed(2)} RON)
-                        </span>
-                      )}
-                      <span className="inline-flex items-center gap-1.5 bg-amber-100 px-3 py-2 text-base font-bold text-amber-800">
-                        {deliveryMethod === "ridicare" ? "Ridicare gratuită" : `+${SHIPPING_COST_LEI}  RON transport`}
-                      </span>
                       <span className="inline-flex items-center gap-1.5 bg-slate-800 px-3 py-2 text-base font-bold text-white">
-                        = {totalWithShipping.toFixed(2)}  RON total
-                      </span>
-                    </div>
-                  )}
-                  {totalPages === 0 && (
-                    <div className="mt-3">
-                      <span className="inline-flex items-center gap-1.5 bg-amber-100 px-3 py-2 text-sm font-bold text-amber-800">
-                        Transport: {SHIPPING_COST_LEI} RON
+                        = {totalPrice.toFixed(2)}  RON total
                       </span>
                     </div>
                   )}
@@ -1880,22 +1865,15 @@ export default function Home() {
                 {totalPages > 0 ? (
                   <>
                     <p className="text-sm font-medium text-slate-600">Total comandă</p>
-                    <p className="mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">{totalWithShipping.toFixed(2)} RON</p>
+                    <p className="mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">{totalPrice.toFixed(2)} RON</p>
                     <p className="mt-1 text-xs text-slate-500">
-                      {deliveryMethod === "ridicare"
-                        ? `${totalPrice.toFixed(2)} RON printare · ${totalPages} pagini · Ridicare gratuită de la sediu`
-                        : `${effectivePrice.toFixed(2)} RON printare${shippingCost > 0 ? ` + ${shippingCost} RON transport` : ""} · ${totalPages} pagini`}
+                      {totalPages} pagini · transportul se calculează la finalizare
                     </p>
                     {detectedColorPages > 0 && (
                       <p className="mt-0.5 text-xs text-slate-500">
                         Detectat: <span className="font-semibold text-cyan-600">{detectedColorPages} pag. color</span>
                         {" · "}
                         <span className="font-semibold">{detectedBwPages} pag. alb-negru</span>
-                      </p>
-                    )}
-                    {deliveryMethod !== "ridicare" && totalPrice > 0 && totalPrice < MIN_ORDER_LEI && (
-                      <p className="mt-1 text-xs font-semibold text-amber-600">
-                        ⚠ Costul real: {totalPrice.toFixed(2)} RON. Comanda minimă este de {MIN_ORDER_LEI} RON, prețul a fost ajustat automat{shippingCost > 0 ? ` (+ ${shippingCost}  RON transport)` : ""}.
                       </p>
                     )}
                   </>
@@ -1974,8 +1952,8 @@ export default function Home() {
         <div className="fixed bottom-0 inset-x-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur-sm px-4 py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] lg:hidden">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-lg font-bold text-cyan-600 tabular-nums">{totalWithShipping.toFixed(2)} RON</p>
-              <p className="text-xs text-slate-500 truncate">{totalPages} pag.{shippingCost > 0 ? ` · incl. ${shippingCost}  RON transport` : " · Ridicare gratuită"}</p>
+              <p className="text-lg font-bold text-cyan-600 tabular-nums">{totalPrice.toFixed(2)} RON</p>
+              <p className="text-xs text-slate-500 truncate">{totalPages} pag. · transport calculat la finalizare</p>
             </div>
             <button
               type="button"
