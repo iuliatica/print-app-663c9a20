@@ -259,6 +259,9 @@ function SuccessContent() {
                       ? "Capsare"
                       : group.spiralType}
                   </strong>
+                  {group.spiralType === "spirala" && group.coverBackColor && (
+                    <span> · Copertă spate: <strong>{COVER_BACK_LABELS[group.coverBackColor] ?? group.coverBackColor}</strong></span>
+                  )}
                 </div>
               )}
             </div>
