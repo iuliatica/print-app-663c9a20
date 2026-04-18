@@ -43,6 +43,7 @@ const PRICE_COLOR_DUPLEX = 1.2;
 const SPIRAL_PRICE = 5;
 const SHIPPING_COST_LEI = 15;
 const MIN_ORDER_LEI = 30;
+const MIN_STRIPE_PICKUP_LEI = 10;
 const MAX_CAPSARE_SHEETS = 220;
 const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024;
 const MAX_FILES = 20;
@@ -679,6 +680,14 @@ export default function Home() {
   useEffect(() => {
     try { localStorage.setItem(LS_KEY_DELIVERY, deliveryMethod); } catch { /* ignore */ }
   }, [deliveryMethod]);
+
+  // Block card payment for pickup with very small orders (< 10 RON)
+  const isStripeBlocked = deliveryMethod === "ridicare" && totalWithShipping > 0 && totalWithShipping < MIN_STRIPE_PICKUP_LEI;
+  useEffect(() => {
+    if (isStripeBlocked && paymentMethod === "stripe") {
+      setPaymentMethod("ramburs");
+    }
+  }, [isStripeBlocked, paymentMethod]);
 
   useEffect(() => {
     try { localStorage.setItem(LS_KEY_GROUP_OPTS, JSON.stringify(groupOptions)); } catch { /* ignore */ }
