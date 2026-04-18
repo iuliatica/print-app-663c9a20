@@ -1157,14 +1157,17 @@ export default function Home() {
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs">
             <div className="flex items-center gap-1.5">
               <Truck className="h-3.5 w-3.5 text-emerald-600" />
-              <span className="font-medium text-emerald-800">Livrare în 2-4 zile lucrătoare</span>
+              <span className="font-medium text-emerald-800">Curier 2-4 zile · {SHIPPING_COST_LEI} RON transport</span>
             </div>
             <div className="hidden sm:block h-3.5 w-px bg-emerald-300" />
             <div className="flex items-center gap-1.5">
               <Shield className="h-3.5 w-3.5 text-emerald-600" />
-              <span className="text-emerald-700">Transport {SHIPPING_COST_LEI} RON</span>
+              <span className="font-medium text-emerald-800">Sau ridicare GRATUITĂ de la sediu (Alba-Iulia)</span>
             </div>
           </div>
+          <p className="mt-1 text-center text-[11px] text-emerald-700/80">
+            Comandă minimă <strong>{MIN_ORDER_LEI} RON</strong> pentru livrarea prin curier · fără minim la ridicare
+          </p>
         </div>
 
         {/* ═══ Color Detection Highlight ═══ */}
