@@ -1952,8 +1952,8 @@ export default function Home() {
         <div className="fixed bottom-0 inset-x-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur-sm px-4 py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] lg:hidden">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-lg font-bold text-cyan-600 tabular-nums">{totalWithShipping.toFixed(2)} RON</p>
-              <p className="text-xs text-slate-500 truncate">{totalPages} pag.{shippingCost > 0 ? ` · incl. ${shippingCost}  RON transport` : " · Ridicare gratuită"}</p>
+              <p className="text-lg font-bold text-cyan-600 tabular-nums">{totalPrice.toFixed(2)} RON</p>
+              <p className="text-xs text-slate-500 truncate">{totalPages} pag. · transport calculat la finalizare</p>
             </div>
             <button
               type="button"
