@@ -1843,23 +1843,8 @@ export default function Home() {
                           +{spiralPrice.toFixed(2)}  RON spiralare
                         </span>
                       )}
-                      {deliveryMethod !== "ridicare" && totalPrice < MIN_ORDER_LEI && totalPrice > 0 && (
-                        <span className="inline-flex items-center gap-1.5 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 border border-amber-200 rounded">
-                          Minim {MIN_ORDER_LEI}  RON (valoare printare: {totalPrice.toFixed(2)} RON)
-                        </span>
-                      )}
-                      <span className="inline-flex items-center gap-1.5 bg-amber-100 px-3 py-2 text-base font-bold text-amber-800">
-                        {deliveryMethod === "ridicare" ? "Ridicare gratuită" : `+${SHIPPING_COST_LEI}  RON transport`}
-                      </span>
                       <span className="inline-flex items-center gap-1.5 bg-slate-800 px-3 py-2 text-base font-bold text-white">
-                        = {totalWithShipping.toFixed(2)}  RON total
-                      </span>
-                    </div>
-                  )}
-                  {totalPages === 0 && (
-                    <div className="mt-3">
-                      <span className="inline-flex items-center gap-1.5 bg-amber-100 px-3 py-2 text-sm font-bold text-amber-800">
-                        Transport: {SHIPPING_COST_LEI} RON
+                        = {totalPrice.toFixed(2)}  RON total
                       </span>
                     </div>
                   )}
