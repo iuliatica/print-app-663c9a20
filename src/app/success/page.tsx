@@ -17,6 +17,16 @@ type GroupInfo = {
   files: FileInfo[];
   spiralType?: string;
   spiralColor?: string;
+  coverBackColor?: string;
+};
+
+const COVER_BACK_LABELS: Record<string, string> = {
+  negru: "Negru",
+  alb: "Alb",
+  albastru_inchis: "Albastru închis",
+  galben: "Galben",
+  rosu: "Roșu",
+  verde: "Verde",
 };
 
 type OrderDetails = {
