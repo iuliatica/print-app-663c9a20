@@ -34,6 +34,20 @@ type ConfirmationBody = {
 
 const PICKUP_ADDRESS = "Alba Iulia, localitatea Barabant, strada Mureșului";
 
+const COVER_BACK_LABELS: Record<string, string> = {
+  negru: "Negru",
+  alb: "Alb",
+  albastru_inchis: "Albastru închis",
+  galben: "Galben",
+  rosu: "Roșu",
+  verde: "Verde",
+};
+
+function getCoverBackLabel(value?: string): string {
+  if (!value) return "";
+  return COVER_BACK_LABELS[value] ?? value;
+}
+
 function getSpiralLabel(spiralType?: string, spiralColor?: string): string {
   if (spiralType === "spirala") return `Spirală ${spiralColor ?? "neagră"}`;
   if (spiralType === "perforare2") return "Perforare cu 2 găuri";
